@@ -1,0 +1,19 @@
+{
+  "name": "tcrhub",
+  "version": "1.0.0",
+  "description": "Group 26 TCR Hub project",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ACRW/SEProject.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ACRW/SEProject/issues"
+  },
+  "homepage": "https://github.com/ACRW/SEProject#readme"
+}
