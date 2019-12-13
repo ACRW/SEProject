@@ -13,7 +13,7 @@ app.use(bodyParser.urlencoded({extended: false}));
 
 app.get('/', function(req, resp) {
     let connection = mysql.createConnection({
-        host: 'tcrhub.cluster-cvjxib5qdvbb.eu-west-2.rds.amazonaws.com',
+        host: 'tcrhub-instance-1.cvjxib5qdvbb.eu-west-2.rds.amazonaws.com',
         user: 'admin',
         password: '7l2A9FnmDbOUMKFY80dH',
         port: '3306'
