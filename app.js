@@ -16,6 +16,7 @@ app.get('/', function(req, resp) {
         host: 'tcrhub.cluster-cvjxib5qdvbb.eu-west-2.rds.amazonaws.com',
         user: 'admin',
         password: '7l2A9FnmDbOUMKFY80dH',
+        port: '3306'
     });
 
     connection.connect(function(err) {
