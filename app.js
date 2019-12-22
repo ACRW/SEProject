@@ -13,9 +13,9 @@ app.use(bodyParser.urlencoded({extended: false}));
 
 app.get('/', function(req, resp) {
     let connection = mysql.createConnection({
-        host: 'tcrhub-instance-1.cvjxib5qdvbb.eu-west-2.rds.amazonaws.com',
+        host: 'database-1.cvjxib5qdvbb.eu-west-2.rds.amazonaws.com',
         user: 'admin',
-        password: '7l2A9FnmDbOUMKFY80dH',
+        password: 'zaRhur-fawbi3-ryxkax',
         port: '3306'
     });
 
