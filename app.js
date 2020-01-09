@@ -33,9 +33,9 @@ app.post('/tokensignin', async function(req, resp) {
     const payload = await login(token);
 
     if (!payload) {
-        //error
+        resp.status(403).send('failed to verify token integrity');
     } else {
-        //
+        resp.status(200).send('successfully verified token integrity');
     }
 });
 
