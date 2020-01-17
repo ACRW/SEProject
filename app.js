@@ -53,6 +53,21 @@ async function performQuery(query) {
     }
 }
 
+// process result of query
+function processQueryResult(result, response) {
+    // if database error
+    if (result == '0database') {
+        // send response
+        response.status(400).send('0database');
+
+        // return false
+        return false;
+    }
+
+    // else return true
+    return true;
+}
+
 // get rooms
 app.get('/rooms', async function(req, resp) {
     // room types
@@ -75,12 +90,9 @@ app.get('/rooms', async function(req, resp) {
                 const community = await performQuery('SELECT * FROM communityRooms');
 
                 // providing no error occurred
-                if (community != '0database') {
+                if (processQueryResult(community, resp)) {
                     // add rooms to dictionary
                     rooms['community'] = community;
-                } else {
-                    // database error
-                    resp.status(400).send('0database');
                 }
             }
 
@@ -90,18 +102,15 @@ app.get('/rooms', async function(req, resp) {
                 const hostel = await performQuery('SELECT * FROM hostelRooms');
 
                 // providing no error occurred
-                if (hostel != '0database') {
+                if (processQueryResult(hostel, resp)) {
                     // add rooms to dictionary
                     rooms['hostel'] = hostel;
-                } else {
-                    // database error
-                    resp.status(400).send('0database');
                 }
             }
 
             // return rooms
             resp.status(200).send(JSON.stringify(rooms));
-            
+
         } else {
             // types error
             resp.status(400).send('0types');
@@ -110,6 +119,103 @@ app.get('/rooms', async function(req, resp) {
     } else {
         // types error
         resp.status(400).send('0types');
+    }
+});
+
+// get room availability
+app.get('/roomavailability', async function(req, resp) {
+    // room type
+    const type = req.query.type;
+    // room ID
+    const id = req.query.id;
+
+    // if ID specified
+    if (id) {
+        // check room type
+        switch (type) {
+            // if community room
+            case 'community':
+                // get room details
+                const communityRoom = await performQuery('SELECT days, start, end, maxLength FROM communityRooms WHERE id = ' + id);
+
+                // if no database error
+                if (processQueryResult(communityRoom, resp)) {
+                    // if room exists
+                    if (communityRoom.length == 1) {
+                        // room details
+                        response = communityRoom[0]
+                        // room ID
+                        response['id'] = id;
+
+                        // room availability
+                        const availability = await performQuery('SELECT start, end FROM communityBookings WHERE id = ' + id);
+
+                        // if no database error
+                        if (processQueryResult(availability, resp)) {
+                            // times at which room is busy
+                            // might need to put bounds on times
+                            response['busy'] = availability;
+
+                            // send response
+                            resp.status(200).send(JSON.stringify(response));
+                        }
+
+
+                    // room does not exist
+                    } else {
+                        // ID error
+                        resp.status(400).send('0id');
+                    }
+                }
+
+                break;
+
+            // if hostel room
+            case 'hostel':
+                // get room details
+                const hostelRoom = await performQuery('SELECT nights FROM hostelRooms WHERE id = ' + id);
+
+                // if no database error
+                if (processQueryResult(hostelRoom, resp)) {
+                    // if room exists
+                    if (hostelRoom.length == 1) {
+                        // room details
+                        response = hostelRoom[0]
+                        // room ID
+                        response['id'] = id;
+
+                        // room availability
+                        const availability = await performQuery('SELECT startDate, endDate FROM hostelBookings WHERE id = ' + id);
+
+                        // if no database error
+                        if (processQueryResult(availability, resp)) {
+                            // times at which room is busy
+                            // might need to put bounds on times
+                            response['busy'] = availability;
+
+                            // send response
+                            resp.status(200).send(JSON.stringify(response));
+                        }
+
+
+                    // room does not exist
+                    } else {
+                        // ID error
+                        resp.status(400).send('0id');
+                    }
+                }
+
+                break;
+
+            // if room type invalid
+            default:
+                //type error
+                resp.status(400).send('0type');
+        }
+
+    } else {
+        // ID error
+        resp.status(400).send('0id');
     }
 });
 
