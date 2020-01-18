@@ -219,6 +219,67 @@ app.get('/roomavailability', async function(req, resp) {
     }
 });
 
+// add parameter to search clause
+function addToSearchClause(parameter, field, whereClause) {
+    // if parameter defined
+    if (parameter) {
+        // if necessary
+        if (whereClause.length > 0) {
+            // add 'AND' to clause
+            whereClause += ' AND ';
+        }
+
+        // add parameter
+        whereClause += field + ' LIKE "%' + parameter + '%"';
+    }
+
+    // return search clause
+    return whereClause;
+}
+
+// customer search
+app.get('/customersearch', async function(req, resp) {
+    // need authentication here
+
+    // search parameters
+    const fname = req.query.fname;
+    const sname = req.query.sname;
+    const email = req.query.email;
+    const phone = req.query.phone;
+
+    // where clause
+    let where = '';
+
+    // build search clause
+    where = addToSearchClause(fname, 'fName', where);
+    where = addToSearchClause(sname, 'lName', where);
+    where = addToSearchClause(email, 'email', where);
+    where = addToSearchClause(phone, 'phone', where);
+
+    // if no parameters specified
+    if (where.length == 0) {
+        // parameter error
+        resp.status(400).send('0parameters');
+
+    } else {
+        // get matching customers
+        const customers = await performQuery('SELECT * FROM users WHERE ' + where + ' ORDER BY lName, fName');
+
+        // if no database error
+        if (processQueryResult(customers, resp)) {
+            // if matching customers found
+            if (customers.length > 0) {
+                // send list of customers
+                resp.status(200).send(JSON.stringify(customers));
+
+            } else {
+                // no matches
+                resp.status(200).send('0matches');
+            }
+        }
+    }
+});
+
 app.post('/tokensignin', async function(req, resp) {
     const token = req.body.token;
     const payload = await login(token);
