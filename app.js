@@ -12,6 +12,8 @@ app.use(express.static('client'));
 var bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({extended: false}));
 
+// helper functions
+
 // configure the database
 function makeDatabase() {
     // connection details
@@ -67,6 +69,8 @@ function processQueryResult(result, response) {
     // else return true
     return true;
 }
+
+// rooms
 
 // get rooms
 app.get('/rooms', async function(req, resp) {
@@ -160,7 +164,6 @@ app.get('/roomavailability', async function(req, resp) {
                             resp.status(200).send(JSON.stringify(response));
                         }
 
-
                     // room does not exist
                     } else {
                         // ID error
@@ -197,7 +200,6 @@ app.get('/roomavailability', async function(req, resp) {
                             resp.status(200).send(JSON.stringify(response));
                         }
 
-
                     // room does not exist
                     } else {
                         // ID error
@@ -218,6 +220,8 @@ app.get('/roomavailability', async function(req, resp) {
         resp.status(400).send('0id');
     }
 });
+
+// customers
 
 // add parameter to search clause
 function addToSearchClause(parameter, field, whereClause) {
@@ -240,6 +244,7 @@ function addToSearchClause(parameter, field, whereClause) {
 // customer search
 app.get('/customersearch', async function(req, resp) {
     // need authentication here
+    // look into session variables
 
     // search parameters
     const fname = req.query.fname;
@@ -277,6 +282,77 @@ app.get('/customersearch', async function(req, resp) {
                 resp.status(200).send('0matches');
             }
         }
+    }
+});
+
+// bookings
+
+// get customer bookings
+async function bookings(customerID, resp) {
+    // dictionary of bookings where key is booking type
+    let bookings = {};
+
+    // need to add activity bookings
+
+    // community room bookings
+    const community = await performQuery('SELECT b.id AS bookingID, b.start, b.end, b.priceOfBooking, b.paid, r.id AS roomID, r.name, r.description FROM communityBookings b INNER JOIN communityRooms r ON b.roomId = r.id WHERE b.userId = ' + customerID + ' ORDER BY b.start');
+    // hostel room bookings
+    const hostel = await performQuery('SELECT b.id AS bookingID, b.startDate, b.endDate, r.id AS roomID, r.noOfPeople, r.pricePerNight FROM hostelBookings b INNER JOIN hostelRooms r ON b.roomId = r.id WHERE b.userId = ' + customerID + ' ORDER BY b.startDate');
+
+    // if no database errors
+    if (processQueryResult(community, resp) && processQueryResult(hostel, resp)) {
+        // if community room bookings exist
+        if (community.length > 0) {
+            // add to dictionary
+            bookings['community'] = community;
+        }
+
+        // if hostel room bookings exist
+        if (hostel.length > 0) {
+            // add to dictionary
+            bookings['hostel'] = hostel;
+        }
+
+        // if customer has made no bookings
+        if (Object.entries(bookings).length === 0) {
+            // bookings error
+            return '0bookings';
+        }
+
+        // return bookings
+        return JSON.stringify(bookings);
+    }
+}
+
+// get bookings for specified customer
+app.get('/customerbookings', async function(req, resp) {
+    // customer ID
+    const customerID = req.query.id;
+
+    // if ID specified
+    if (customerID) {
+        // check customer in database
+        const customer = await performQuery('SELECT * FROM users WHERE id = ' + customerID);
+
+        // if no database error
+        if (processQueryResult(customer, resp)) {
+            // if customer in database
+            if (customer.length == 1) {
+                // get dictionary of bookings
+                const bookingsToReturn = await bookings(customerID, resp);
+                // send bookings
+                resp.status(200).send(bookingsToReturn);
+
+            // customer not in database
+            } else {
+                // ID error
+                resp.status(400).send('0customerID');
+            }
+        }
+
+    } else {
+        // ID error
+        resp.status(400).send('0customerID');
     }
 });
 
