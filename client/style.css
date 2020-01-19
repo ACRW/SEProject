@@ -1,0 +1,20 @@
+      .newTable>tbody>tr>td, .mytable>tbody>tr>th, .mytable>tfoot>tr>td, .mytable>tfoot>tr>th, .mytable>thead>tr>td, .mytable>thead>tr>th {
+        padding: 30px;
+    }
+    
+    .newColor {
+        background-color: #C2D6B6;
+        color: black;
+        border-style: none;
+        font-size: 115%;
+    }
+    
+    .newColor:hover {
+        background-color: #A5B686;
+    }
+    
+    .newDropdown {
+        background-color: #C2D6B6; 
+        font-size: 115%;
+        color: black;
+    }

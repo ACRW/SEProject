@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>TCR Hub Booking Design</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  <script>
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const dayNames = ["Mon", "Tues", "Wed", "Thur", "Fri", "Sat", "Sun"];
+    function Calender () {
+        let targetMon = new Date(); // Date of the monday of the week being looked at
+        if (targetMon.getDay() != 1) {
+            targetMon.setDate(targetMon.getDate() - ((targetMon.getDay() - 1) % 7));
+        }
+        
+        let displayDates = function() {
+            let tempDate = new Date(targetMon);
+            tempDate.setDate(tempDate.getDate() + 6);
+            document.getElementById("tableDate").innerHTML = monthNames[targetMon.getMonth()] + " " + targetMon.getDate() + " - " + monthNames[tempDate.getMonth()] + " " + tempDate.getDate();
+            headers = document.getElementById("calTable").rows[0];
+            for (i = 0; i < 7; i++) {
+                newDate = new Date(targetMon);
+                newDate.setDate(newDate.getDate() + i);
+                headers.cells[i + 1].innerHTML = dayNames[i] + " " + newDate.getDate();
+            }
+        }
+        
+        displayDates();
+        
+        this.nextWeek = function() {
+            targetMon.setDate(targetMon.getDate() + 7);
+            displayDates();
+        }
+        
+        this.prevWeek = function() {
+            targetMon.setDate(targetMon.getDate() - 7);
+            displayDates();
+        }
+    }
+  </script>
+</head>
+<body>
+<div class="container" style="font-size: 100%">
+    <h1> Room Booking </h1>
+    <p class="mt-2 "> Book a room by first selecting which room you would like to book, then choosing the date, time and duration. </p>
+
+    <select class="browser-default custom-select newDropdown" >
+        <option selected>Select Room... </option> # Will fetch these from a database
+        <!--<option value="1">Music Room 1 (max 6 persons) £12/hour</option>-->
+    </select>
+    <p class="mt-2" > Select the time by clicking below, then change the duration with the drop down. </p>
+    <div class="row">
+      <div class="col"><button type="button" class="btn btn-primary newColor" onclick="calender.prevWeek()">Prev</button></div>
+      <div class="col" ><h3 id="tableDate"></h3></div>
+      <div class="col"><button type="button" class="btn btn-primary newColor" onclick="calender.nextWeek()" style="float: right;">Next</a></div>
+    </div>
+    <table class="table table-striped newTable" id="calTable" style="margin-top:5px; text-align: center;">
+        <thead>
+          <tr style="background-color: #C2D6B6">
+            <th>Time</th>
+            <th>Mon</th>
+            <th>Tues</th>
+            <th>Wed</th>
+            <th>Thurs</th>
+            <th>Fri</th>
+            <th>Sat</th>
+            <th>Sun</th>
+          </tr>
+        </thead>
+        <colgroup>
+            <col style="border-right: 3px solid #DDDDDD;";</col>
+        </colgroup>
+        <tbody>
+          <tr>
+            <td>9am</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>10am</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>11am</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>12pm</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>1pm</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>2pm</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+           <tr>
+            <td>3pm</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>4pm</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>5pm</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>6pm</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>7pm</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>8pm</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>9pm</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+        </tbody>
+    </table>
+    <select class="browser-default custom-select newDropdown">
+        <option selected>Select Duration... </option>
+        <option value="1">30 minutes</option>
+        <option value="2">1 hour</option>
+        <option value="3">1 hour 30 minutes</option>
+        <option value="4">2 hours</option>
+    </select>
+    <table class="table" style="margin-top:30px">
+        <tr>
+            <td>Room</td>
+            <td>Price/Hour</td>
+            <td>Total Price</td>
+        </tr>
+        <tr>
+            <td>--</td>
+            <td>--</td>
+            <td>--</td>
+        </tr>
+    </table>
+    <div class="row" style="margin-bottom: 30px;">
+        <div class="col-sm-6"></div>
+        <div class="col-sm-2"><a class="btn btn-primary newColor" href="#" role="button" >Book & Pay now</a></div>
+        <div class="col-sm-1" style="text-align: center;"><h5>or</h5></div>
+        <div class="col-sm-3"><a class="btn btn-primary newColor" href="#" role="button" >Book & Pay at desk</a></div>
+    </div>
+</div>
+<script>
+    calender = new Calender();
+</script>
+</body>
