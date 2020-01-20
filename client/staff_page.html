@@ -27,17 +27,100 @@
       document.getElementById("byUser").hidden = true;
       document.getElementById("byAvaliability").hidden = false;
     }
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const dayNames = ["Mon", "Tues", "Wed", "Thur", "Fri", "Sat", "Sun"];
+    function Calender () {
+        let targetMon = new Date(); // Date of the monday of the week being looked at
+        if (targetMon.getDay() != 1) {
+            targetMon.setDate(targetMon.getDate() - ((targetMon.getDay() - 1) % 7));
+        }
 
+        let displayDates = function() {
+            let tempDate = new Date(targetMon);
+            tempDate.setDate(tempDate.getDate() + 6);
+            document.getElementById("tableDate").innerHTML = monthNames[targetMon.getMonth()] + " " + targetMon.getDate() + " - " + monthNames[tempDate.getMonth()] + " " + tempDate.getDate();
+            headers = document.getElementById("calTable").rows[0];
+            for (i = 0; i < 7; i++) {
+                newDate = new Date(targetMon);
+                newDate.setDate(newDate.getDate() + i);
+                headers.cells[i + 1].innerHTML = dayNames[i] + " " + newDate.getDate();
+            }
+        }
+
+        displayDates();
+
+        this.nextWeek = function() {
+            targetMon.setDate(targetMon.getDate() + 7);
+            displayDates();
+        }
+
+        this.prevWeek = function() {
+            targetMon.setDate(targetMon.getDate() - 7);
+            displayDates();
+        }
+    }
+
+    function filterUserNameFunction() {
+      var input, filter, ul, li, a, i;
+      input = document.getElementById("findByUserNameSearch");
+      filter = input.value.toUpperCase();
+      div = document.getElementById("findByUserNameDropdown");
+      a = div.getElementsByTagName("a");
+      for (i = 0; i < a.length; i++) {
+        txtValue = a[i].textContent || a[i].innerText;
+        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+          a[i].style.display = "";
+        } else {
+          a[i].style.display = "none";
+        }
+      }
+    }
+
+    function filterPhoneNumberFunction() {
+      var input, filter, ul, li, a, i;
+      input = document.getElementById("findByPhoneNumberSearch");
+      filter = input.value.toUpperCase();
+      div = document.getElementById("findByPhoneNumberDropdown");
+      a = div.getElementsByTagName("a");
+      for (i = 0; i < a.length; i++) {
+        txtValue = a[i].textContent || a[i].innerText;
+        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+          a[i].style.display = "";
+        } else {
+          a[i].style.display = "none";
+        }
+      }
+    }
+
+    function filterEmailFunction() {
+      var input, filter, ul, li, a, i;
+      input = document.getElementById("findByEmailSearch");
+      filter = input.value.toUpperCase();
+      div = document.getElementById("findByEmailDropdown");
+      a = div.getElementsByTagName("a");
+      for (i = 0; i < a.length; i++) {
+        txtValue = a[i].textContent || a[i].innerText;
+        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+          a[i].style.display = "";
+        } else {
+          a[i].style.display = "none";
+        }
+      }
+    }
+
+    function hideShow(id) {
+      document.getElementById(id).classList.toggle("show");
+    }
   </script>
 </head>
 <body>
   <div class="container" style="font-size: 100%">
     <button type="button" class="btn btn-primary newColor" onclick="" data-toggle="modal" data-target="#searchModal">Search</button>
-    <button type="button" class="btn btn-primary newColor" onclick="">New Booking</button>
-    <button type="button" class="btn btn-primary newColor" onclick="">Notifications</button>
+    <button type="button" class="btn btn-primary newColor" onclick="" data-toggle="modal" data-target="#newEventModal">New Booking</button>
+    <button type="button" class="btn btn-primary newColor" onclick="" data-toggle="modal" data-target="#notificationModal">Notifications</button>
 
   </div>
-  <div class="modal fade" id="searchModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal" id="searchModal" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
@@ -96,10 +179,7 @@
             </div>
             <div class="form-group">
               <label>Time</label>
-              <select class="browser-default custom-select newDropdown" >
-                  <option selected>Select Time... </option> <!--check valid -->
-                  <!--<option value="1">9:00</option>-->
-              </select>
+              <input class="form-control" placeholder="Search by username">
             </div>
             <button type="submit" class="btn btn-primary">Submit</button>
           </form>
@@ -107,6 +187,272 @@
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
           <button type="button" class="btn btn-primary">Search</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal" id="newEventModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">New Booking</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="dropdown">
+            <button onclick="hideShow('findByUserNameDropdown')" class="dropbtn">Find By Username</button>
+            <div id='findByUserNameDropdown' class="dropdown-content">
+              <input type="text" placeholder="Search.." id="findByUserNameSearch" onkeyup="filterFunction()">
+              <a href="#about">About</a>
+              <a href="#base">Base</a>
+              <a href="#blog">Blog</a>
+              <a href="#contact">Contact</a>
+              <a href="#custom">Custom</a>
+              <a href="#support">Support</a>
+              <a href="#tools">Tools</a>
+            </div>
+          </div>
+          <div class="dropdown">
+            <button onclick="hideShow('findByPhoneNumberDropdown')" class="dropbtn newColor">Find By Phone Number</button>
+            <div id='findByPhoneNumberDropdown' class="dropdown-content">
+              <input type="text" placeholder="Search.." id="findByPhoneNumberSearch" onkeyup="filterFunction()">
+              <a href="#about">About</a>
+              <a href="#base">Base</a>
+              <a href="#blog">Blog</a>
+              <a href="#contact">Contact</a>
+              <a href="#custom">Custom</a>
+              <a href="#support">Support</a>
+              <a href="#tools">Tools</a>
+            </div>
+          </div>
+          <div class="dropdown">
+            <button onclick="hideShow('findByEmailDropdown')" class="dropbtn newColor">Find By Email</button>
+            <div id='findByEmailDropdown' class="dropdown-content">
+              <input type="text" placeholder="Search.." id="findByEmailSearch" onkeyup="filterFunction()">
+              <a href="#about">About</a>
+              <a href="#base">Base</a>
+              <a href="#blog">Blog</a>
+              <a href="#contact">Contact</a>
+              <a href="#custom">Custom</a>
+              <a href="#support">Support</a>
+              <a href="#tools">Tools</a>
+            </div>
+          </div>
+          <div class="container" style="font-size: 100%">
+              <h1> Room Booking </h1>
+              <p class="mt-2 "> Book a room by first selecting which room you would like to book, then choosing the date, time and duration. </p>
+
+              <select class="browser-default custom-select newDropdown" >
+                  <option selected>Select Room... </option> # Will fetch these from a database
+                  <!--<option value="1">Music Room 1 (max 6 persons) £12/hour</option>-->
+              </select>
+              <p class="mt-2" > Select the time by clicking below, then change the duration with the drop down. </p>
+              <div class="row">
+                <div class="col"><button type="button" class="btn btn-primary newColor" onclick="calender.prevWeek()">Prev</button></div>
+                <div class="col" ><h3 id="tableDate"></h3></div>
+                <div class="col"><button type="button" class="btn btn-primary newColor" onclick="calender.nextWeek()" style="float: right;">Next</a></div>
+              </div>
+              <table class="table table-striped newTable" id="calTable" style="margin-top:5px; text-align: center;">
+                  <thead>
+                    <tr style="background-color: #C2D6B6">
+                      <th>Time</th>
+                      <th>Mon</th>
+                      <th>Tues</th>
+                      <th>Wed</th>
+                      <th>Thurs</th>
+                      <th>Fri</th>
+                      <th>Sat</th>
+                      <th>Sun</th>
+                    </tr>
+                  </thead>
+                  <colgroup>
+                      <col style="border-right: 3px solid #DDDDDD;";</col>
+                  </colgroup>
+                  <tbody>
+                    <tr>
+                      <td>9am</td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                    </tr>
+                    <tr>
+                      <td>10am</td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                    </tr>
+                    <tr>
+                      <td>11am</td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                    </tr>
+                    <tr>
+                      <td>12pm</td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                    </tr>
+                    <tr>
+                      <td>1pm</td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                    </tr>
+                    <tr>
+                      <td>2pm</td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                    </tr>
+                     <tr>
+                      <td>3pm</td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                    </tr>
+                    <tr>
+                      <td>4pm</td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                    </tr>
+                    <tr>
+                      <td>5pm</td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                    </tr>
+                    <tr>
+                      <td>6pm</td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                    </tr>
+                    <tr>
+                      <td>7pm</td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                    </tr>
+                    <tr>
+                      <td>8pm</td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                    </tr>
+                    <tr>
+                      <td>9pm</td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                    </tr>
+                  </tbody>
+              </table>
+              <select class="browser-default custom-select newDropdown">
+                  <option selected>Select Duration... </option>
+                  <option value="1">30 minutes</option>
+                  <option value="2">1 hour</option>
+                  <option value="3">1 hour 30 minutes</option>
+                  <option value="4">2 hours</option>
+              </select>
+              <table class="table" style="margin-top:30px">
+                  <tr>
+                      <td>Room</td>
+                      <td>Price/Hour</td>
+                      <td>Total Price</td>
+                  </tr>
+                  <tr>
+                      <td>--</td>
+                      <td>--</td>
+                      <td>--</td>
+                  </tr>
+              </table>
+              <div class="row" style="margin-bottom: 30px;">
+                  <div class="col-sm-6"></div>
+                  <div class="col-sm-3"><a class="btn btn-primary newColor" href="#" role="button" >Book & Pay at desk</a></div>
+              </div>
+          </div>
+          <script>
+              calender = new Calender();
+          </script>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary">Save changes</button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal" id='notificationModal' tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Notifications</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p>Modal body text goes here.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary">Save changes</button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
         </div>
       </div>
     </div>

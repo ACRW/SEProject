@@ -17,7 +17,7 @@
         if (targetMon.getDay() != 1) {
             targetMon.setDate(targetMon.getDate() - ((targetMon.getDay() - 1) % 7));
         }
-        
+
         let displayDates = function() {
             let tempDate = new Date(targetMon);
             tempDate.setDate(tempDate.getDate() + 6);
@@ -29,14 +29,14 @@
                 headers.cells[i + 1].innerHTML = dayNames[i] + " " + newDate.getDate();
             }
         }
-        
+
         displayDates();
-        
+
         this.nextWeek = function() {
             targetMon.setDate(targetMon.getDate() + 7);
             displayDates();
         }
-        
+
         this.prevWeek = function() {
             targetMon.setDate(targetMon.getDate() - 7);
             displayDates();
