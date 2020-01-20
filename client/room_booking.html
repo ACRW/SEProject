@@ -12,13 +12,28 @@
   <script>
     const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
     const dayNames = ["Mon", "Tues", "Wed", "Thur", "Fri", "Sat", "Sun"];
+    const hostAddr = "127.0.0.1";
+    const hostPort = "8090"
+    
+    async function updateRooms() {
+        const rooms = await getRooms();
+        roomDrop = document.getElementById("roomDrop");
+        for (i = 0; i < rooms.length; i++) {
+            let option = document.createElement("option");
+            option.text = rooms[i]["name"];
+            roomDrop.add(option);
+        }
+    }
+    
+    updateRooms();
+    
     function Calender () {
         let targetMon = new Date(); // Date of the monday of the week being looked at
         if (targetMon.getDay() != 1) {
             targetMon.setDate(targetMon.getDate() - ((targetMon.getDay() - 1) % 7));
         }
-
-        let displayDates = function() {
+        
+        let displayDates = async function() {
             let tempDate = new Date(targetMon);
             tempDate.setDate(tempDate.getDate() + 6);
             document.getElementById("tableDate").innerHTML = monthNames[targetMon.getMonth()] + " " + targetMon.getDate() + " - " + monthNames[tempDate.getMonth()] + " " + tempDate.getDate();
@@ -29,18 +44,29 @@
                 headers.cells[i + 1].innerHTML = dayNames[i] + " " + newDate.getDate();
             }
         }
-
+        
         displayDates();
-
+        
         this.nextWeek = function() {
             targetMon.setDate(targetMon.getDate() + 7);
             displayDates();
         }
-
+        
         this.prevWeek = function() {
             targetMon.setDate(targetMon.getDate() - 7);
             displayDates();
         }
+    }
+    
+    async function getRooms(startDate, endDate) { // Need to add error handling at some point.
+        let response = await fetch('http://' + hostAddr + ":" + hostPort + '/rooms?types=community', {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        });
+        let rooms = await response.json();
+        return rooms["community"]
     }
   </script>
 </head>
@@ -49,7 +75,7 @@
     <h1> Room Booking </h1>
     <p class="mt-2 "> Book a room by first selecting which room you would like to book, then choosing the date, time and duration. </p>
 
-    <select class="browser-default custom-select newDropdown" >
+    <select class="browser-default custom-select newDropdown" id="roomDrop">
         <option selected>Select Room... </option> # Will fetch these from a database
         <!--<option value="1">Music Room 1 (max 6 persons) £12/hour</option>-->
     </select>
