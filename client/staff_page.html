@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  <script>
+
+    function byUser (){
+      document.getElementById("byUser").hidden = false;
+      document.getElementById("byEvent").hidden = true;
+      document.getElementById("byAvaliability").hidden = true;
+    }
+
+    function byEvent (){
+      document.getElementById("byEvent").hidden = false;
+      document.getElementById("byUser").hidden = true;
+      document.getElementById("byAvaliability").hidden = true;
+    }
+
+    function byAvaliability (){
+      document.getElementById("byEvent").hidden = true;
+      document.getElementById("byUser").hidden = true;
+      document.getElementById("byAvaliability").hidden = false;
+    }
+
+  </script>
+</head>
+<body>
+  <div class="container" style="font-size: 100%">
+    <button type="button" class="btn btn-primary newColor" onclick="" data-toggle="modal" data-target="#searchModal">Search</button>
+    <button type="button" class="btn btn-primary newColor" onclick="">New Booking</button>
+    <button type="button" class="btn btn-primary newColor" onclick="">Notifications</button>
+
+  </div>
+  <div class="modal fade" id="searchModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Search</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <button type="button" class="btn btn-primary newColor" onclick="byUser()">Find User</button>
+          <button type="button" class="btn btn-primary newColor" onclick="byEvent()">Find Event</button>
+          <button type="button" class="btn btn-primary newColor" onclick="byAvaliability()">Check Avaliabilty</button>
+          <form id='byUser' hidden=true>
+            <div class="form-group">
+              <label>Email address</label>
+              <input class="form-control" id="emailSearch" placeholder="Enter email or leave blank"> <!--check valid -->
+            </div>
+            <div class="form-group">
+              <label>User Name</label>
+              <input class="form-control" id="usernameSearch" placeholder="Enter username or leave blank">
+            </div>
+            <div class="form-group">
+              <label>Phone Number</label>
+              <input class="form-control" id="phoneNoSearch" placeholder="Enter phone number or leave blank"> <!--check valid -->
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+          </form>
+          <form id='byEvent' hidden=true>
+            <div class="form-group">
+              <label>Event Name</label>
+              <input class="form-control" id="emailSearch" placeholder="Enter event name or leave blank"> <!--check valid -->
+            </div>
+            <div class="form-group">
+              <label>Room</label>
+              <select class="browser-default custom-select newDropdown" >
+                  <option selected>Select Room... </option> <!--check valid -->
+                  <!--<option value="1">Music Room 1 (max 6 persons) £12/hour</option>-->
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Time</label>
+              <select class="browser-default custom-select newDropdown" >
+                  <option selected>Select Time... </option> <!--check valid -->
+                  <!--<option value="1">9:00</option>-->
+              </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+          </form>
+          <form id='byAvaliability' hidden=true>
+            <div class="form-group">
+              <label>Room</label>
+              <select class="browser-default custom-select newDropdown" >
+                  <option selected>Select Room... </option> <!--check valid -->
+                  <!--<option value="1">Music Room 1 (max 6 persons) £12/hour</option>-->
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Time</label>
+              <select class="browser-default custom-select newDropdown" >
+                  <option selected>Select Time... </option> <!--check valid -->
+                  <!--<option value="1">9:00</option>-->
+              </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary">Search</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
