@@ -14,7 +14,7 @@
     const dayNames = ["Mon", "Tues", "Wed", "Thur", "Fri", "Sat", "Sun"];
     const hostAddr = "127.0.0.1";
     const hostPort = "8090"
-    
+
     async function updateRooms() {
         const rooms = await getRooms();
         roomDrop = document.getElementById("roomDrop");
@@ -24,15 +24,15 @@
             roomDrop.add(option);
         }
     }
-    
+
     updateRooms();
-    
+
     function Calender () {
         let targetMon = new Date(); // Date of the monday of the week being looked at
         if (targetMon.getDay() != 1) {
             targetMon.setDate(targetMon.getDate() - ((targetMon.getDay() - 1) % 7));
         }
-        
+
         let displayDates = async function() {
             let tempDate = new Date(targetMon);
             tempDate.setDate(tempDate.getDate() + 6);
@@ -44,20 +44,20 @@
                 headers.cells[i + 1].innerHTML = dayNames[i] + " " + newDate.getDate();
             }
         }
-        
+
         displayDates();
-        
+
         this.nextWeek = function() {
             targetMon.setDate(targetMon.getDate() + 7);
             displayDates();
         }
-        
+
         this.prevWeek = function() {
             targetMon.setDate(targetMon.getDate() - 7);
             displayDates();
         }
     }
-    
+
     async function getRooms(startDate, endDate) { // Need to add error handling at some point.
         let response = await fetch('http://' + hostAddr + ":" + hostPort + '/rooms?types=community', {
             method: "GET",

@@ -1,5 +1,6 @@
 document.addEventListener("DOMContentLoaded", function () {
   document.getElementById("searchForUser").addEventListener("click", searchForUser);
+  updateRooms();
 });
 
 //runs get request to search for user in database and displays results
@@ -55,4 +56,30 @@ async function getUserBookings(customerID){
       } catch (error) {
         alert ('Problem: ' + error);
       }
+}
+
+async function updateRooms() {
+    const rooms = await getRooms();
+    roomDrop1 = document.getElementById("roomSelectDrop1");
+    roomDrop2 = document.getElementById("roomSelectDrop2");
+    console.log(rooms);
+    for (i = 0; i < rooms.length; i++) {
+        let option = document.createElement("option");
+        option.text = rooms[i]["name"];
+        console.log(option.text);
+        roomDrop1.add(option);
+        roomDrop2.add(option);
+    }
+}
+
+async function getRooms(startDate, endDate) { // Need to add error handling at some point.
+    let response = await fetch('http://localhost:8090/rooms?types=community', {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json"
+        }
+    });
+    let body = await response.text();
+    var rooms = JSON.parse(body);
+    return rooms["community"]
 }
