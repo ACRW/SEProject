@@ -44,6 +44,11 @@ async function getUserBookings(customerID){
           tableRow='<tr><th scope="row">'+bookings['community'][i].bookingID+'</th><td>'+bookings['community'][i].start+'</td><td>'+bookings['community'][i].end+'</td><td>'+bookings['community'][i].priceOfBooking+'</td><td>'+bookings['community'][i].paid+'</td><td>'+ bookings['community'][i].name+'</td></tr>';
           document.getElementById('usersCommunityBookingTableBody').innerHTML += tableRow;
         }
+        console.log(bookings['hostel'][0]);
+        for(var i=0;i<bookings['hostel'].length;i++){
+          tableRow='<tr><th scope="row">'+bookings['hostel'][i].bookingID+'</th><td>'+bookings['hostel'][i].startDate+'</td><td>'+bookings['hostel'][i].endDate+'</td><td>'+bookings['hostel'][i].roomID+'</td><td>'+bookings['hostel'][i].pricePerNight+'</td><td>'+ bookings['hostel'][i].noOfPeople+'</td></tr>';
+          document.getElementById('usersHostelBookingTableBody').innerHTML += tableRow;
+        }
       }else{
         throw new Error('Error getting customers' + response.code);
       }
