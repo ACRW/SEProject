@@ -15,12 +15,12 @@ async function searchForUser(){
       });
     if(response.ok){
       var body = await response.text();
-      console.log(body);
       var customers = JSON.parse(body);
-      console.log(customers);
       document.getElementById('byUser').hidden = true;
       for(var i=0; i<customers.length; i++){
         document.getElementById('searchResults').innerHTML += '<p> Name : ' + customers[i].fName + ' ' +  customers[i].lName + ' Email: ' + customers[i].email + ' Phone Number: ' + customers[i].phone;
+        document.getElementById('searchResults').innerHTML += '<button type="button" class="btn btn-primary newColor" id="result'+i+'" data-toggle="modal" data-target="#viewUsersBookingsModal">View Bookings</button>';
+        document.getElementById('result'+i).addEventListener('click', getUserBookings(customers[i].id));
       }
     } else {
       throw new Error('Error getting customers' + response.code);
@@ -28,4 +28,26 @@ async function searchForUser(){
     } catch (error) {
       alert ('Problem: ' + error);
     }
+}
+
+async function getUserBookings(customerID){
+  try{
+    let response = await fetch('http://localhost:8090/customerbookings?id=' + customerID,
+      {
+        method: 'GET'
+      });
+      if(response.ok){
+        var body = await response.text();
+        var bookings = JSON.parse(body);
+
+        for(var i=0;i<bookings['community'].length;i++){
+          tableRow='<tr><th scope="row">'+bookings['community'][i].bookingID+'</th><td>'+bookings['community'][i].start+'</td><td>'+bookings['community'][i].end+'</td><td>'+bookings['community'][i].priceOfBooking+'</td><td>'+bookings['community'][i].paid+'</td><td>'+ bookings['community'][i].name+'</td></tr>';
+          document.getElementById('usersCommunityBookingTableBody').innerHTML += tableRow;
+        }
+      }else{
+        throw new Error('Error getting customers' + response.code);
+      }
+      } catch (error) {
+        alert ('Problem: ' + error);
+      }
 }
