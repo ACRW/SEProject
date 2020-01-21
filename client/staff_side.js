@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", function () {
         searchForUser()
         break;
       case 2:
-      // code block
+        searchForEvents()
         break;
       case 3:
         searchForAvaliability()
@@ -39,7 +39,20 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("dayAvaliableSearch").hidden = false;
     year = document.getElementById("yearAvaliableSearch").value;
     month = document.getElementById("monthAvaliableSearch").value;
-    fillDayDrop(year,month)
+    fillDayDrop(year,month,"Avaliable")
+  });
+
+  document.getElementById("yearEventSearch").addEventListener("change", function(){
+    document.getElementById("monthEventSearchLabel").hidden = false;
+    document.getElementById("monthEventSearch").hidden = false;
+  });
+
+  document.getElementById("monthEventSearch").addEventListener("change", function(){
+    document.getElementById("dayEventSearchLabel").hidden = false;
+    document.getElementById("dayEventSearch").hidden = false;
+    year = document.getElementById("yearEventSearch").value;
+    month = document.getElementById("monthEventSearch").value;
+    fillDayDrop(year,month,"Event")
   });
 
   updateRooms();
@@ -111,13 +124,11 @@ async function getUserBookings(customerID){
 //fills drop boxes
 async function updateRooms() {
     const rooms = await getRooms();
-    roomDrop1 = document.getElementById("roomSelectDrop1");
-    roomDrop2 = document.getElementById("roomSelectDrop2");
+    roomDrop = document.getElementById("roomSelectDrop");
     for (i = 0; i < rooms.length; i++) {
         let option = document.createElement("option");
         option.text = rooms[i]["name"];
-        roomDrop1.add(option);
-        roomDrop2.add(option);
+        roomDrop.add(option);
     }
 }
 
@@ -125,8 +136,8 @@ function daysInMonth (year, month) {
     return new Date(year, month, 0).getDate();
 }
 
-function fillDayDrop(year, month){
-  daysDrop = document.getElementById("dayAvaliableSearch");
+function fillDayDrop(year, month, searchType){
+  daysDrop = document.getElementById("day"+searchType+"Search");
   for(var i=1; i<=daysInMonth(year,month);i++){
     let option = document.createElement("option")
     option.text = i.toString().padStart(2,'0');
@@ -190,3 +201,33 @@ async function searchForAvaliability(){
   document.getElementById("byAvaliability").hidden = true;
   document.getElementById("searchModalFooter").hidden = true;
 };
+
+async function searchForEvents(){
+  name = document.getElementById("eventSearch").value;
+  year = document.getElementById("yearEventSearch").value;
+  month = document.getElementById("monthEventSearch").value;
+  day = document.getElementById("dayEventSearch").value;
+  var dateCombined = year+ '-' + month + '-' + day;
+  try{
+    let response = await fetch('http://localhost:8090/eventsearch?name=' + name + '&date=' + dateCombined,
+      {
+        method: 'GET',
+        headers: {
+            "Content-Type": "application/json"
+        }
+      });
+    if(response.ok){
+      var body = await response.text();
+      var events = JSON.parse(body);
+      document.getElementById('byEvent').hidden = true;
+      for(var i=0; i<events.length; i++){
+        document.getElementById('searchResults').innerHTML += '<p> Name : ' + events[i].name + ' Description: ' + events[i].description + ' Capacity: ' + events[i].capacity;
+      }
+    } else {
+      throw new Error('Error getting customers' + response.code);
+    }
+    } catch (error) {
+      alert ('Problem: ' + error);
+    }
+  document.getElementById("searchModalFooter").hidden = true;
+}

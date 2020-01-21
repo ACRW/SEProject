@@ -182,24 +182,40 @@
               <input class="form-control" id="eventSearch" placeholder="Enter event name or leave blank"> <!--check valid -->
             </div>
             <div class="form-group">
-              <label>Room</label>
-              <select class="browser-default custom-select newDropdown" id="roomSelectDrop1">
-                  <option selected>Select Room... </option> <!--check valid -->
-                  <!--<option value="1">Music Room 1 (max 6 persons) £12/hour</option>-->
+              <label>Year</label>
+              <select class="browser-default custom-select newDropdown" id="yearEventSearch">
+                  <option selected>Select Year... </option> <!--check valid -->
+                  <option value="2020">2020</option>
+                  <option value="2021">2021</option>
+                  <option value="2022">2022</option>
+                  <option value="2023">2023</option>
               </select>
-            </div>
-            <div class="form-group">
-              <label>Time</label>
-              <select class="browser-default custom-select newDropdown" >
-                  <option selected>Select Time... </option> <!--check valid -->
-                  <!--<option value="1">9:00</option>-->
+              <label id="monthEventSearchLabel" hidden="true">Month</label>
+              <select class="browser-default custom-select newDropdown" id="monthEventSearch" hidden="true">
+                  <option selected>Select Month... </option>
+                  <option value="01">January</option>
+                  <option value="02">February</option>
+                  <option value="03">March</option>
+                  <option value="04">April</option>
+                  <option value="05">May</option>
+                  <option value="06">June</option>
+                  <option value="07">July</option>
+                  <option value="08">August</option>
+                  <option value="09">September</option>
+                  <option value="10">October</option>
+                  <option value="11">November</option>
+                  <option value="12">December</option>
+              </select>
+              <label id="dayEventSearchLabel" hidden="true">Day</label>
+              <select class="browser-default custom-select newDropdown" id="dayEventSearch" hidden="true">
+                  <option selected>Select Day... </option>
               </select>
             </div>
           </form>
           <form id='byAvaliability' hidden=true>
             <div class="form-group">
               <label>Room</label>
-              <select class="browser-default custom-select newDropdown" id="roomSelectDrop2">
+              <select class="browser-default custom-select newDropdown" id="roomSelectDrop">
                   <option selected>Select Room... </option> <!--check valid -->
                   <!--<option value="1">Music Room 1 (max 6 persons) £12/hour</option>-->
               </select>
