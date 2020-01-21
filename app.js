@@ -152,12 +152,11 @@ app.get('/roomavailability', async function(req, resp) {
                         response['id'] = id;
 
                         // room availability
-                        const availability = await performQuery('SELECT start, end FROM communityBookings WHERE id = ' + id);
+                        const availability = await performQuery('SELECT start, end FROM communityBookings WHERE UNIX_TIMESTAMP(start) >= ' + ((new Date).getTime()) / 1000 + ' AND roomId = ' + id);
 
                         // if no database error
                         if (processQueryResult(availability, resp)) {
                             // times at which room is busy
-                            // might need to put bounds on times
                             response['busy'] = availability;
 
                             // send response
@@ -188,7 +187,7 @@ app.get('/roomavailability', async function(req, resp) {
                         response['id'] = id;
 
                         // room availability
-                        const availability = await performQuery('SELECT startDate, endDate FROM hostelBookings WHERE id = ' + id);
+                        const availability = await performQuery('SELECT startDate, endDate FROM hostelBookings WHERE UNIX_TIMESTAMP(startDate) >= ' + ((new Date).getTime()) / 1000 + ' AND roomId = ' + id);
 
                         // if no database error
                         if (processQueryResult(availability, resp)) {
