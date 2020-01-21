@@ -1,5 +1,33 @@
+var submitAction = 0;
+
 document.addEventListener("DOMContentLoaded", function () {
-  document.getElementById("searchForUser").addEventListener("click", searchForUser);
+  document.getElementById("searchModalFooter").hidden = true;
+
+  document.getElementById("searchSubmit").addEventListener("click", function(){
+    switch(submitAction) {
+      case 1:
+        searchForUser()
+        break;
+      case 2:
+      // code block
+        break;
+      case 3:
+        searchForAvaliability()
+        break;
+      default:
+      // code block
+    }
+  });
+  document.getElementById("searchUser").addEventListener("click", function(){
+    submitAction = 1;
+  });
+  document.getElementById("searchEvent").addEventListener("click", function(){
+    submitAction = 2;
+  });
+  document.getElementById("searchAvaliability").addEventListener("click", function(){
+    submitAction = 3;
+  });
+
   updateRooms();
 });
 
@@ -12,7 +40,10 @@ async function searchForUser(){
   try{
     let response = await fetch('http://localhost:8090/customersearch?fname=' + fName + '&sname=' + sName + '&email=' + email + '&phone=' + phoneNumber,
       {
-        method: 'GET'
+        method: 'GET',
+        headers: {
+            "Content-Type": "application/json"
+        }
       });
     if(response.ok){
       var body = await response.text();
@@ -29,13 +60,18 @@ async function searchForUser(){
     } catch (error) {
       alert ('Problem: ' + error);
     }
+  document.getElementById("searchModalFooter").hidden = true;
 }
 
+//creates tables from users community and hostel bookings
 async function getUserBookings(customerID){
   try{
     let response = await fetch('http://localhost:8090/customerbookings?id=' + customerID,
       {
-        method: 'GET'
+        method: 'GET',
+        headers: {
+            "Content-Type": "application/json"
+        }
       });
       if(response.ok){
         var body = await response.text();
@@ -58,15 +94,14 @@ async function getUserBookings(customerID){
       }
 }
 
+//fills drop boxes
 async function updateRooms() {
     const rooms = await getRooms();
     roomDrop1 = document.getElementById("roomSelectDrop1");
     roomDrop2 = document.getElementById("roomSelectDrop2");
-    console.log(rooms);
     for (i = 0; i < rooms.length; i++) {
         let option = document.createElement("option");
         option.text = rooms[i]["name"];
-        console.log(option.text);
         roomDrop1.add(option);
         roomDrop2.add(option);
     }
@@ -83,3 +118,43 @@ async function getRooms(startDate, endDate) { // Need to add error handling at s
     var rooms = JSON.parse(body);
     return rooms["community"]
 }
+
+async function searchForAvaliability(){
+  time = document.getElementById("timeSelectSearch").value
+  duration = document.getElementById("durationSelectSearch").value
+  roomName = document.getElementById("roomSelectDrop2").value
+  let response = await fetch('http://localhost:8090/rooms?types=community', {
+      method: "GET",
+      headers: {
+          "Content-Type": "application/json"
+      }
+  });
+  let body = await response.text();
+  var rooms = JSON.parse(body);
+  roomID = 0;
+  for(var i=0; i<rooms['community'].length; i++){
+    if (rooms['community'][i].name == roomName){
+      roomID = rooms['community'][i].id;
+    }
+  }
+  let response2 = await fetch('http://localhost:8090/roomavailability?type=community&id='+roomID, {
+      method: "GET",
+      headers: {
+          "Content-Type": "application/json"
+      }
+  });
+  let body2 = await response2.text();
+  var availability = JSON.parse(body2);
+  for(var i=1; i< 14; i++){
+    document.getElementById('timeTable' + i).innerHTML = 'Avaliable';
+  }
+  for(var i=0; i< availability.busy.length; i++){
+    for(var j= availability["busy"][i].start.substring(11,13); j<=availability["busy"][i].end.substring(11,13); j++ ){
+
+      document.getElementById('timeTable' + (j-8).toString()).innerHTML = 'Busy';
+    }
+  }
+  document.getElementById("roomAvailabilityTable").hidden = false;
+  document.getElementById("byAvaliability").hidden = true;
+  document.getElementById("searchModalFooter").hidden = true;
+};

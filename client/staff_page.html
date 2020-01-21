@@ -14,6 +14,7 @@
     //resets form
     function clearSearch(){
       document.getElementById('searchResults').innerHTML = '';
+      document.getElementById("roomAvailabilityTable").hidden = true;
 
     }
 
@@ -23,6 +24,8 @@
       document.getElementById("byEvent").hidden = true;
       document.getElementById("byAvaliability").hidden = true;
       document.getElementById('searchResults').innerHTML = '';
+      document.getElementById("searchModalFooter").hidden = false;
+      document.getElementById("roomAvailabilityTable").hidden = true;
     }
 
     //unhides the correct form
@@ -31,6 +34,8 @@
       document.getElementById("byUser").hidden = true;
       document.getElementById("byAvaliability").hidden = true;
       document.getElementById('searchResults').innerHTML = '';
+      document.getElementById("searchModalFooter").hidden = false;
+      document.getElementById("roomAvailabilityTable").hidden = true;
     }
 
     //unhides the correct form
@@ -39,6 +44,8 @@
       document.getElementById("byUser").hidden = true;
       document.getElementById("byAvaliability").hidden = false;
       document.getElementById('searchResults').innerHTML = '';
+      document.getElementById("searchModalFooter").hidden = false;
+      document.getElementById("roomAvailabilityTable").hidden = true;
     }
 
     const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -147,9 +154,9 @@
           </button>
         </div>
         <div class="modal-body" id="searchModalBody">
-          <button type="button" class="btn btn-primary newColor" onclick="byUser()">Find User</button>
-          <button type="button" class="btn btn-primary newColor" onclick="byEvent()">Find Event</button>
-          <button type="button" class="btn btn-primary newColor" onclick="byAvaliability()">Check Avaliabilty</button>
+          <button type="button" class="btn btn-primary newColor" onclick="byUser()" id='searchUser'>Find User</button>
+          <button type="button" class="btn btn-primary newColor" onclick="byEvent()" id ='searchEvent'>Find Event</button>
+          <button type="button" class="btn btn-primary newColor" onclick="byAvaliability()" id='searchAvaliability'>Check Avaliabilty</button>
           <div id='searchResults'></div>
           <form id='byUser' hidden=true>
             <div class="form-group">
@@ -199,13 +206,100 @@
             </div>
             <div class="form-group">
               <label>Time</label>
-              <input class="form-control" placeholder="Search by username">
+              <select class="browser-default custom-select newDropdown" id="timeSelectSearch">
+                  <option selected>Select Time... </option> <!--check valid -->
+                  <option value="1">9am</option>
+                  <option value="2">10am</option>
+                  <option value="3">11am</option>
+                  <option value="4">12pm</option>
+                  <option value="5">1pm</option>
+                  <option value="6">2pm</option>
+                  <option value="7">3pm</option>
+                  <option value="8">4pm</option>
+                  <option value="9">5pm</option>
+                  <option value="10">6pm</option>
+                  <option value="11">7pm</option>
+                  <option value="12">8pm</option>
+                  <option value="13">9pm</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Duration</label>
+              <select class="browser-default custom-select newDropdown" id="durationSelectSearch">
+                  <option selected>Select Duration... </option>
+                  <option value="1">30 minutes</option>
+                  <option value="2">1 hour</option>
+                  <option value="3">1 hour 30 minutes</option>
+                  <option value="4">2 hours</option>
+              </select>
             </div>
           </form>
+          <table class="table table-striped newTable" id="roomAvailabilityTable" style="margin-top:5px; text-align: center;">
+            <thead>
+              <tr>
+                <th scope="col">Time</th>
+                <th scope="col">Busy</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>9am</td>
+                <td id="timeTable1"></td>
+              </tr>
+              <tr>
+                <td>10am</td>
+                <td id="timeTable2"></td>
+              </tr>
+              <tr>
+                <td>11am</td>
+                <td id="timeTable3"></td>
+              </tr>
+              <tr>
+                <td>12pm</td>
+                <td id="timeTable4"></td>
+              </tr>
+              <tr>
+                <td>1pm</td>
+                <td id="timeTable5"></td>
+              </tr>
+              <tr>
+                <td>2pm</td>
+                <td id="timeTable6"></td>
+              </tr>
+              <tr>
+                <td>3pm</td>
+                <td id="timeTable7"></td>
+              </tr>
+              <tr>
+                <td>4pm</td>
+                <td id="timeTable8"></td>
+              </tr>
+              <tr>
+                <td>5pm</td>
+                <td id="timeTable9"></td>
+              </tr>
+              <tr>
+                <td>6pm</td>
+                <td id="timeTable10"></td>
+              </tr>
+              <tr>
+                <td>7pm</td>
+                <td id="timeTable11"></td>
+              </tr>
+              <tr>
+                <td>8pm</td>
+                <td id="timeTable12"></td>
+              </tr>
+              <tr>
+                <td>9pm</td>
+                <td id="timeTable13"></td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-        <div class="modal-footer">
+        <div class="modal-footer" id="searchModalFooter">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary" id='searchForUser'>Search</button>
+          <button type="button" class="btn btn-primary" id='searchSubmit'>Search</button>
         </div>
       </div>
     </div>
@@ -521,5 +615,6 @@
       </div>
     </div>
   </div>
+
 </body>
 </html>
