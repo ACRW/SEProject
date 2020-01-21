@@ -240,6 +240,22 @@ function addToSearchClause(parameter, field, whereClause) {
     return whereClause;
 }
 
+//get all customers
+app.get('/customers', async function(req,resp){
+  const customers = await performQuery('SELECT * FROM users');
+  if (processQueryResult(customers, resp)) {
+      // if matching customers found
+      if (customers.length > 0) {
+          // send list of customers
+          resp.status(200).send(JSON.stringify(customers));
+
+      } else {
+          // no matches
+          resp.status(200).send('0matches');
+      }
+  }
+})
+
 // customer search
 app.get('/customersearch', async function(req, resp) {
     // need authentication here
