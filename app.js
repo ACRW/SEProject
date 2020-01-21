@@ -355,6 +355,47 @@ app.get('/customerbookings', async function(req, resp) {
     }
 });
 
+//events
+app.get('/eventsearch', async function(req, resp) {
+    // need authentication here
+    // look into session variables
+
+    // search parameters
+    const name = req.query.name;
+    const date = req.query.date;
+
+    // where clause
+    let where = '';
+
+    // build search clause
+    where = addToSearchClause(name, 'name', where);
+    where = addToSearchClause(date, 'datetime', where);
+
+    // if no parameters specified
+    if (where.length == 0) {
+        // parameter error
+        resp.status(400).send('0parameters');
+
+    } else {
+        // get matching customers
+        const events = await performQuery('SELECT * FROM events WHERE ' + where + ' ORDER BY name');
+
+        // if no database error
+        if (processQueryResult(events, resp)) {
+            // if matching customers found
+            if (events.length > 0) {
+                // send list of customers
+                resp.status(200).send(JSON.stringify(events));
+
+            } else {
+                // no matches
+                resp.status(200).send('0matches');
+            }
+        }
+    }
+});
+
+
 app.post('/tokensignin', async function(req, resp) {
     const token = req.body.token;
     const payload = await login(token);
