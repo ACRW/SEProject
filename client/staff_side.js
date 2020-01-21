@@ -1,6 +1,7 @@
 var submitAction = 0;
 
 document.addEventListener("DOMContentLoaded", function () {
+
   document.getElementById("searchModalFooter").hidden = true;
 
   document.getElementById("searchSubmit").addEventListener("click", function(){
@@ -26,6 +27,19 @@ document.addEventListener("DOMContentLoaded", function () {
   });
   document.getElementById("searchAvaliability").addEventListener("click", function(){
     submitAction = 3;
+  });
+
+  document.getElementById("yearAvaliableSearch").addEventListener("change", function(){
+    document.getElementById("monthAvaliableSearchLabel").hidden = false;
+    document.getElementById("monthAvaliableSearch").hidden = false;
+  });
+
+  document.getElementById("monthAvaliableSearch").addEventListener("change", function(){
+    document.getElementById("dayAvaliableSearchLabel").hidden = false;
+    document.getElementById("dayAvaliableSearch").hidden = false;
+    year = document.getElementById("yearAvaliableSearch").value;
+    month = document.getElementById("monthAvaliableSearch").value;
+    fillDayDrop(year,month)
   });
 
   updateRooms();
@@ -107,6 +121,20 @@ async function updateRooms() {
     }
 }
 
+function daysInMonth (year, month) {
+    return new Date(year, month, 0).getDate();
+}
+
+function fillDayDrop(year, month){
+  daysDrop = document.getElementById("dayAvaliableSearch");
+  for(var i=1; i<=daysInMonth(year,month);i++){
+    let option = document.createElement("option")
+    option.text = i.toString().padStart(2,'0');
+    daysDrop.add(option);
+
+  }
+}
+
 async function getRooms(startDate, endDate) { // Need to add error handling at some point.
     let response = await fetch('http://localhost:8090/rooms?types=community', {
         method: "GET",
@@ -120,9 +148,11 @@ async function getRooms(startDate, endDate) { // Need to add error handling at s
 }
 
 async function searchForAvaliability(){
-  time = document.getElementById("timeSelectSearch").value
-  duration = document.getElementById("durationSelectSearch").value
-  roomName = document.getElementById("roomSelectDrop2").value
+  roomName = document.getElementById("roomSelectDrop2").value;
+  year = document.getElementById("yearAvaliableSearch").value;
+  month = document.getElementById("monthAvaliableSearch").value;
+  day = document.getElementById("dayAvaliableSearch").value;
+  dateCombined = year+ '-' + month + '-' + day;
   let response = await fetch('http://localhost:8090/rooms?types=community', {
       method: "GET",
       headers: {
@@ -149,9 +179,11 @@ async function searchForAvaliability(){
     document.getElementById('timeTable' + i).innerHTML = 'Avaliable';
   }
   for(var i=0; i< availability.busy.length; i++){
-    for(var j= availability["busy"][i].start.substring(11,13); j<=availability["busy"][i].end.substring(11,13); j++ ){
+    if(availability["busy"][i].start.substring(0,10) == dateCombined){
+      for(var j= availability["busy"][i].start.substring(11,13); j<=availability["busy"][i].end.substring(11,13); j++ ){
 
-      document.getElementById('timeTable' + (j-8).toString()).innerHTML = 'Busy';
+        document.getElementById('timeTable' + (j-8).toString()).innerHTML = 'Busy';
+      }
     }
   }
   document.getElementById("roomAvailabilityTable").hidden = false;
