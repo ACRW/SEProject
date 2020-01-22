@@ -56,6 +56,8 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   updateRooms();
+
+  fillFindBy();
 });
 
 //runs get request to search for user in database and displays results
@@ -231,3 +233,29 @@ async function searchForEvents(){
     }
   document.getElementById("searchModalFooter").hidden = true;
 }
+
+async function fillFindBy(){
+  try{
+    let response = await fetch('http://localhost:8090/customers',
+      {
+        method: 'GET',
+        headers: {
+            "Content-Type": "application/json"
+          }
+      });
+    if(response.ok){
+      var body = await response.text();
+      var customers = JSON.parse(body);
+      for(var i = 0; i<customers.length; i++){
+        document.getElementById('findByNameDropdown').innerHTML += '<a>' + customers[i].fName + ' ' + customers[i].lName + '</a>';
+        document.getElementById('findByPhoneNumberDropdown').innerHTML += '<a>' + customers[i].phone + '</a>';
+        document.getElementById('findByEmailDropdown').innerHTML += '<a>' + customers[i].email +  '</a>'
+      }
+
+    }else{
+      throw new Error('Error getting customers' + response.code);
+    }
+    } catch (error) {
+      alert ('Problem: ' + error);
+    }
+  }

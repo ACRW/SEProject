@@ -82,11 +82,11 @@
     }
 
     //for dropdown search box for booking
-    function filterUserNameFunction() {
+    function filterNameFunction() {
       var input, filter, ul, li, a, i;
-      input = document.getElementById("findByUserNameSearch");
+      input = document.getElementById("findByNameSearch");
       filter = input.value.toUpperCase();
-      div = document.getElementById("findByUserNameDropdown");
+      div = document.getElementById("findByNameDropdown");
       a = div.getElementsByTagName("a");
       for (i = 0; i < a.length; i++) {
         txtValue = a[i].textContent || a[i].innerText;
@@ -119,6 +119,7 @@
     function filterEmailFunction() {
       var input, filter, ul, li, a, i;
       input = document.getElementById("findByEmailSearch");
+      console.log(document.getElementById("findByEmailSearch"))
       filter = input.value.toUpperCase();
       div = document.getElementById("findByEmailDropdown");
       a = div.getElementsByTagName("a");
@@ -332,42 +333,24 @@
         </div>
         <div class="modal-body">
           <div class="dropdown">
-            <button onclick="hideShow('findByUserNameDropdown')" class="dropbtn">Find By Username</button>
-            <div id='findByUserNameDropdown' class="dropdown-content">
-              <input type="text" placeholder="Search.." id="findByUserNameSearch" onkeyup="filterFunction()">
-              <a href="#about">About</a>
-              <a href="#base">Base</a>
-              <a href="#blog">Blog</a>
-              <a href="#contact">Contact</a>
-              <a href="#custom">Custom</a>
-              <a href="#support">Support</a>
-              <a href="#tools">Tools</a>
+            <button onclick="hideShow('findByNameDropdown')" class="dropbtn">Find By Name</button>
+            <div id='findByNameDropdown' class="dropdown-content">
+              <input type="text" placeholder="Search.." id="findByNameSearch" onkeyup="filterNameFunction()">
+
             </div>
           </div>
           <div class="dropdown">
             <button onclick="hideShow('findByPhoneNumberDropdown')" class="dropbtn newColor">Find By Phone Number</button>
             <div id='findByPhoneNumberDropdown' class="dropdown-content">
-              <input type="text" placeholder="Search.." id="findByPhoneNumberSearch" onkeyup="filterFunction()">
-              <a href="#about">About</a>
-              <a href="#base">Base</a>
-              <a href="#blog">Blog</a>
-              <a href="#contact">Contact</a>
-              <a href="#custom">Custom</a>
-              <a href="#support">Support</a>
-              <a href="#tools">Tools</a>
+              <input type="text" placeholder="Search.." id="findByPhoneNumberSearch" onkeyup="filterPhoneNumberFunction()">
+              
             </div>
           </div>
           <div class="dropdown">
             <button onclick="hideShow('findByEmailDropdown')" class="dropbtn newColor">Find By Email</button>
             <div id='findByEmailDropdown' class="dropdown-content">
-              <input type="text" placeholder="Search.." id="findByEmailSearch" onkeyup="filterFunction()">
-              <a href="#about">About</a>
-              <a href="#base">Base</a>
-              <a href="#blog">Blog</a>
-              <a href="#contact">Contact</a>
-              <a href="#custom">Custom</a>
-              <a href="#support">Support</a>
-              <a href="#tools">Tools</a>
+              <input type="text" placeholder="Search.." id="findByEmailSearch" onkeyup="filterEmailFunction()">
+
             </div>
           </div>
           <div class="container" style="font-size: 100%">
