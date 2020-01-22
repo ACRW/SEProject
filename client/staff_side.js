@@ -55,6 +55,11 @@ document.addEventListener("DOMContentLoaded", function () {
     fillDayDrop(year,month,"Event")
   });
 
+  document.getElementById("newBookingButton").addEventListener('click',function(){
+    document.getElementById("findBy").hidden = false;
+    document.getElementById("makeBooking").hidden = true;
+  })
+
   updateRooms();
 
   fillFindBy();
@@ -247,9 +252,9 @@ async function fillFindBy(){
       var body = await response.text();
       var customers = JSON.parse(body);
       for(var i = 0; i<customers.length; i++){
-        document.getElementById('findByNameDropdown').innerHTML += '<a>' + customers[i].fName + ' ' + customers[i].lName + '</a>';
-        document.getElementById('findByPhoneNumberDropdown').innerHTML += '<a>' + customers[i].phone + '</a>';
-        document.getElementById('findByEmailDropdown').innerHTML += '<a>' + customers[i].email +  '</a>'
+        document.getElementById('findByNameDropdown').innerHTML += '<a onclick="bookingView('+customers[i].id+')">' + customers[i].fName + ' ' + customers[i].lName + '</a>';
+        document.getElementById('findByPhoneNumberDropdown').innerHTML += '<a onclick="bookingView('+customers[i].id+')">' + customers[i].phone + '</a>';
+        document.getElementById('findByEmailDropdown').innerHTML += '<a onclick="bookingView('+customers[i].id+')">' + customers[i].email +  '</a>'
       }
 
     }else{
@@ -259,3 +264,27 @@ async function fillFindBy(){
       alert ('Problem: ' + error);
     }
   }
+
+async function bookingView(id){
+  document.getElementById('makeBooking').hidden = false;
+  document.getElementById('findBy').hidden = true;
+  try{
+    let response = await fetch('http://localhost:8090/customersearch?id='+id,
+      {
+        method: 'GET',
+        headers: {
+            "Content-Type": "application/json"
+          }
+      });
+    if(response.ok){
+      var body = await response.text();
+      var customers = JSON.parse(body);
+      document.getElementById('customerInfo').innerHTML= 'Customer Name:' + customers[0].fName + ' ' + customers[0].lName;
+
+    }else{
+      throw new Error('Error getting customers' + response.code);
+    }
+    } catch (error) {
+      alert ('Problem: ' + error);
+    }
+}

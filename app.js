@@ -262,6 +262,7 @@ app.get('/customersearch', async function(req, resp) {
     // look into session variables
 
     // search parameters
+    const id = req.query.id;
     const fname = req.query.fname;
     const sname = req.query.sname;
     const email = req.query.email;
@@ -271,6 +272,7 @@ app.get('/customersearch', async function(req, resp) {
     let where = '';
 
     // build search clause
+    where = addToSearchClause(id, 'id', where);
     where = addToSearchClause(fname, 'fName', where);
     where = addToSearchClause(sname, 'lName', where);
     where = addToSearchClause(email, 'email', where);

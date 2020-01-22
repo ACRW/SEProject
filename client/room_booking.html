@@ -12,7 +12,7 @@
   <script>
     const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
     const dayNames = ["Mon", "Tues", "Wed", "Thur", "Fri", "Sat", "Sun"];
-    const hostAddr = "127.0.0.1";
+    const hostAddr = "localhost";
     const hostPort = "8090"
 
     async function updateRooms() {
@@ -45,7 +45,7 @@
                 headers.cells[i + 1].innerHTML = dayNames[i] + " " + newDate.getDate();
             }
         }
-        
+
         this.displayBookings = async function () { // Displays all the booking on the calender
             let roomID = document.getElementById("roomDrop").value; // The list is in order of room id but offset by one due to the default option
             if (roomID == -1) {

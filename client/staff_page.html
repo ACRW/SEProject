@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <title>TCR Hub Staff Page</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
@@ -26,6 +27,7 @@
       document.getElementById('searchResults').innerHTML = '';
       document.getElementById("searchModalFooter").hidden = false;
       document.getElementById("roomAvailabilityTable").hidden = true;
+      document.getElementById("makeBooking").hidden = false;
     }
 
     //unhides the correct form
@@ -36,6 +38,8 @@
       document.getElementById('searchResults').innerHTML = '';
       document.getElementById("searchModalFooter").hidden = false;
       document.getElementById("roomAvailabilityTable").hidden = true;
+      document.getElementById("makeBooking").hidden = false;
+
     }
 
     //unhides the correct form
@@ -46,6 +50,8 @@
       document.getElementById('searchResults').innerHTML = '';
       document.getElementById("searchModalFooter").hidden = false;
       document.getElementById("roomAvailabilityTable").hidden = true;
+      document.getElementById("makeBooking").hidden = false;
+
     }
 
     const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -141,8 +147,9 @@
 <body>
   <div class="container" style="font-size: 100%">
     <button type="button" class="btn btn-primary newColor" onclick="clearSearch()" data-toggle="modal" data-target="#searchModal">Search</button>
-    <button type="button" class="btn btn-primary newColor" onclick="" data-toggle="modal" data-target="#newEventModal">New Booking</button>
+    <button type="button" class="btn btn-primary newColor" onclick="" data-toggle="modal" data-target="#newEventModal" id='newBookingButton'>New Booking</button>
     <button type="button" class="btn btn-primary newColor" onclick="" data-toggle="modal" data-target="#notificationModal">Notifications</button>
+    <button type="button" class="btn btn-primary newColor" onclick="" data-toggle="modal" data-target="#statsModal">Statistics</button>
 
   </div>
   <div class="modal" id="searchModal" tabindex="-1" role="dialog">
@@ -322,6 +329,7 @@
       </div>
     </div>
   </div>
+
   <div class="modal" id="newEventModal" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-lg" role="document">
       <div class="modal-content">
@@ -332,6 +340,7 @@
           </button>
         </div>
         <div class="modal-body">
+          <div id="findBy">
           <div class="dropdown">
             <button onclick="hideShow('findByNameDropdown')" class="dropbtn">Find By Name</button>
             <div id='findByNameDropdown' class="dropdown-content">
@@ -343,7 +352,7 @@
             <button onclick="hideShow('findByPhoneNumberDropdown')" class="dropbtn newColor">Find By Phone Number</button>
             <div id='findByPhoneNumberDropdown' class="dropdown-content">
               <input type="text" placeholder="Search.." id="findByPhoneNumberSearch" onkeyup="filterPhoneNumberFunction()">
-              
+
             </div>
           </div>
           <div class="dropdown">
@@ -353,7 +362,9 @@
 
             </div>
           </div>
-          <div class="container" style="font-size: 100%">
+        </div>
+          <div class="container" id='makeBooking' style="font-size: 100%" hidden='true'>
+              <h2 id='customerInfo'></h2>
               <h1> Room Booking </h1>
               <p class="mt-2 "> Book a room by first selecting which room you would like to book, then choosing the date, time and duration. </p>
 
@@ -551,6 +562,7 @@
       </div>
     </div>
   </div>
+
   <div class="modal" id='notificationModal' tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
@@ -570,6 +582,7 @@
       </div>
     </div>
   </div>
+
   <div class="modal" id='viewUsersBookingsModal' tabindex="-1" role="dialog">
     <div class="modal-dialog modal-lg" role="document">
       <div class="modal-content">
