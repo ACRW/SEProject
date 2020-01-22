@@ -83,6 +83,7 @@ async function searchForUser(){
       var body = await response.text();
       var customers = JSON.parse(body);
       document.getElementById('byUser').hidden = true;
+      document.getElementById('searchResults').innerHTML += '<h5> Found ' + customers.length + ' match in the database </h5>';
       for(var i=0; i<customers.length; i++){
         document.getElementById('searchResults').innerHTML += '<p> Name : ' + customers[i].fName + ' ' +  customers[i].lName + ' Email: ' + customers[i].email + ' Phone Number: ' + customers[i].phone;
         document.getElementById('searchResults').innerHTML += '<button type="button" class="btn btn-primary newColor" id="result'+i+'" data-toggle="modal" data-target="#viewUsersBookingsModal">View Bookings</button>';

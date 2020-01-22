@@ -145,13 +145,16 @@
   </script>
 </head>
 <body>
-  <div class="container" style="font-size: 100%">
-    <button type="button" class="btn btn-primary newColor" onclick="clearSearch()" data-toggle="modal" data-target="#searchModal">Search</button>
-    <button type="button" class="btn btn-primary newColor" onclick="" data-toggle="modal" data-target="#newEventModal" id='newBookingButton'>New Booking</button>
-    <button type="button" class="btn btn-primary newColor" onclick="" data-toggle="modal" data-target="#notificationModal">Notifications</button>
-    <button type="button" class="btn btn-primary newColor" onclick="" data-toggle="modal" data-target="#statsModal">Statistics</button>
 
+  <!-- buttons at top of page -->
+  <div class="container" style="font-size: 100%">
+    <button type="button" class="btn btn-primary newColor mainButton" onclick="clearSearch()" data-toggle="modal" data-target="#searchModal">Search</button>
+    <button type="button" class="btn btn-primary newColor mainButton" onclick="" data-toggle="modal" data-target="#newEventModal" id='newBookingButton'>New Booking</button>
+    <button type="button" class="btn btn-primary newColor mainButton" onclick="" data-toggle="modal" data-target="#notificationModal">Notifications</button>
+    <button type="button" class="btn btn-primary newColor mainButton" onclick="" data-toggle="modal" data-target="#statsModal">Statistics</button>
   </div>
+
+
   <div class="modal" id="searchModal" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-lg" role="document">
       <div class="modal-content">
@@ -162,11 +165,13 @@
           </button>
         </div>
         <div class="modal-body" id="searchModalBody">
+          <h5>Select a button to search for a specific user, a specific event or to find out if a room is avaliable.</h5>
           <button type="button" class="btn btn-primary newColor" onclick="byUser()" id='searchUser'>Find User</button>
           <button type="button" class="btn btn-primary newColor" onclick="byEvent()" id ='searchEvent'>Find Event</button>
           <button type="button" class="btn btn-primary newColor" onclick="byAvaliability()" id='searchAvaliability'>Check Avaliabilty</button>
           <div id='searchResults'></div>
           <form id='byUser' hidden=true>
+            <h5>Enter any information you have about the user. Leave inputs blank if you're unsure.</h5>
             <div class="form-group">
               <label>First Name</label>
               <input class="form-control" id="firstnameSearch" placeholder="Enter first name or leave blank">
@@ -329,6 +334,7 @@
       </div>
     </div>
   </div>
+
 
   <div class="modal" id="newEventModal" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-lg" role="document">
