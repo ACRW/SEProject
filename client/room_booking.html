@@ -21,19 +21,20 @@
         for (i = 0; i < rooms.length; i++) {
             let option = document.createElement("option");
             option.text = rooms[i]["name"];
+            option.value = rooms[i]["id"];
             roomDrop.add(option);
         }
     }
 
     updateRooms();
 
-    function Calender () {
+    function Calender () { // Calender constructor/class
         let targetMon = new Date(); // Date of the monday of the week being looked at
         if (targetMon.getDay() != 1) {
             targetMon.setDate(targetMon.getDate() - ((targetMon.getDay() - 1) % 7));
         }
 
-        let displayDates = async function() {
+        let displayDates = async function() { // Displays/updates the dates above the calender
             let tempDate = new Date(targetMon);
             tempDate.setDate(tempDate.getDate() + 6);
             document.getElementById("tableDate").innerHTML = monthNames[targetMon.getMonth()] + " " + targetMon.getDate() + " - " + monthNames[tempDate.getMonth()] + " " + tempDate.getDate();
@@ -44,8 +45,24 @@
                 headers.cells[i + 1].innerHTML = dayNames[i] + " " + newDate.getDate();
             }
         }
+        
+        this.displayBookings = async function () { // Displays all the booking on the calender
+            let roomID = document.getElementById("roomDrop").value; // The list is in order of room id but offset by one due to the default option
+            if (roomID == -1) {
+                return;
+            }
+            let response = await fetch('http://' + hostAddr + ":" + hostPort + '/roomavailability?type=community' + "&id=" + roomID, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            });
+            let bookings = await response.json();
+            console.log(bookings);
+        }
 
         displayDates();
+        this.displayBookings();
 
         this.nextWeek = function() {
             targetMon.setDate(targetMon.getDate() + 7);
@@ -75,8 +92,8 @@
     <h1> Room Booking </h1>
     <p class="mt-2 "> Book a room by first selecting which room you would like to book, then choosing the date, time and duration. </p>
 
-    <select class="browser-default custom-select newDropdown" id="roomDrop">
-        <option selected>Select Room... </option> # Will fetch these from a database
+    <select class="browser-default custom-select newDropdown" id="roomDrop" onchange=calender.displayBookings()>
+        <option selected="selected" value="-1">Select Room... </option> # Will fetch these from a database
         <!--<option value="1">Music Room 1 (max 6 persons) £12/hour</option>-->
     </select>
     <p class="mt-2" > Select the time by clicking below, then change the duration with the drop down. </p>
