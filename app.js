@@ -504,6 +504,45 @@ app.post('/staffhostelbooking', async function(req, resp) {
     }
 });
 
+// cancel booking
+app.post('/cancelbooking', async function(req, resp) {
+    // booking type
+    const type = req.body.type;
+    // booking ID
+    const bookingID = req.body.id;
+
+    // if booking ID specified
+    if (bookingID) {
+        // if type valid
+        if (['community', 'hostel'].includes(type)) {
+            // cancel booking
+            const result = await performQuery('DELETE FROM ' + type + 'Bookings' + ' WHERE id = ' + bookingID);
+
+            // if no database error
+            if (processQueryResult(result, resp)) {
+                // if one row deleted
+                if (result['affectedRows'] == 1) {
+                    // successful cancellation
+                    resp.status(200).send('1success');
+
+                // booking does not exist
+                } else {
+                    // booking error
+                    resp.status(400).send('0booking');
+                }
+            }
+
+        } else {
+            // type error
+            resp.status(400).send('0type');
+        }
+
+    } else {
+        // booking ID error
+        resp.status(400).send('0id');
+    }
+});
+
 // need function to update booking e.g. due to payment
 
 // events
