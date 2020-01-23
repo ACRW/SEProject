@@ -388,6 +388,8 @@ app.get('/customerbookings', async function(req, resp) {
 
 // community room booking
 async function communityBooking(customerID, roomID, start, end, price, paid, resp) {
+    // should check if free at specified times
+
     // insert row
     const result = await performQuery('INSERT INTO communityBookings (start, end, priceOfBooking, paid, roomId, userId) VALUES (FROM_UNIXTIME(' + start + '), FROM_UNIXTIME(' + end + '), ' + price + ', ' + paid + ', ' + roomID + ', ' + customerID + ')');
 
@@ -408,7 +410,7 @@ async function communityBooking(customerID, roomID, start, end, price, paid, res
     return false;
 }
 
-// make a community room booking on behalf of a customer
+// make community room booking on behalf of customer
 app.post('/staffcommunitybooking', async function(req, resp) {
     // customer ID
     const customerID = req.body.customerid;
@@ -428,6 +430,64 @@ app.post('/staffcommunitybooking', async function(req, resp) {
             if (roomID && start && end && price && paid) {
                 // make booking
                 if (await communityBooking(customerID, roomID, start, end, price, paid, resp)) {
+                    // booking successful
+                    resp.status(200).send('1success');
+                }
+
+            } else {
+                // parameter error
+                resp.status(400).send('0parameters');
+            }
+        }
+
+    } else {
+        // customer ID error
+        resp.status(400).send('0customerID');
+    }
+});
+
+// hostel room booking
+async function hostelBooking(customerID, roomID, start, end, resp) {
+    // should check if free at specified times
+
+    // insert row
+    const result = await performQuery('INSERT INTO hostelBookings (roomID, startDate, endDate, userId) VALUES (' + roomID + ', FROM_UNIXTIME(' + start + '), FROM_UNIXTIME(' + end + '), ' + customerID + ')');
+
+    // if no database error
+    if (processQueryResult(result, resp)) {
+        // if correct number of rows inserted
+        if (result['affectedRows'] == 1) {
+            // return true
+            return true;
+
+        } else {
+            // database error
+            resp.status(500).send('0database');
+        }
+    }
+
+    // return false
+    return false;
+}
+
+// make hostel room booking on behalf of customer
+app.post('/staffhostelbooking', async function(req, resp) {
+    // customer ID
+    const customerID = req.body.customerid;
+
+    // if customer ID specified
+    if (customerID) {
+        // check customer exists
+        if (checkCustomerExists(customerID, resp)) {
+            // booking parameters
+            const roomID = req.body.roomid;
+            const start = req.body.start;
+            const end = req.body.end;
+
+            // if all parameters specified
+            if (roomID && start && end) {
+                // make booking
+                if (await hostelBooking(customerID, roomID, start, end, resp)) {
                     // booking successful
                     resp.status(200).send('1success');
                 }
