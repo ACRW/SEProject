@@ -60,7 +60,7 @@ function processQueryResult(result, response) {
     // if database error
     if (result == '0database') {
         // send response
-        response.status(400).send('0database');
+        response.status(500).send('0database');
 
         // return false
         return false;
@@ -386,6 +386,29 @@ app.get('/customerbookings', async function(req, resp) {
     }
 });
 
+// community room booking
+async function communityBooking(customerID, roomID, start, end, price, paid, resp) {
+    // insert row
+    const result = await performQuery('INSERT INTO communityBookings (start, end, priceOfBooking, paid, roomId, userId) VALUES (FROM_UNIXTIME(' + start + '), FROM_UNIXTIME(' + end + '), ' + price + ', ' + paid + ', ' + roomID + ', ' + customerID + ')');
+
+    // if no database error
+    if (processQueryResult(result, resp)) {
+        // if correct number of rows inserted
+        if (result['affectedRows'] == 1) {
+            // return true
+            return true;
+
+        } else {
+            // database error
+            resp.status(500).send('0database');
+        }
+    }
+
+    // return false
+    return false;
+}
+
+// make a community room booking on behalf of a customer
 app.post('/staffcommunitybooking', async function(req, resp) {
     // customer ID
     const customerID = req.body.customerid;
@@ -394,7 +417,25 @@ app.post('/staffcommunitybooking', async function(req, resp) {
     if (customerID) {
         // check customer exists
         if (checkCustomerExists(customerID, resp)) {
-            resp.status(200).send('woo')
+            // booking parameters
+            const roomID = req.body.roomid;
+            const start = req.body.start;
+            const end = req.body.end;
+            const price = req.body.price;
+            const paid = req.body.paid;
+
+            // if all parameters specified
+            if (roomID && start && end && price && paid) {
+                // make booking
+                if (await communityBooking(customerID, roomID, start, end, price, paid, resp)) {
+                    // booking successful
+                    resp.status(200).send('1success');
+                }
+
+            } else {
+                // parameter error
+                resp.status(400).send('0parameters');
+            }
         }
 
     } else {
@@ -405,7 +446,7 @@ app.post('/staffcommunitybooking', async function(req, resp) {
 
 // need function to update booking e.g. due to payment
 
-//events
+// events
 
 // event search
 app.get('/eventsearch', async function(req, resp) {
@@ -444,7 +485,6 @@ app.get('/eventsearch', async function(req, resp) {
         }
     }
 });
-
 
 app.post('/tokensignin', async function(req, resp) {
     const token = req.body.token;
