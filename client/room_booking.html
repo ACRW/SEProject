@@ -33,13 +33,20 @@
     updateRooms();
 
     function Calender () { // Calender constructor/class
-        let targetMon = new Date(); // Date of the monday of the week being looked at
+        let targetMon = new Date(); // Date of the monday of the week being looked at, date initilizes as current date
+        let targetSun = new Date(); // Date of the sunday of the week being looked at (end of week)
         let table = document.getElementById("calTable");
         let eTable = document.getElementById("eventTable");
-        let cellHeight = 50;
-        if (targetMon.getDay() != 1) {
-            targetMon.setDate(targetMon.getDate() - ((targetMon.getDay() - 1) % 7));
+        let cellHeight = 50; // Height of calender rows
+        let bookings = [];
+        
+        targetMon.setHours(0);
+        targetMon.setMinutes(0);
+        targetMon.setSeconds(1);
+        if (targetMon.getDay() != 1) { // Only changes date if not already a monday
+            targetMon.setDate(targetMon.getDate() - ((targetMon.getDay() - 1) % 7)); // Changes to last monday
         }
+        targetSun.setDate(targetMon.getDate() + 7); // Sets the sunday of the week (conveniant to have, also, actually sets the next monday to prevent issues with comparisons)
 
         let displayDates = async function() { // Displays/updates the dates above the calender
             let tempDate = new Date(targetMon);
@@ -54,18 +61,15 @@
         }
         
         let clearCalender = function () { // Clears all the contents of the calender to prevent them 'building up'.
-            for (i = 1; i < table.rows.length; i++) {
-                for (c = 1; c < table.rows[0].cells.length; c++) {
-                    let target = table.rows[i].cells[c];
-                    while (target.firstChild) {
-                        target.removeChild(target.firstChild);
-                    }
+            for (c = 1; c < table.rows[0].cells.length; c++) {
+                let target = eTable.rows[0].cells[c];
+                while (target.firstChild) {
+                    target.removeChild(target.firstChild);
                 }
             }
         }
         
-        this.displayBookings = async function () { // Displays all the booking on the calender
-            clearCalender();
+        this.getBookings = async function() { // Gets the bookings then displays them.
             let roomID = document.getElementById("roomDrop").value; // The list is in order of room id but offset by one due to the default option
             if (roomID == -1) {
                 return;
@@ -77,15 +81,21 @@
                 }
             });
             let availability = await response.json();
-            let bookings = availability["busy"];
-            console.log(bookings);
+            bookings = availability["busy"];
+            displayBookings();
+            return;
+        }
+        
+        let displayBookings = async function () { // Displays all the booking on the calender
+            clearCalender();
             for (i = 0; i < bookings.length; i++) {
                 let ss = bookings[i]["start"].split(/[- :TZ]/);
                 let es = bookings[i]["end"].split(/[- :TZ]/);
-                let day = ss[2];
-                let month = ss[1];
                 let startTime = new Date(Date.UTC(ss[0], ss[1] - 1, ss[2], ss[3], ss[4], 0));
                 let endTime = new Date(Date.UTC(es[0], es[1] - 1, es[2], es[3], es[4], 0));
+                if (startTime <= targetMon || startTime >= targetSun) {
+                    continue; // Continues if booking is not in this week.
+                }
                 let startCell = eTable.rows[0].cells[mod(startTime.getDay() - 1, 7) + 1];
                 let bookingGraphic = document.createElement("div");
                 bookingGraphic.className = "bookingGraphic newColor";
@@ -95,18 +105,21 @@
                 startCell.appendChild(bookingGraphic);
             }
         }
-
+        
         displayDates();
-        this.displayBookings();
 
         this.nextWeek = function() {
             targetMon.setDate(targetMon.getDate() + 7);
+            targetSun.setDate(targetSun.getDate() + 7);
             displayDates();
+            displayBookings();
         }
 
         this.prevWeek = function() {
             targetMon.setDate(targetMon.getDate() - 7);
+            targetSun.setDate(targetSun.getDate() - 7);
             displayDates();
+            displayBookings();
         }
     }
 
@@ -127,7 +140,7 @@
     <h1> Room Booking </h1>
     <p class="mt-2 "> Book a room by first selecting which room you would like to book, then choosing the date, time and duration. </p>
 
-    <select class="browser-default custom-select newDropdown" id="roomDrop" onchange=calender.displayBookings()>
+    <select class="browser-default custom-select newDropdown" id="roomDrop" onchange=calender.getBookings()>
         <option selected="selected" value="-1">Select Room... </option> # Will fetch these from a database
         <!--<option value="1">Music Room 1 (max 6 persons) £12/hour</option>-->
     </select>
