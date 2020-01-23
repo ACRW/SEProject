@@ -1,23 +1,50 @@
-      .newTable>tbody>tr>td, .mytable>tbody>tr>th, .mytable>tfoot>tr>td, .mytable>tfoot>tr>th, .mytable>thead>tr>td, .mytable>thead>tr>th {
-        padding: 30px;
-    }
+.newTable>tbody>tr>td, .mytable>tbody>tr>th, .mytable>tfoot>tr>td, .mytable>tfoot>tr>th, .mytable>thead>tr>td, .mytable>thead>tr>th {
+    padding: 0px;
+    margin: 0px;
+    border: 0px;
+}
 
-    .newColor {
-        background-color: #C2D6B6;
-        color: black;
-        border-style: none;
-        font-size: 115%;
-    }
+.newHeight tr {
+    height: 50px;
+}
 
-    .newColor:hover {
-        background-color: #A5B686;
-    }
+.newHeight td {
+    width: 10px;
+}
 
-    .newDropdown {
-        background-color: #C2D6B6;
-        font-size: 115%;
-        color: black;
-    }
+.hiddenTable {
+    position: relative;
+    /*margin: 0;
+    padding: 0;*/
+    height: 700px;
+    
+}
+
+.newColor {
+    background-color: #C2D6B6;
+    color: black;
+    border-style: none;
+    font-size: 115%;
+}
+
+.newColor:hover {
+    background-color: #A5B686;
+}
+
+.newDropdown {
+    background-color: #C2D6B6;
+    font-size: 115%;
+    color: black;
+}
+
+.bookingGraphic {
+    border-radius: 5px;
+    position: relative;
+    width: 100%;
+    z-index: 10;
+    padding: 0;
+    margin: 0;
+}
 
     /* Dropdown Button */
 .dropbtn {

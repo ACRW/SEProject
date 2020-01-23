@@ -1,19 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>TCR Hub Booking Design</title>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-  <link rel="stylesheet" href="style.css">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-  <script>
+    <title>TCR Hub Booking</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script>
     const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
     const dayNames = ["Mon", "Tues", "Wed", "Thur", "Fri", "Sat", "Sun"];
     const hostAddr = "127.0.0.1";
     const hostPort = "8090"
+    
+    function mod(n, m) { // Because javascript mod % is broken
+        return ((n % m) + m) % m;
+    }
 
     async function updateRooms() {
         const rooms = await getRooms();
@@ -30,6 +34,9 @@
 
     function Calender () { // Calender constructor/class
         let targetMon = new Date(); // Date of the monday of the week being looked at
+        let table = document.getElementById("calTable");
+        let eTable = document.getElementById("eventTable");
+        let cellHeight = 50;
         if (targetMon.getDay() != 1) {
             targetMon.setDate(targetMon.getDate() - ((targetMon.getDay() - 1) % 7));
         }
@@ -38,7 +45,7 @@
             let tempDate = new Date(targetMon);
             tempDate.setDate(tempDate.getDate() + 6);
             document.getElementById("tableDate").innerHTML = monthNames[targetMon.getMonth()] + " " + targetMon.getDate() + " - " + monthNames[tempDate.getMonth()] + " " + tempDate.getDate();
-            headers = document.getElementById("calTable").rows[0];
+            headers = table.rows[0];
             for (i = 0; i < 7; i++) {
                 newDate = new Date(targetMon);
                 newDate.setDate(newDate.getDate() + i);
@@ -46,7 +53,19 @@
             }
         }
         
+        let clearCalender = function () { // Clears all the contents of the calender to prevent them 'building up'.
+            for (i = 1; i < table.rows.length; i++) {
+                for (c = 1; c < table.rows[0].cells.length; c++) {
+                    let target = table.rows[i].cells[c];
+                    while (target.firstChild) {
+                        target.removeChild(target.firstChild);
+                    }
+                }
+            }
+        }
+        
         this.displayBookings = async function () { // Displays all the booking on the calender
+            clearCalender();
             let roomID = document.getElementById("roomDrop").value; // The list is in order of room id but offset by one due to the default option
             if (roomID == -1) {
                 return;
@@ -57,8 +76,24 @@
                     "Content-Type": "application/json"
                 }
             });
-            let bookings = await response.json();
+            let availability = await response.json();
+            let bookings = availability["busy"];
             console.log(bookings);
+            for (i = 0; i < bookings.length; i++) {
+                let ss = bookings[i]["start"].split(/[- :TZ]/);
+                let es = bookings[i]["end"].split(/[- :TZ]/);
+                let day = ss[2];
+                let month = ss[1];
+                let startTime = new Date(Date.UTC(ss[0], ss[1] - 1, ss[2], ss[3], ss[4], 0));
+                let endTime = new Date(Date.UTC(es[0], es[1] - 1, es[2], es[3], es[4], 0));
+                let startCell = eTable.rows[0].cells[mod(startTime.getDay() - 1, 7) + 1];
+                let bookingGraphic = document.createElement("div");
+                bookingGraphic.className = "bookingGraphic newColor";
+                bookingGraphic.style.top = String(((startTime.getHours() - 9) * 50) + 50) + "px";
+                let bookingLength = (endTime.getHours() - startTime.getHours()) + (endTime.getMinutes() - startTime.getMinutes()) / 60;
+                bookingGraphic.style.height = String(bookingLength * cellHeight) + "px";
+                startCell.appendChild(bookingGraphic);
+            }
         }
 
         displayDates();
@@ -88,7 +123,7 @@
   </script>
 </head>
 <body>
-<div class="container" style="font-size: 100%">
+<div class="container" style="font-size: 100%; position: relative;">
     <h1> Room Booking </h1>
     <p class="mt-2 "> Book a room by first selecting which room you would like to book, then choosing the date, time and duration. </p>
 
@@ -98,21 +133,32 @@
     </select>
     <p class="mt-2" > Select the time by clicking below, then change the duration with the drop down. </p>
     <div class="row">
-      <div class="col"><button type="button" class="btn btn-primary newColor" onclick="calender.prevWeek()">Prev</button></div>
-      <div class="col" ><h3 id="tableDate"></h3></div>
-      <div class="col"><button type="button" class="btn btn-primary newColor" onclick="calender.nextWeek()" style="float: right;">Next</a></div>
+        <div class="col"><button type="button" class="btn btn-primary newColor" onclick="calender.prevWeek()">Prev</button></div>
+        <div class="col" ><h3 id="tableDate"></h3></div>
+        <div class="col"><button type="button" class="btn btn-primary newColor" onclick="calender.nextWeek()" style="float: right;">Next</a></div>
     </div>
-    <table class="table table-striped newTable" id="calTable" style="margin-top:5px; text-align: center;">
+    <table class="table newTable newHeight hiddenTable" id="eventTable" style="margin-top:5px; text-align: center;"> <!-- Might be smarter to generate this with javascript. -->
+        <tr style="">
+            <th style="width:9%"></th>
+            <th style="width:13%"></th>
+            <th style="width:13%"></th>
+            <th style="width:13%"></th>
+            <th style="width:13%"></th>
+            <th style="width:13%"></th>
+            <th style="width:13%"></th>
+            <th style="width:13%"></th>
+        </tr>
+    <table class="table table-striped newTable newHeight" id="calTable" style="margin-top:-705px; text-align: center;"> <!-- Might be smarter to generate this with javascript. -->
         <thead>
           <tr style="background-color: #C2D6B6">
-            <th>Time</th>
-            <th>Mon</th>
-            <th>Tues</th>
-            <th>Wed</th>
-            <th>Thurs</th>
-            <th>Fri</th>
-            <th>Sat</th>
-            <th>Sun</th>
+            <th style="width:9%">Time</th>
+            <th style="width:13%">Mon</th>
+            <th style="width:13%">Tues</th>
+            <th style="width:13%">Wed</th>
+            <th style="width:13%">Thurs</th>
+            <th style="width:13%">Fri</th>
+            <th style="width:13%">Sat</th>
+            <th style="width:13%">Sun</th>
           </tr>
         </thead>
         <colgroup>
