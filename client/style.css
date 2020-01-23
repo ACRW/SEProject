@@ -46,6 +46,17 @@
     margin: 0;
 }
 
+    .mainButton {
+      margin-top: 15px;
+      margin-left: 5px;
+      margin-right: 5px;
+    }
+
+    .btn {
+      margin-bottom: 5px;
+      margin-top: 5px;
+    }
+
     /* Dropdown Button */
 .dropbtn {
   background-color: #4CAF50;

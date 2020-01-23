@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <title>TCR Hub Staff Page</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
@@ -26,6 +27,7 @@
       document.getElementById('searchResults').innerHTML = '';
       document.getElementById("searchModalFooter").hidden = false;
       document.getElementById("roomAvailabilityTable").hidden = true;
+      document.getElementById("makeBooking").hidden = false;
     }
 
     //unhides the correct form
@@ -36,6 +38,8 @@
       document.getElementById('searchResults').innerHTML = '';
       document.getElementById("searchModalFooter").hidden = false;
       document.getElementById("roomAvailabilityTable").hidden = true;
+      document.getElementById("makeBooking").hidden = false;
+
     }
 
     //unhides the correct form
@@ -46,6 +50,8 @@
       document.getElementById('searchResults').innerHTML = '';
       document.getElementById("searchModalFooter").hidden = false;
       document.getElementById("roomAvailabilityTable").hidden = true;
+      document.getElementById("makeBooking").hidden = false;
+
     }
 
     const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -119,9 +125,25 @@
     function filterEmailFunction() {
       var input, filter, ul, li, a, i;
       input = document.getElementById("findByEmailSearch");
-      console.log(document.getElementById("findByEmailSearch"))
       filter = input.value.toUpperCase();
       div = document.getElementById("findByEmailDropdown");
+      a = div.getElementsByTagName("a");
+      for (i = 0; i < a.length; i++) {
+        txtValue = a[i].textContent || a[i].innerText;
+        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+          a[i].style.display = "";
+        } else {
+          a[i].style.display = "none";
+        }
+      }
+    }
+
+    //for dropdown search box for booking
+    function filterEventNameFunction() {
+      var input, filter, ul, li, a, i;
+      input = document.getElementById("findByEventNameSearch");
+      filter = input.value.toUpperCase();
+      div = document.getElementById("findByEventNameDropdown");
       a = div.getElementsByTagName("a");
       for (i = 0; i < a.length; i++) {
         txtValue = a[i].textContent || a[i].innerText;
@@ -139,12 +161,16 @@
   </script>
 </head>
 <body>
-  <div class="container" style="font-size: 100%">
-    <button type="button" class="btn btn-primary newColor" onclick="clearSearch()" data-toggle="modal" data-target="#searchModal">Search</button>
-    <button type="button" class="btn btn-primary newColor" onclick="" data-toggle="modal" data-target="#newEventModal">New Booking</button>
-    <button type="button" class="btn btn-primary newColor" onclick="" data-toggle="modal" data-target="#notificationModal">Notifications</button>
 
+  <!-- buttons at top of page -->
+  <div class="container" style="font-size: 100%">
+    <button type="button" class="btn btn-primary newColor mainButton" onclick="clearSearch()" data-toggle="modal" data-target="#searchModal">Search</button>
+    <button type="button" class="btn btn-primary newColor mainButton" onclick="" data-toggle="modal" data-target="#newEventModal" id='newBookingButton'>New Booking</button>
+    <button type="button" class="btn btn-primary newColor mainButton" onclick="" data-toggle="modal" data-target="#notificationModal">Notifications</button>
+    <button type="button" class="btn btn-primary newColor mainButton" onclick="" data-toggle="modal" data-target="#statisticsModal">Statistics</button>
   </div>
+
+
   <div class="modal" id="searchModal" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-lg" role="document">
       <div class="modal-content">
@@ -155,11 +181,13 @@
           </button>
         </div>
         <div class="modal-body" id="searchModalBody">
+          <h5>Select a button to search for a specific user, a specific event or to find out if a room is avaliable.</h5>
           <button type="button" class="btn btn-primary newColor" onclick="byUser()" id='searchUser'>Find User</button>
           <button type="button" class="btn btn-primary newColor" onclick="byEvent()" id ='searchEvent'>Find Event</button>
           <button type="button" class="btn btn-primary newColor" onclick="byAvaliability()" id='searchAvaliability'>Check Avaliabilty</button>
           <div id='searchResults'></div>
           <form id='byUser' hidden=true>
+            <h5>Enter any information you have about the user. Leave inputs blank if you're unsure.</h5>
             <div class="form-group">
               <label>First Name</label>
               <input class="form-control" id="firstnameSearch" placeholder="Enter first name or leave blank">
@@ -178,6 +206,7 @@
             </div>
           </form>
           <form id='byEvent' hidden=true>
+            <h5>Enter a event name or choose the date of the event </h5>
             <div class="form-group">
               <label>Event Name</label>
               <input class="form-control" id="eventSearch" placeholder="Enter event name or leave blank"> <!--check valid -->
@@ -215,6 +244,7 @@
           </form>
           <form id='byAvaliability' hidden=true>
             <div class="form-group">
+              <h5>Choose a room and date to check room avaliabilty </h5>
               <label>Room</label>
               <select class="browser-default custom-select newDropdown" id="roomSelectDrop">
                   <option selected>Select Room... </option> <!--check valid -->
@@ -322,6 +352,8 @@
       </div>
     </div>
   </div>
+
+
   <div class="modal" id="newEventModal" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-lg" role="document">
       <div class="modal-content">
@@ -332,6 +364,8 @@
           </button>
         </div>
         <div class="modal-body">
+          <div id="findBy">
+          <h5>Find user to book for by name, email or phone number</h5>
           <div class="dropdown">
             <button onclick="hideShow('findByNameDropdown')" class="dropbtn">Find By Name</button>
             <div id='findByNameDropdown' class="dropdown-content">
@@ -343,7 +377,7 @@
             <button onclick="hideShow('findByPhoneNumberDropdown')" class="dropbtn newColor">Find By Phone Number</button>
             <div id='findByPhoneNumberDropdown' class="dropdown-content">
               <input type="text" placeholder="Search.." id="findByPhoneNumberSearch" onkeyup="filterPhoneNumberFunction()">
-              
+
             </div>
           </div>
           <div class="dropdown">
@@ -353,7 +387,9 @@
 
             </div>
           </div>
-          <div class="container" style="font-size: 100%">
+        </div>
+          <div class="container" id='makeBooking' style="font-size: 100%" hidden='true'>
+              <h2 id='customerInfo'></h2>
               <h1> Room Booking </h1>
               <p class="mt-2 "> Book a room by first selecting which room you would like to book, then choosing the date, time and duration. </p>
 
@@ -551,6 +587,7 @@
       </div>
     </div>
   </div>
+
   <div class="modal" id='notificationModal' tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
@@ -570,6 +607,7 @@
       </div>
     </div>
   </div>
+
   <div class="modal" id='viewUsersBookingsModal' tabindex="-1" role="dialog">
     <div class="modal-dialog modal-lg" role="document">
       <div class="modal-content">
@@ -615,6 +653,32 @@
       </div>
     </div>
   </div>
+
+  <div class="modal" id='statisticsModal' tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Statistics</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <h5>Choose a past event to view statistics about it</h5>
+        <div class="dropdown">
+          <button onclick="hideShow('findByEventNameDropdown')" class="dropbtn">Find By Event Name</button>
+          <div id='findByEventNameDropdown' class="dropdown-content">
+            <input type="text" placeholder="Search.." id="findByEventNameSearch" onkeyup="filterNameFunction()">
+
+          </div>
+
+        </div>
+        <h5 id='eventStatistics'></h5>
+      </div>
+      <div class="modal-footer">
+    </div>
+  </div>
+</div>
 
 </body>
 </html>
