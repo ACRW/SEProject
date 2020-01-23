@@ -547,17 +547,37 @@ app.post('/cancelbooking', async function(req, resp) {
 
 // events
 
+// get all events
+app.get('/events', async function(req,resp) {
+    // fetch events
+    const events = await performQuery('SELECT * FROM events');
+
+    // if no database error
+    if (processQueryResult(events, resp)) {
+        // if matching events found
+        if (events.length > 0) {
+            // send list of events
+            resp.status(200).send(JSON.stringify(events));
+
+        } else {
+            // no matches
+            resp.status(200).send('0matches');
+        }
+    }
+});
+
 // event search
 app.get('/eventsearch', async function(req, resp) {
     // search parameters
+    const id = req.query.id;
     const name = req.query.name;
     const date = req.query.date;
-    console.log(name)
 
     // where clause
     let where = '';
 
     // build search clause
+    where = addToSearchClause(id, 'id', where);
     where = addToSearchClause(name, 'name', where);
     where = addToSearchClause(date, 'datetime', where);
 
@@ -576,6 +596,41 @@ app.get('/eventsearch', async function(req, resp) {
             if (events.length > 0) {
                 // send list of events
                 resp.status(200).send(JSON.stringify(events));
+
+            } else {
+                // no matches
+                resp.status(200).send('0matches');
+            }
+        }
+    }
+});
+
+app.get('/eventstatistics', async function(req, resp) {
+    // search parameters
+    const id = req.query.id;
+
+
+    // where clause
+    let where = '';
+
+    // build search clause
+    where = addToSearchClause(id, 'e.id', where);
+
+    // if no parameters specified
+    if (where.length == 0) {
+        // parameter error
+        resp.status(400).send('0parameters');
+
+    } else {
+        // get matching events
+        const stats = await performQuery('SELECT e.name, e.description, e.capacity, e.datetime, SUM(ts.noOfTickets) AS numSold FROM events e INNER JOIN ticketsSold ts ON e.id = ts.eventId WHERE ' + where)
+
+        // if no database error
+        if (processQueryResult(stats, resp)) {
+            // if matching customers found
+            if (stats.length > 0) {
+                // send list of events
+                resp.status(200).send(JSON.stringify(stats));
 
             } else {
                 // no matches

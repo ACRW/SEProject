@@ -279,6 +279,26 @@ async function fillFindBy(){
     } catch (error) {
       alert ('Problem: ' + error);
     }
+    try{
+      let response = await fetch('http://localhost:8090/events',
+        {
+          method: 'GET',
+          headers: {
+              "Content-Type": "application/json"
+            }
+        });
+      if(response.ok){
+        var body = await response.text();
+        var events = JSON.parse(body);
+        for(var i = 0; i<customers.length; i++){
+          document.getElementById('findByEventNameDropdown').innerHTML += '<a onclick="eventStatsView('+events[i].id+')">' + events[i].name + '</a>';
+        }
+      }else{
+        throw new Error('Error getting events' + response.code);
+      }
+      } catch (error) {
+        alert ('Problem: ' + error);
+      }
   }
 
 async function bookingView(id){
@@ -299,6 +319,29 @@ async function bookingView(id){
 
     }else{
       throw new Error('Error getting customers' + response.code);
+    }
+    } catch (error) {
+      alert ('Problem: ' + error);
+    }
+}
+
+async function eventStatsView(id){
+  console.log(id)
+  try{
+    let response = await fetch('http://localhost:8090/eventstatistics?id='+id,
+      {
+        method: 'GET',
+        headers: {
+            "Content-Type": "application/json"
+          }
+      });
+    if(response.ok){
+      var body = await response.text();
+      var stats = JSON.parse(body);
+      document.getElementById('eventStatistics').innerHTML = "Event Name: " + stats[0].name + " Description: " + stats[0].description + " Tickets Sold: " + stats[0].numSold + '/' + stats[0].capacity;
+
+    }else{
+      throw new Error('Error getting statistics' + response.code);
     }
     } catch (error) {
       alert ('Problem: ' + error);
