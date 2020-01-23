@@ -381,6 +381,7 @@ app.get('/eventsearch', async function(req, resp) {
     // search parameters
     const name = req.query.name;
     const date = req.query.date;
+    console.log(name)
 
     // where clause
     let where = '';

@@ -167,7 +167,7 @@ async function getRooms(startDate, endDate) { // Need to add error handling at s
 }
 
 async function searchForAvaliability(){
-  roomName = document.getElementById("roomSelectDrop2").value;
+  roomName = document.getElementById("roomSelectDrop").value;
   year = document.getElementById("yearAvaliableSearch").value;
   month = document.getElementById("monthAvaliableSearch").value;
   day = document.getElementById("dayAvaliableSearch").value;
@@ -216,6 +216,9 @@ async function searchForEvents(){
   month = document.getElementById("monthEventSearch").value;
   day = document.getElementById("dayEventSearch").value;
   var dateCombined = year+ '-' + month + '-' + day;
+  if(dateCombined.length != 10){
+    dateCombined = ''
+  }
   try{
     let response = await fetch('http://localhost:8090/eventsearch?name=' + name + '&date=' + dateCombined,
       {
@@ -228,6 +231,7 @@ async function searchForEvents(){
       var body = await response.text();
       var events = JSON.parse(body);
       document.getElementById('byEvent').hidden = true;
+      document.getElementById('searchResults').innerHTML += '<h5> Found ' + events.length + ' match in the database </h5>';
       for(var i=0; i<events.length; i++){
         document.getElementById('searchResults').innerHTML += '<p> Name : ' + events[i].name + ' Description: ' + events[i].description + ' Capacity: ' + events[i].capacity;
       }
