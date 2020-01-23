@@ -70,6 +70,24 @@ function processQueryResult(result, response) {
     return true;
 }
 
+// add parameter to search clause
+function addToSearchClause(parameter, field, whereClause) {
+    // if parameter defined
+    if (parameter) {
+        // if necessary
+        if (whereClause.length > 0) {
+            // add 'AND' to clause
+            whereClause += ' AND ';
+        }
+
+        // add parameter
+        whereClause += field + ' LIKE "%' + parameter + '%"';
+    }
+
+    // return search clause
+    return whereClause;
+}
+
 // rooms
 
 // get rooms
@@ -222,39 +240,45 @@ app.get('/roomavailability', async function(req, resp) {
 
 // customers
 
-// add parameter to search clause
-function addToSearchClause(parameter, field, whereClause) {
-    // if parameter defined
-    if (parameter) {
-        // if necessary
-        if (whereClause.length > 0) {
-            // add 'AND' to clause
-            whereClause += ' AND ';
+// check customer in database
+async function checkCustomerExists(customerID, resp) {
+    // try to get customer's details
+    const customer = await performQuery('SELECT * FROM users WHERE id = ' + customerID);
+
+    // if no database error
+    if (processQueryResult(customer, resp)) {
+        // if customer in database
+        if (customer.length == 1) {
+            // return true
+            return true;
         }
 
-        // add parameter
-        whereClause += field + ' LIKE "%' + parameter + '%"';
-    }
+        // ID error
+        resp.status(400).send('0customerID');
 
-    // return search clause
-    return whereClause;
+        // return false
+        return false;
+    }
 }
 
-//get all customers
-app.get('/customers', async function(req,resp){
-  const customers = await performQuery('SELECT * FROM users');
-  if (processQueryResult(customers, resp)) {
-      // if matching customers found
-      if (customers.length > 0) {
-          // send list of customers
-          resp.status(200).send(JSON.stringify(customers));
+// get all customers
+app.get('/customers', async function(req,resp) {
+    // fetch customers
+    const customers = await performQuery('SELECT * FROM users');
 
-      } else {
-          // no matches
-          resp.status(200).send('0matches');
-      }
-  }
-})
+    // if no database error
+    if (processQueryResult(customers, resp)) {
+        // if matching customers found
+        if (customers.length > 0) {
+            // send list of customers
+            resp.status(200).send(JSON.stringify(customers));
+
+        } else {
+            // no matches
+            resp.status(200).send('0matches');
+        }
+    }
+});
 
 // customer search
 app.get('/customersearch', async function(req, resp) {
@@ -348,23 +372,12 @@ app.get('/customerbookings', async function(req, resp) {
 
     // if ID specified
     if (customerID) {
-        // check customer in database
-        const customer = await performQuery('SELECT * FROM users WHERE id = ' + customerID);
-
-        // if no database error
-        if (processQueryResult(customer, resp)) {
-            // if customer in database
-            if (customer.length == 1) {
-                // get dictionary of bookings
-                const bookingsToReturn = await bookings(customerID, resp);
-                // send bookings
-                resp.status(200).send(bookingsToReturn);
-
-            // customer not in database
-            } else {
-                // ID error
-                resp.status(400).send('0customerID');
-            }
+        // check customer exists
+        if (await checkCustomerExists(customerID, resp)) {
+            // get dictionary of bookings
+            const bookingsToReturn = await bookings(customerID, resp);
+            // send bookings
+            resp.status(200).send(bookingsToReturn);
         }
 
     } else {
@@ -373,11 +386,29 @@ app.get('/customerbookings', async function(req, resp) {
     }
 });
 
-//events
-app.get('/eventsearch', async function(req, resp) {
-    // need authentication here
-    // look into session variables
+app.post('/staffcommunitybooking', async function(req, resp) {
+    // customer ID
+    const customerID = req.body.customerid;
 
+    // if customer ID specified
+    if (customerID) {
+        // check customer exists
+        if (checkCustomerExists(customerID, resp)) {
+            resp.status(200).send('woo')
+        }
+
+    } else {
+        // customer ID error
+        resp.status(400).send('0customerID');
+    }
+});
+
+// need function to update booking e.g. due to payment
+
+//events
+
+// event search
+app.get('/eventsearch', async function(req, resp) {
     // search parameters
     const name = req.query.name;
     const date = req.query.date;
@@ -396,14 +427,14 @@ app.get('/eventsearch', async function(req, resp) {
         resp.status(400).send('0parameters');
 
     } else {
-        // get matching customers
+        // get matching events
         const events = await performQuery('SELECT * FROM events WHERE ' + where + ' ORDER BY name');
 
         // if no database error
         if (processQueryResult(events, resp)) {
             // if matching customers found
             if (events.length > 0) {
-                // send list of customers
+                // send list of events
                 resp.status(200).send(JSON.stringify(events));
 
             } else {
