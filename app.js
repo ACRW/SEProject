@@ -243,7 +243,7 @@ app.get('/roomavailability', async function(req, resp) {
 // check customer in database
 async function checkCustomerExists(customerID, resp) {
     // try to get customer's details
-    const customer = await performQuery('SELECT * FROM users WHERE id = ' + customerID);
+    const customer = await performQuery('SELECT id, fName, lName, email, phone FROM customers WHERE id = ' + customerID);
 
     // if no database error
     if (processQueryResult(customer, resp)) {
@@ -264,7 +264,7 @@ async function checkCustomerExists(customerID, resp) {
 // get all customers
 app.get('/customers', async function(req,resp) {
     // fetch customers
-    const customers = await performQuery('SELECT * FROM users');
+    const customers = await performQuery('SELECT id, fName, lName, email, phone FROM customers');
 
     // if no database error
     if (processQueryResult(customers, resp)) {
@@ -309,7 +309,7 @@ app.get('/customersearch', async function(req, resp) {
 
     } else {
         // get matching customers
-        const customers = await performQuery('SELECT * FROM users WHERE ' + where + ' ORDER BY lName, fName');
+        const customers = await performQuery('SELECT id, fName, lName, email, phone FROM customers WHERE ' + where + ' ORDER BY lName, fName');
 
         // if no database error
         if (processQueryResult(customers, resp)) {
@@ -640,13 +640,27 @@ app.get('/eventstatistics', async function(req, resp) {
     }
 });
 
-app.post('/tokensignin', async function(req, resp) {
+app.post('/customersignin', async function(req, resp) {
     const token = req.body.token;
     const payload = await login(token);
 
     if (!payload) {
-        resp.status(403).send('failed to verify token integrity');
+        resp.status(403).send('0token');
     } else {
+        const googleID = payload['sub'];
+
+        const customer = await performQuery('SELECT * FROM customers WHERE googleId = ' + googleID);
+
+        if (processQueryResult(customer, resp)) {
+            if (customer.length == 1) {
+
+            } else {
+                //const result = await performQuery('INSERT INTO customers (fName, lName, googleId, email) VALUES ("' + payload['give_name'] + '", "' + payload['family_name'] + '", "' + googleID + '", "' + payload['email'] + '")');
+
+                //console.log(result);
+            }
+        }
+
         resp.status(200).send('successfully verified token integrity');
     }
 });
