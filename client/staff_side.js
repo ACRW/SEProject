@@ -81,6 +81,10 @@ async function searchForUser(){
       });
     if(response.ok){
       var body = await response.text();
+      if(body=='0matches'){
+        document.getElementById('searchResults').innerHTML += '<h5> No results found </h5>';
+        document.getElementById('byUser').hidden = true;
+      }else{
       var customers = JSON.parse(body);
       document.getElementById('byUser').hidden = true;
       document.getElementById('searchResults').innerHTML += '<h5> Found ' + customers.length + ' match in the database </h5>';
@@ -89,6 +93,7 @@ async function searchForUser(){
         document.getElementById('searchResults').innerHTML += '<button type="button" class="btn btn-primary newColor" id="result'+i+'" data-toggle="modal" data-target="#viewUsersBookingsModal">View Bookings</button>';
         document.getElementById('result'+i).addEventListener('click', getUserBookings(customers[i].id));
       }
+    }
     } else {
       throw new Error('Error getting customers' + response.code);
     }
@@ -110,6 +115,7 @@ async function getUserBookings(customerID){
       });
       if(response.ok){
         var body = await response.text();
+
         var bookings = JSON.parse(body);
 
         for(var i=0;i<bookings['community'].length;i++){
@@ -229,12 +235,17 @@ async function searchForEvents(){
       });
     if(response.ok){
       var body = await response.text();
+      if(body=='0matches'){
+        document.getElementById('byEvent').hidden = true;
+        document.getElementById('searchResults').innerHTML += '<h5> No results found </h5>';
+      }else{
       var events = JSON.parse(body);
       document.getElementById('byEvent').hidden = true;
       document.getElementById('searchResults').innerHTML += '<h5> Found ' + events.length + ' match in the database </h5>';
       for(var i=0; i<events.length; i++){
         document.getElementById('searchResults').innerHTML += '<p> Name : ' + events[i].name + ' Description: ' + events[i].description + ' Capacity: ' + events[i].capacity;
       }
+    }
     } else {
       throw new Error('Error getting customers' + response.code);
     }
