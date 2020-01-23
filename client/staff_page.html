@@ -125,9 +125,25 @@
     function filterEmailFunction() {
       var input, filter, ul, li, a, i;
       input = document.getElementById("findByEmailSearch");
-      console.log(document.getElementById("findByEmailSearch"))
       filter = input.value.toUpperCase();
       div = document.getElementById("findByEmailDropdown");
+      a = div.getElementsByTagName("a");
+      for (i = 0; i < a.length; i++) {
+        txtValue = a[i].textContent || a[i].innerText;
+        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+          a[i].style.display = "";
+        } else {
+          a[i].style.display = "none";
+        }
+      }
+    }
+
+    //for dropdown search box for booking
+    function filterEventNameFunction() {
+      var input, filter, ul, li, a, i;
+      input = document.getElementById("findByEventNameSearch");
+      filter = input.value.toUpperCase();
+      div = document.getElementById("findByEventNameDropdown");
       a = div.getElementsByTagName("a");
       for (i = 0; i < a.length; i++) {
         txtValue = a[i].textContent || a[i].innerText;
@@ -151,7 +167,7 @@
     <button type="button" class="btn btn-primary newColor mainButton" onclick="clearSearch()" data-toggle="modal" data-target="#searchModal">Search</button>
     <button type="button" class="btn btn-primary newColor mainButton" onclick="" data-toggle="modal" data-target="#newEventModal" id='newBookingButton'>New Booking</button>
     <button type="button" class="btn btn-primary newColor mainButton" onclick="" data-toggle="modal" data-target="#notificationModal">Notifications</button>
-    <button type="button" class="btn btn-primary newColor mainButton" onclick="" data-toggle="modal" data-target="#statsModal">Statistics</button>
+    <button type="button" class="btn btn-primary newColor mainButton" onclick="" data-toggle="modal" data-target="#statisticsModal">Statistics</button>
   </div>
 
 
@@ -637,6 +653,32 @@
       </div>
     </div>
   </div>
+
+  <div class="modal" id='statisticsModal' tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Statistics</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <h5>Choose a past event to view statistics about it</h5>
+        <div class="dropdown">
+          <button onclick="hideShow('findByEventNameDropdown')" class="dropbtn">Find By Event Name</button>
+          <div id='findByEventNameDropdown' class="dropdown-content">
+            <input type="text" placeholder="Search.." id="findByEventNameSearch" onkeyup="filterNameFunction()">
+
+          </div>
+
+        </div>
+        <h5 id='eventStatistics'></h5>
+      </div>
+      <div class="modal-footer">
+    </div>
+  </div>
+</div>
 
 </body>
 </html>
