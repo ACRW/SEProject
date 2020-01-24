@@ -61,6 +61,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
   })
 
+  document.getElementById('bookingRoomDropdown').addEventListener('change',function(){
+    fillPrice()
+  });
+
+  document.getElementById('bookingDurationTime').addEventListener('change',function(){
+    calculatePrice()
+  });
 
   updateRooms();
 
@@ -124,7 +131,6 @@ async function getUserBookings(customerID){
           tableRow='<tr><th scope="row">'+bookings['community'][i].bookingID+'</th><td>'+bookings['community'][i].start+'</td><td>'+bookings['community'][i].end+'</td><td>'+bookings['community'][i].priceOfBooking+'</td><td>'+bookings['community'][i].paid+'</td><td>'+ bookings['community'][i].name+'</td></tr>';
           document.getElementById('usersCommunityBookingTableBody').innerHTML += tableRow;
         }
-        console.log(bookings['hostel'][0]);
         for(var i=0;i<bookings['hostel'].length;i++){
           tableRow='<tr><th scope="row">'+bookings['hostel'][i].bookingID+'</th><td>'+bookings['hostel'][i].startDate+'</td><td>'+bookings['hostel'][i].endDate+'</td><td>'+bookings['hostel'][i].roomID+'</td><td>'+bookings['hostel'][i].pricePerNight+'</td><td>'+ bookings['hostel'][i].noOfPeople+'</td></tr>';
           document.getElementById('usersHostelBookingTableBody').innerHTML += tableRow;
@@ -152,6 +158,7 @@ async function updateRooms() {
         bookRoomDrop.add(option2);
         roomDrop.add(option);
     }
+
 }
 
 function daysInMonth (year, month) {
@@ -258,7 +265,7 @@ async function searchForEvents(){
       throw new Error('Error getting customers' + response.code);
     }
     } catch (error) {
-      alert ('Problem: ' + error);
+      alert ('Error: ' + error);
     }
   document.getElementById("searchModalFooter").hidden = true;
 }
@@ -285,7 +292,7 @@ async function fillFindBy(){
       throw new Error('Error getting customers' + response.code);
     }
     } catch (error) {
-      alert ('Problem: ' + error);
+      alert ('Error: ' + error);
     }
     try{
       let response = await fetch('http://localhost:8090/events',
@@ -298,14 +305,15 @@ async function fillFindBy(){
       if(response.ok){
         var body = await response.text();
         var events = JSON.parse(body);
-        for(var i = 0; i<customers.length; i++){
+        for(var i = 0; i<events.length; i++){
+
           document.getElementById('findByEventNameDropdown').innerHTML += '<a onclick="eventStatsView('+events[i].id+')">' + events[i].name + '</a>';
         }
       }else{
         throw new Error('Error getting events' + response.code);
       }
       } catch (error) {
-        alert ('Problem: ' + error);
+        alert ('Error: ' + error);
       }
   }
 
@@ -330,12 +338,11 @@ async function bookingView(id){
       throw new Error('Error getting customers' + response.code);
     }
     } catch (error) {
-      alert ('Problem: ' + error);
+      alert ('Error: ' + error);
     }
 }
 
 async function eventStatsView(id){
-  console.log(id)
   try{
     let response = await fetch('http://localhost:8090/eventstatistics?id='+id,
       {
@@ -353,30 +360,28 @@ async function eventStatsView(id){
       throw new Error('Error getting statistics' + response.code);
     }
     } catch (error) {
-      alert ('Problem: ' + error);
+      alert ('Error: ' + error);
     }
 }
 
 async function newBooking(id){
-  console.log(id)
   startTime = parseInt(document.getElementById('bookingStartTime').value) + 8;
   duration = document.getElementById('bookingDurationTime').value;
   //startnew Date(2010, 6, 26).getTime() / 1000
-  if(duration == 1){
+  if(duration == 0.5){
     endTime = new Date(2020, 0, 25, startTime, 30, 0, 0).getTime()/1000;
-  }else if(duration == 2){
+  }else if(duration == 1){
     endTime = new Date(2020, 0, 25, startTime + 1, 0, 0, 0).getTime()/1000;
 
-  }else if(duration == 3){
+  }else if(duration == 1.5){
     endTime = new Date(2020, 0, 25, startTime+1, 30, 0, 0).getTime()/1000;
   }else{
     endTime = new Date(2020, 0, 25, startTime+2, 0, 0, 0).getTime()/1000;
   }
   startTime = new Date(2020, 0, 25, startTime, 0, 0, 0).getTime()/1000;
-  console.log(startTime)
   roomId = document.getElementById('bookingRoomDropdown').value;
-  price = 10
-  paid = 5
+  price = document.getElementById('totalBookingPrice').innerText;
+  paid = 0
   let response = await fetch('http://localhost:8090/staffcommunitybooking',
     {
       method: 'POST',
@@ -389,4 +394,37 @@ async function newBooking(id){
     throw new Error('problem adding new event ' + response.code);
   }
 
+}
+
+async function fillPrice(){
+  roomId = document.getElementById('bookingRoomDropdown').value;
+
+  try{
+    let response = await fetch('http://localhost:8090/communityroomprice?id='+roomId,
+      {
+        method: 'GET',
+        headers: {
+            "Content-Type": "application/json"
+          }
+      });
+    if(response.ok){
+      var body = await response.text();
+      if(body=='0matches'){
+    }else{
+      var price = JSON.parse(body);
+      document.getElementById('roomName').innerText = price[0].name;
+      document.getElementById('roomPricePerHour').innerText = price[0].pricePerHour
+    }
+    }else{
+      throw new Error('Error getting statistics' + response.code);
+    }
+    } catch (error) {
+      alert ('Error: ' + error);
+    }
+
+}
+
+function calculatePrice(){
+  price = document.getElementById('roomPricePerHour').innerText * document.getElementById('bookingDurationTime').value
+  document.getElementById('totalBookingPrice').innerText = price
 }

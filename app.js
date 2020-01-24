@@ -410,7 +410,7 @@ async function communityBooking(customerID, roomID, start, end, price, paid, res
 
     // insert row
     const result = await performQuery('INSERT INTO communityBookings (start, end, priceOfBooking, paid, roomId, userId) VALUES (FROM_UNIXTIME(' + start + '), FROM_UNIXTIME(' + end + '), ' + price + ', ' + paid + ', ' + roomID + ', ' + customerID + ')');
-    console.log(result)
+    
     // if no database error
     if (processQueryResult(result, resp)) {
         // if correct number of rows inserted
@@ -431,7 +431,6 @@ async function communityBooking(customerID, roomID, start, end, price, paid, res
 // make community room booking on behalf of customer
 app.post('/staffcommunitybooking', async function(req, resp) {
     // customer ID
-    console.log(req.body)
     const customerID = req.body.customerid;
 
     // if customer ID specified
@@ -562,6 +561,8 @@ app.post('/cancelbooking', async function(req, resp) {
     }
 });
 
+
+
 // need function to update booking e.g. due to payment
 
 // events
@@ -659,6 +660,32 @@ app.get('/eventstatistics', async function(req, resp) {
     }
 });
 
+//prices
+
+app.get('/communityroomprice', async function(req,resp) {
+
+    const id = req.query.id;
+    // where clause
+    let where = '';
+
+    where = addToSearchClause(id, 'id', where);
+    // fetch events
+    const price = await performQuery('SELECT name, pricePerHour FROM communityRooms WHERE '+ where);
+
+    // if no database error
+    if (processQueryResult(price, resp)) {
+        // if matching events found
+        if (price.length > 0) {
+            // send list of events
+            resp.status(200).send(JSON.stringify(price));
+
+        } else {
+            // no matches
+            resp.status(200).send('0matches');
+        }
+    }
+});
+
 app.post('/customersignin', async function(req, resp) {
     const token = req.body.token;
     const payload = await login(token);
@@ -719,5 +746,8 @@ app.post('/customersignin', async function(req, resp) {
         //resp.status(200).send('successfully verified token integrity');
     }
 });
+
+
+
 
 module.exports = app;

@@ -394,7 +394,7 @@
               <p class="mt-2 "> Book a room by first selecting which room you would like to book, then choosing the date, time and duration. </p>
 
               <select class="browser-default custom-select newDropdown" id='bookingRoomDropdown' >
-                  <option selected>Select Room... </option> # Will fetch these from a database
+                  <option disabled selected>Select Room... </option> # Will fetch these from a database
                   <!--<option value="1">Music Room 1 (max 6 persons) £12/hour</option>-->
               </select>
               <p class="mt-2" > Select the time by clicking below, then change the duration with the drop down. </p>
@@ -553,7 +553,7 @@
                   </tbody>
               </table>
               <select class="browser-default custom-select newDropdown" id = 'bookingStartTime'>
-                  <option selected>Select Start Time... </option>
+                  <option disabled selected>Select Start Time... </option>
                   <option value="1">9am</option>
                   <option value="2">10am</option>
                   <option value="3">11am</option>
@@ -569,11 +569,11 @@
                   <option value="13">9pm</option>
               </select>
               <select class="browser-default custom-select newDropdown" id = 'bookingDurationTime'>
-                  <option selected>Select Duration... </option>
-                  <option value="1">30 minutes</option>
-                  <option value="2">1 hour</option>
-                  <option value="3">1 hour 30 minutes</option>
-                  <option value="4">2 hours</option>
+                  <option disabled selected>Select Duration... </option>
+                  <option value="0.5">30 minutes</option>
+                  <option value="1">1 hour</option>
+                  <option value="1.5">1 hour 30 minutes</option>
+                  <option value="2">2 hours</option>
               </select>
               <table class="table" style="margin-top:30px">
                   <tr>
@@ -582,9 +582,9 @@
                       <td>Total Price</td>
                   </tr>
                   <tr>
-                      <td>--</td>
-                      <td>--</td>
-                      <td>--</td>
+                      <td id='roomName'>--</td>
+                      <td id='roomPricePerHour'>--</td>
+                      <td id= 'totalBookingPrice'>--</td>
                   </tr>
               </table>
               <div class="row" style="margin-bottom: 30px;">
