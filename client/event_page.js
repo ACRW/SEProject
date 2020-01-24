@@ -20,26 +20,32 @@ getEvents = async() => {
       }
     })
     if(response.ok){
-      const jsonResponse = await response.json();
-      // render json response
-      renderResponse(jsonResponse);
+      if(response.body === '0matches' || response.body === '0database'){
+        // get element do the replacement 
+        responseField.innerHTML = "<p>Sorry, No events available.</p><p>Please wait for release.</p>";
+        paymentButton.disable = true;
+        paymentTable.style.display = "none";
+      } else{
+        const jsonResponse = await response.json();
+        // render json response
+        renderResponse(jsonResponse);
+      }
     }
     throw new Error('Error getting events.' + response.code);
   }catch(error){
     console.log(error)
   }
 }
-getEvents()
+// call the function
+getEvents();
 
-// Manipulates responseField to render an unformatted response
+
 const renderResponse = (res) => {
   // Displays either message depending on results
-  if(JSON.stringify(res) === '0matches' || JSON.stringify(res) === '0database'){
-    // get element do the replacement 
-    responseField.innerHTML = "<p>Sorry, No events available.</p><p>Please wait for release.</p>";
+  if(res.error){
+    responseField.innerHTML = "<p>Sorry, error occurs.</p><p> Try later.</p>";
     paymentButton.disable = true;
     paymentTable.style.display = "none";
-
   } else {
     // Code to display the json file content code
     /*
@@ -48,8 +54,10 @@ const renderResponse = (res) => {
     responseField.innerHTML = `${structuredRes}`;
     */
 
-    // get description and displace on screen
-    
+    // get the number of events and display the right picture in right place
+    const eventNumber = res.id.length;
+    // get description and display on screen
+    let description = res.description;
     // update the payment table 
 
   }
@@ -79,12 +87,12 @@ window.onload = function(){
   for(let i = 0; i< eventPic.length; i++){
     // when click show info:
     eventPic[i].onclick = function(){
+      //let eventNumber = int(this.id);
       showBookInfo();
     }
   }
 }
 
-/* set of funcitons */
 // when click the pic, show the book info
 function showBookInfo() {
   let bookInfo = document.getElementById("bookInfo");
