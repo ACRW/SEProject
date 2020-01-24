@@ -1,15 +1,28 @@
+// for GET & POST methods
 const express = require('express');
 const app = express();
 
-//require login code
+// for session variables
+const session = require('express-session');
+// IMPORTANT - needs better secret
+app.use(session({
+    secret: 'tcrhub',
+    resave: false,
+    saveUninitialized: true
+}));
+
+// for Google sign in
 const login = require('./login');
 
+// for database
 const util = require('util');
 const mysql = require('mysql');
 
+// for client code
 app.use(express.static('client'));
 
-var bodyParser = require('body-parser');
+// for POST methods
+const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({extended: false}));
 
 // helper functions
@@ -646,6 +659,7 @@ app.post('/customersignin', async function(req, resp) {
 
     if (!payload) {
         resp.status(403).send('0token');
+
     } else {
         const googleID = payload['sub'];
 
@@ -653,15 +667,32 @@ app.post('/customersignin', async function(req, resp) {
 
         if (processQueryResult(customer, resp)) {
             if (customer.length == 1) {
-                console.log('exists')
+                // create unique session ID
+
+                req.session.regenerate(function (error) {
+                    if (error) {
+                        resp.status(500).send('0session');
+
+                    } else {
+                        req.session.type = 'customer';
+                        req.session.userID = customer[0]['id'];
+
+                        const customerDetails = {'fname': customer[0]['fName'], 'sname': customer[0]['lName']};
+
+                        resp.status(200).send(JSON.stringify(customerDetails));
+                    }
+                });
+
+
             } else {
                 const maxID = await performQuery('SELECT MAX(id) FROM customers');
 
                 if (processQueryResult(maxID, resp)) {
+                    let newID = 0;
+
                     if (maxID.length == 1) {
-                        const newID = parseInt(maxID[0]['MAX(id)']) + 1;
-                    } else {
-                        const newID = 0;
+                        newID = parseInt(maxID[0]['MAX(id)']) + 1;
+
                     }
 
                     const result = await performQuery('INSERT INTO customers (id, fName, lName, googleId, email) VALUES (' + newID + ', "' + payload['given_name'] + '", "' + payload['family_name'] + '", "' + googleID + '", "' + payload['email'] + '")');
@@ -679,7 +710,7 @@ app.post('/customersignin', async function(req, resp) {
             }
         }
 
-        resp.status(200).send('successfully verified token integrity');
+        //resp.status(200).send('successfully verified token integrity');
     }
 });
 
