@@ -256,6 +256,7 @@ app.get('/roomavailability', async function(req, resp) {
 // check customer in database
 async function checkCustomerExists(customerID, resp) {
     // try to get customer's details
+
     const customer = await performQuery('SELECT id, fName, lName, email, phone FROM customers WHERE id = ' + customerID);
 
     // if no database error
@@ -277,7 +278,9 @@ async function checkCustomerExists(customerID, resp) {
 // get all customers
 app.get('/customers', async function(req,resp) {
     // fetch customers
+
     const customers = await performQuery('SELECT id, fName, lName, email, phone FROM customers');
+
 
     // if no database error
     if (processQueryResult(customers, resp)) {
@@ -322,7 +325,9 @@ app.get('/customersearch', async function(req, resp) {
 
     } else {
         // get matching customers
+
         const customers = await performQuery('SELECT id, fName, lName, email, phone FROM customers WHERE ' + where + ' ORDER BY lName, fName');
+
 
         // if no database error
         if (processQueryResult(customers, resp)) {
@@ -405,7 +410,7 @@ async function communityBooking(customerID, roomID, start, end, price, paid, res
 
     // insert row
     const result = await performQuery('INSERT INTO communityBookings (start, end, priceOfBooking, paid, roomId, userId) VALUES (FROM_UNIXTIME(' + start + '), FROM_UNIXTIME(' + end + '), ' + price + ', ' + paid + ', ' + roomID + ', ' + customerID + ')');
-
+    console.log(result)
     // if no database error
     if (processQueryResult(result, resp)) {
         // if correct number of rows inserted
@@ -426,6 +431,7 @@ async function communityBooking(customerID, roomID, start, end, price, paid, res
 // make community room booking on behalf of customer
 app.post('/staffcommunitybooking', async function(req, resp) {
     // customer ID
+    console.log(req.body)
     const customerID = req.body.customerid;
 
     // if customer ID specified
