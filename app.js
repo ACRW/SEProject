@@ -344,6 +344,34 @@ app.get('/customersearch', async function(req, resp) {
     }
 });
 
+// checks customer exists
+app.get('/customerexists', async function(req,resp) {
+    // fetch id
+    const id = req.query.id;
+
+    // where clause
+    let where = '';
+
+    // build search clause
+    where = addToSearchClause(id, 'id', where);
+
+    const customers = await performQuery('SELECT id, fName, lName, email, phone FROM customers WHERE ' + where );
+
+
+    // if no database error
+    if (processQueryResult(customers, resp)) {
+        // if matching customers found
+        if (customers.length > 0) {
+            // send list of customers
+            resp.status(200).send(JSON.stringify(customers));
+
+        } else {
+            // no matches
+            resp.status(200).send('0matches');
+        }
+    }
+});
+
 // bookings
 
 // get customer bookings

@@ -131,6 +131,11 @@ async function searchForUser(){
   sName = document.getElementById("surnameSearch").value;
   email = document.getElementById("emailSearch").value;
   phoneNumber = document.getElementById("phoneNoSearch").value;
+
+  if((fName + sName + email + phoneNumber).length ==0 ){
+    document.getElementById('searchError').innerHTML = 'Please enter at least one parameter to search by'
+
+  }else{
   try{
     let response = await fetch('http://localhost:8090/customersearch?fname=' + fName + '&sname=' + sName + '&email=' + email + '&phone=' + phoneNumber,
       {
@@ -144,7 +149,7 @@ async function searchForUser(){
       if(body=='0matches'){
         document.getElementById('searchResults').innerHTML += '<h5> No results found </h5>';
         document.getElementById('byUser').hidden = true;
-      }else{
+      }else {
       var customers = JSON.parse(body);
       document.getElementById('byUser').hidden = true;
       document.getElementById('searchResults').innerHTML += '<h5> Found ' + customers.length + ' match in the database </h5>';
@@ -154,17 +159,25 @@ async function searchForUser(){
         document.getElementById('result'+i).addEventListener('click', getUserBookings(customers[i].id));
       }
     }
-    } else {
+    document.getElementById("searchModalFooter").hidden = true;
+  } else if(response.status == 400){
+    document.getElementById('searchError').innerHTML = 'Please enter at least one parameter to search by'
+  }else{
       throw new Error('Error getting customers' + response.code);
     }
     } catch (error) {
       alert ('Problem: ' + error);
     }
-  document.getElementById("searchModalFooter").hidden = true;
+  }
+
+
 }
 
 //creates tables from users community and hostel bookings
 async function getUserBookings(customerID){
+  var exist =  await checkCustomerExists(customerID)
+  console.log(exist)
+  if(exist == true){
   try{
     let response = await fetch('http://localhost:8090/customerbookings?id=' + customerID,
       {
@@ -175,16 +188,24 @@ async function getUserBookings(customerID){
       });
       if(response.ok){
         var body = await response.text();
-
+        console.log(body)
         var bookings = JSON.parse(body);
-
-        for(var i=0;i<bookings['community'].length;i++){
-          tableRow='<tr><th scope="row">'+bookings['community'][i].bookingID+'</th><td>'+bookings['community'][i].start+'</td><td>'+bookings['community'][i].end+'</td><td>'+bookings['community'][i].priceOfBooking+'</td><td>'+bookings['community'][i].paid+'</td><td>'+ bookings['community'][i].name+'</td></tr>';
-          document.getElementById('usersCommunityBookingTableBody').innerHTML += tableRow;
+        if(bookings['community']!= null){
+          for(var i=0;i<bookings['community'].length;i++){
+            tableRow='<tr><th scope="row">'+bookings['community'][i].bookingID+'</th><td>'+bookings['community'][i].start+'</td><td>'+bookings['community'][i].end+'</td><td>'+bookings['community'][i].priceOfBooking+'</td><td>'+bookings['community'][i].paid+'</td><td>'+ bookings['community'][i].name+'</td></tr>';
+            document.getElementById('usersCommunityBookingTableBody').innerHTML += tableRow;
+          }
         }
-        for(var i=0;i<bookings['hostel'].length;i++){
-          tableRow='<tr><th scope="row">'+bookings['hostel'][i].bookingID+'</th><td>'+bookings['hostel'][i].startDate+'</td><td>'+bookings['hostel'][i].endDate+'</td><td>'+bookings['hostel'][i].roomID+'</td><td>'+bookings['hostel'][i].pricePerNight+'</td><td>'+ bookings['hostel'][i].noOfPeople+'</td></tr>';
-          document.getElementById('usersHostelBookingTableBody').innerHTML += tableRow;
+        if(bookings['hostel']!= null){
+          for(var i=0;i<bookings['hostel'].length;i++){
+            tableRow='<tr><th scope="row">'+bookings['hostel'][i].bookingID+'</th><td>'+bookings['hostel'][i].startDate+'</td><td>'+bookings['hostel'][i].endDate+'</td><td>'+bookings['hostel'][i].roomID+'</td><td>'+bookings['hostel'][i].pricePerNight+'</td><td>'+ bookings['hostel'][i].noOfPeople+'</td></tr>';
+            document.getElementById('usersHostelBookingTableBody').innerHTML += tableRow;
+          }
+        }
+
+        if(bookings['community'].length == null && bookings['hostel'].length == null){
+          document.getElementById('usersBookingError').innerHTML = 'User has no bookings'
+
         }
       }else{
         throw new Error('Error getting customers' + response.code);
@@ -192,6 +213,9 @@ async function getUserBookings(customerID){
       } catch (error) {
         alert ('Problem: ' + error);
       }
+    }else{
+      document.getElementById('usersBookingError').innerHTML = 'User does not exist in the database'
+    }
 }
 
 //fills drop boxes
@@ -512,7 +536,7 @@ async function fillBookingTable(){
       });
     if(response.ok){
       var body = await response.text();
-      if(body=='0matches'){
+    if(body=='0matches'){
     }else{
 
       var busy = JSON.parse(body);
@@ -526,6 +550,31 @@ async function fillBookingTable(){
     }
     }else{
       throw new Error('Error getting statistics' + response.code);
+    }
+    } catch (error) {
+      alert ('Error: ' + error);
+    }
+}
+
+async function checkCustomerExists(id){
+  try{
+    let response = await fetch('http://localhost:8090/customerexists?id='+id,
+      {
+        method: 'GET',
+        headers: {
+            "Content-Type": "application/json"
+          }
+      });
+    if(response.ok){
+      var body = await response.text();
+      if(body == '0matches'){
+        return false
+      }else{
+        return true
+      }
+
+    }else{
+      throw new Error('Error checking for existance' + response.code);
     }
     } catch (error) {
       alert ('Error: ' + error);

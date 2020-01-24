@@ -16,7 +16,7 @@
     function clearSearch(){
       document.getElementById('searchResults').innerHTML = '';
       document.getElementById("roomAvailabilityTable").hidden = true;
-
+      document.getElementById('searchError').innerHTML = '';
     }
 
     //unhides the correct form
@@ -28,6 +28,7 @@
       document.getElementById("searchModalFooter").hidden = false;
       document.getElementById("roomAvailabilityTable").hidden = true;
       document.getElementById("makeBooking").hidden = false;
+      document.getElementById('searchError').innerHTML = '';
     }
 
     //unhides the correct form
@@ -39,7 +40,7 @@
       document.getElementById("searchModalFooter").hidden = false;
       document.getElementById("roomAvailabilityTable").hidden = true;
       document.getElementById("makeBooking").hidden = false;
-
+      document.getElementById('searchError').innerHTML = '';
     }
 
     //unhides the correct form
@@ -51,7 +52,7 @@
       document.getElementById("searchModalFooter").hidden = false;
       document.getElementById("roomAvailabilityTable").hidden = true;
       document.getElementById("makeBooking").hidden = false;
-
+      document.getElementById('searchError').innerHTML = '';
     }
 
     const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -372,6 +373,7 @@
         <div class="modal-footer" id="searchModalFooter">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
           <button type="button" class="btn btn-primary" id='searchSubmit'>Search</button>
+          <p id='searchError'></p>
         </div>
       </div>
     </div>
@@ -568,6 +570,7 @@
           </button>
         </div>
         <div class="modal-body">
+          <p id='usersBookingError'></p>
           <p>Room Bookings</p>
           <table class="table table-striped newTable" id="usersCommunityBookingTable" style="margin-top:5px; text-align: center;">
             <thead>
