@@ -653,11 +653,29 @@ app.post('/customersignin', async function(req, resp) {
 
         if (processQueryResult(customer, resp)) {
             if (customer.length == 1) {
-
+                console.log('exists')
             } else {
-                //const result = await performQuery('INSERT INTO customers (fName, lName, googleId, email) VALUES ("' + payload['give_name'] + '", "' + payload['family_name'] + '", "' + googleID + '", "' + payload['email'] + '")');
+                const maxID = await performQuery('SELECT MAX(id) FROM customers');
 
-                //console.log(result);
+                if (processQueryResult(maxID, resp)) {
+                    if (maxID.length == 1) {
+                        const newID = parseInt(maxID[0]['MAX(id)']) + 1;
+                    } else {
+                        const newID = 0;
+                    }
+
+                    const result = await performQuery('INSERT INTO customers (id, fName, lName, googleId, email) VALUES (' + newID + ', "' + payload['given_name'] + '", "' + payload['family_name'] + '", "' + googleID + '", "' + payload['email'] + '")');
+
+                    if (processQueryResult(result, resp)) {
+                        if (result['affectedRows'] == 1) {
+                            // new customer
+                            // prompt phone number and ... ?
+
+                        } else {
+                            resp.status(500).send('0database');
+                        }
+                    }
+                }
             }
         }
 
