@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset=UTF-8">
+	<title>homepage</title>
+
+	<style type="text/css">
+		.top{
+			background-color:rgb(187,217,182);
+			height:258px;
+			width:100%;
+			
+		}
+
+		.top .top_c{
+			
+			height:20px;
+			width: 100%;
+			padding-top: 20px;
+
+		}
+
+
+		.top .facebook {
+			float: left;
+			margin-left:130px;
+			height:30px;
+			width:20px;
+			
+		}
+		
+
+		.top .instagram {	
+			float: left;
+			height: 30px;
+			width:22px;						
+			
+		}
+
+		hr{
+			clear:both;
+		}
+
+		.top .center_c{
+			clear: both;
+			overflow: hidden;
+			height:130px;
+		}
+		
+		.top .logo{
+			float: left;
+			height:120px;
+			width: 850px;
+			padding:0px 0px 0px 150px;
+			margin:15px 0 0 0 ;
+		}
+
+		.top .logo a{
+			display: block;
+			background: url(webimage/logo.png) no-repeat;
+			height:98px;
+			width:196px;
+			text-indent:-9999px;
+
+		}
+
+		.top .slogan{
+			color:rgb(138,172,26);
+			float: left;
+			padding:25px 0px 0px 0;
+			font-size: 20px;
+			font-family: 'calibri';
+			font-style: italic;
+
+		}
+				
+
+		.top .down_c{
+			
+			height:100px;
+			margin:25px 0 0 130px;
+
+			
+		}
+		.top .nav a:hover{
+			color:black;
+			text-decoration: bold;
+		}
+
+		.top .down_c .link1{
+			float: left;
+			width: 100px;
+			border-right: 2px solid grey;
+			
+		}
+		
+		.top .down_c .account{
+			float: left;
+			width: 200px;
+			padding-left: 10px; 
+			text-align: left;
+						
+		}
+
+		.middle {
+			position: relative;
+			margin:60px 0 0 130px; 
+			
+			
+			
+		}
+
+
+		.center{
+			position: relative;
+			overflow: hidden;
+			width:85%;
+			margin: 40px 130px 0 130px;
+			border: 2px solid grey;
+		}
+
+		.center li{
+			position: relative;
+			color: grey;
+			font-size:36px;
+
+		}
+
+
+		.dropdown{
+			display:none;
+			position: relative;
+
+		}
+
+		
+
+		.account:hover .dropdown_account{
+			display: block;
+			border: 2
+
+		}
+
+
+		.events:hover .dropdown_events{
+			display: block;
+		}
+
+		.lessons:hover .dropdown_lessons{
+			display: block;
+		}
+
+		.rooms:hover .dropdown_rooms{
+			display: block;
+		}
+
+		.transport:hover .dropdown_transport{
+			display: block;
+		}
+	</style>
+</head>
+<body>
+<!--top -->
+	<div class='top' >
+
+		<div class="top_c">
+
+			<div class="facebook">
+				<a  href="https://www.facebook.com/TCRHub/">
+					<img src="webimage/facebook.png">
+				</a>
+			</div>
+			
+			<div class='instagram'>
+				<a href="https://www.instagram.com/teesdale_community_resources/">
+					<img src="webimage/instagram.png">
+				</a>	
+			</div>
+			
+		</div>
+
+		<hr color='grey'/>
+
+		<div class='inner_c center_c'>	
+
+			<h1 class='logo'>
+				<a href='clientside.html'>tcr hub</a>
+			</h1>
+
+			<span class="slogan">
+				<strong>a unique facility for the whole community</strong>
+			</span>
+
+		</div>
+
+		<div class='nav down_c' >
+
+				<div class="link1">
+					<a  href='google sign in'>google sign in</a> 
+				</div>
+
+				<div class="account">
+					<a  href='My account'>my account</a>
+					<div class="dropdown dropdown_account">
+						<p>
+							<a href="viewmybooking">view my booking</a>
+						</p>
+						<p>
+							<a href="logout">log out</a>
+						</p>
+					</div>
+				</div>
+
+			
+		</div>
+	</div>
+
+<div class="middle">
+	<span style="color: rgb(138,172,26);font-size: 36px;  font-style: bold;  ">join us! </span>
+</div>
+
+<!--center content -->		
+	
+
+	<div class='center' >
+		
+			<ul >
+				<div class="events">
+					<li >events</li>
+
+					<div class="dropdown dropdown_events">
+						<p>
+							<a href="#event1">event1</a>
+						</p>
+						<p>
+							<a href="#event2">event2</a>
+						</p>
+					</div>
+				</div>
+
+				
+				<div class="lessons">
+					<li >lessons</li>
+
+					<div class="dropdown dropdown_lessons">
+						<p>
+							<a href="#lesson1">lesson1</a>
+						</p>
+						<p>
+							<a href="lesson2">lesson2</a>
+						</p>
+						
+					</div>
+				</div>
+
+				<div class="rooms">
+					<li>rooms</li>
+
+					<div class="dropdown dropdown_rooms">
+						<p>
+							<a href="room.html">room1</a>
+						</p>
+						<p>
+							<a href="#room2">room2</a>
+						</p>
+					</div>
+				</div>
+
+				<div class="transport">
+					<li >transport</li>
+
+					<div class="dropdown dropdown_transport">
+						<p>
+							<a href="#1">transport1</a>
+						</p>
+						<p>
+							<a href="#2">transport2</a>
+						</p>
+						
+					</div>				
+				</div>
+
+			</ul>
+
+
+			
+		
+
+
+		
+	</div>
+</body>
+</html>
+

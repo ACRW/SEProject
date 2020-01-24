@@ -1,20 +1,25 @@
-async function test() {
-    let response = await fetch('/cancelbooking',
+async function onSignIn(googleUser) {
+    const token = googleUser.getAuthResponse().id_token;
+
+    let response = await fetch('/customersignin',
     {
         method: "POST",
         headers: {
             "Content-Type": "application/x-www-form-urlencoded"
         },
-        body: 'id=3'
+        body: 'token=' + token
     });
 
-    let body = await response.text();
+    const body = await response.text();
 
     if (!response.ok) {
-        throw new Error(body);
+
+        var auth2 = gapi.auth2.getAuthInstance();
+        auth2.signOut();
+
+        alert('failed to verify token integrity. pls try again.')
+
+    } else {
+        console.log(body);
     }
-
-    console.log(body);
 }
-
-test()

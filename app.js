@@ -1,15 +1,28 @@
+// for GET & POST methods
 const express = require('express');
 const app = express();
 
-//require login code
+// for session variables
+const session = require('express-session');
+// IMPORTANT - needs better secret
+app.use(session({
+    secret: 'tcrhub',
+    resave: false,
+    saveUninitialized: true
+}));
+
+// for Google sign in
 const login = require('./login');
 
+// for database
 const util = require('util');
 const mysql = require('mysql');
 
+// for client code
 app.use(express.static('client'));
 
-var bodyParser = require('body-parser');
+// for POST methods
+const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({extended: false}));
 
 // helper functions
@@ -243,7 +256,8 @@ app.get('/roomavailability', async function(req, resp) {
 // check customer in database
 async function checkCustomerExists(customerID, resp) {
     // try to get customer's details
-    const customer = await performQuery('SELECT * FROM customers WHERE id = ' + customerID);
+
+    const customer = await performQuery('SELECT id, fName, lName, email, phone FROM customers WHERE id = ' + customerID);
 
     // if no database error
     if (processQueryResult(customer, resp)) {
@@ -264,7 +278,9 @@ async function checkCustomerExists(customerID, resp) {
 // get all customers
 app.get('/customers', async function(req,resp) {
     // fetch customers
-    const customers = await performQuery('SELECT * FROM customers');
+
+    const customers = await performQuery('SELECT id, fName, lName, email, phone FROM customers');
+
 
     // if no database error
     if (processQueryResult(customers, resp)) {
@@ -309,7 +325,9 @@ app.get('/customersearch', async function(req, resp) {
 
     } else {
         // get matching customers
-        const customers = await performQuery('SELECT * FROM customers WHERE ' + where + ' ORDER BY lName, fName');
+
+        const customers = await performQuery('SELECT id, fName, lName, email, phone FROM customers WHERE ' + where + ' ORDER BY lName, fName');
+
 
         // if no database error
         if (processQueryResult(customers, resp)) {
@@ -641,14 +659,64 @@ app.get('/eventstatistics', async function(req, resp) {
     }
 });
 
-app.post('/tokensignin', async function(req, resp) {
+app.post('/customersignin', async function(req, resp) {
     const token = req.body.token;
     const payload = await login(token);
 
     if (!payload) {
-        resp.status(403).send('failed to verify token integrity');
+        resp.status(403).send('0token');
+
     } else {
-        resp.status(200).send('successfully verified token integrity');
+        const googleID = payload['sub'];
+
+        const customer = await performQuery('SELECT * FROM customers WHERE googleId = ' + googleID);
+
+        if (processQueryResult(customer, resp)) {
+            if (customer.length == 1) {
+                // create unique session ID
+
+                req.session.regenerate(function (error) {
+                    if (error) {
+                        resp.status(500).send('0session');
+
+                    } else {
+                        req.session.type = 'customer';
+                        req.session.userID = customer[0]['id'];
+
+                        const customerDetails = {'fname': customer[0]['fName'], 'sname': customer[0]['lName']};
+
+                        resp.status(200).send(JSON.stringify(customerDetails));
+                    }
+                });
+
+
+            } else {
+                const maxID = await performQuery('SELECT MAX(id) FROM customers');
+
+                if (processQueryResult(maxID, resp)) {
+                    let newID = 0;
+
+                    if (maxID.length == 1) {
+                        newID = parseInt(maxID[0]['MAX(id)']) + 1;
+
+                    }
+
+                    const result = await performQuery('INSERT INTO customers (id, fName, lName, googleId, email) VALUES (' + newID + ', "' + payload['given_name'] + '", "' + payload['family_name'] + '", "' + googleID + '", "' + payload['email'] + '")');
+
+                    if (processQueryResult(result, resp)) {
+                        if (result['affectedRows'] == 1) {
+                            // new customer
+                            // prompt phone number and ... ?
+
+                        } else {
+                            resp.status(500).send('0database');
+                        }
+                    }
+                }
+            }
+        }
+
+        //resp.status(200).send('successfully verified token integrity');
     }
 });
 
