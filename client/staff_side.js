@@ -63,11 +63,20 @@ document.addEventListener("DOMContentLoaded", function () {
 
   document.getElementById('bookingRoomDropdown').addEventListener('change',function(){
     fillPrice()
+    fillBookingTable()
   });
 
   document.getElementById('bookingDurationTime').addEventListener('change',function(){
     calculatePrice()
   });
+
+  document.getElementById('calenderNext').addEventListener('click',function(){
+    fillBookingTable()
+  })
+
+  document.getElementById('calenderPrev').addEventListener('click',function(){
+    fillBookingTable()
+  })
 
   updateRooms();
 
@@ -427,4 +436,40 @@ async function fillPrice(){
 function calculatePrice(){
   price = document.getElementById('roomPricePerHour').innerText * document.getElementById('bookingDurationTime').value
   document.getElementById('totalBookingPrice').innerText = price
+}
+
+async function fillBookingTable(){
+  roomId = document.getElementById('bookingRoomDropdown').value;
+  try{
+    let response = await fetch('http://localhost:8090/roomavailability?type=community&id='+roomId,
+      {
+        method: 'GET',
+        headers: {
+            "Content-Type": "application/json"
+          }
+      });
+    if(response.ok){
+      var body = await response.text();
+      if(body=='0matches'){
+    }else{
+
+      var busy = JSON.parse(body);
+      console.log(busy)
+      for(var i =0; i<busy["busy"].length; i++){
+
+        for(var j= busy["busy"][i].start.substring(11,13); j<=busy["busy"][i].end.substring(11,13); j++ ){
+          console.log(j.toString() + '.' + (parseInt(busy["busy"][i].start.substring(5,7))-1) + '.' + busy["busy"][i].start.substring(2,4).padStart(2,'0'))
+          if(document.getElementById(j.toString() + '.' + busy["busy"][i].start.substring(2,4)+ '.' + (parseInt(busy["busy"][i].start.substring(5,7))-1) ) != null){
+            console.log('yes')
+            document.getElementById(j.toString() + '.' + busy["busy"][i].start.substring(2,4)+ '.' + (parseInt(busy["busy"][i].start.substring(5,7))-1) ).innerHTML = 'Busy';
+          }
+        }
+      }
+    }
+    }else{
+      throw new Error('Error getting statistics' + response.code);
+    }
+    } catch (error) {
+      alert ('Error: ' + error);
+    }
 }
