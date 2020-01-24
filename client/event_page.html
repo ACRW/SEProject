@@ -6,11 +6,11 @@
 
 	<title>eventbooking</title>
 	<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-	<link href="assets/css/bootstrap-responsive.css" rel="stylesheet">
+	<!-- <link href="assets/css/bootstrap-responsive.css" rel="stylesheet">-->
 
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-
+	<script src="event_page.js"></script>
 	<style type="text/css">
 		.carousel-item{
 			text-align: center;
@@ -106,13 +106,13 @@
 
 			<div class="facebook">
 				<a  href="https://www.facebook.com/TCRHub/">
-					<img src="webimage/facebook.png">
+					<img  src="webimage/facebook.png">
 				</a>
 			</div>
 			
 			<div class='instagram'>
 				<a href="https://www.instagram.com/teesdale_community_resources/">
-					<img src="webimage/instagram.png">
+					<img  src="webimage/instagram.png">
 				</a>	
 			</div>
 			
@@ -146,12 +146,12 @@
     
   </ul>
 
-  <div class="carousel-inner">
+  <div class="carousel-inner" id="carouselInner">
     <div class="carousel-item active">
-      <img src="webimage/01.png">
+      <img name="eventPic" src="webimage/01.png">
     </div>
     <div class="carousel-item">
-      <img src="webimage/02.png">
+      <img name="eventPic" src="webimage/02.png">
     </div>
     
   </div>
@@ -166,10 +166,13 @@
 </div>
 
 <!-- bookevent -->
-<div class="container">
+<div id="responseField">
+
+</div>
+<div hidden class="container" id="bookInfo">
 
   <h2>Book Now</h2> 
-  <table class="table">
+  <table class="table" id="paymentTable">
     <thead>
       <tr>
         <th></th>
@@ -180,24 +183,24 @@
     <tbody>
       <tr>
         <td>Adult Ticket</td>
-        <td>anniu</td>
-        <td>qian</td>
+        <td name="quantity">anniu</td>
+        <td name="subTotal">qian</td>
        
       </tr>
       <tr>
         <td>Child Ticket</td>
-        <td>anniu</td>
-        <td>qian</td>
+        <td name="quantity">anniu</td>
+        <td name="subTotal">qian</td>
       </tr>
       <tr>
         <td>Total Price</td>
         <td></td>
-        <td>qian</td>
+        <td name="subTotal" >qian</td>
       </tr>
     </tbody>
   </table>
 
-  <button id="fat-btn" class="btn btn-success"  type="button" style="text-align: right;"> submit</button>
+  <button id="fat-btn" class="btn btn-success"  type="button" style="text-align: right;"> make payment</button>
 </div>
 
 	
