@@ -17,9 +17,13 @@ async function onSignIn(googleUser) {
         var auth2 = gapi.auth2.getAuthInstance();
         auth2.signOut();
 
-        alert('failed to verify token integrity. pls try again.')
+        alert('pls try again.')
 
     } else {
-        console.log(body);
+        if (response.status == 200) {
+            console.log(body)
+        } else if (response.status == 201) {
+            console.log('more action')
+        }
     }
 }

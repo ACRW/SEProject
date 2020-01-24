@@ -410,7 +410,7 @@ async function communityBooking(customerID, roomID, start, end, price, paid, res
 
     // insert row
     const result = await performQuery('INSERT INTO communityBookings (start, end, priceOfBooking, paid, roomId, userId) VALUES (FROM_UNIXTIME(' + start + '), FROM_UNIXTIME(' + end + '), ' + price + ', ' + paid + ', ' + roomID + ', ' + customerID + ')');
-    
+
     // if no database error
     if (processQueryResult(result, resp)) {
         // if correct number of rows inserted
@@ -686,68 +686,89 @@ app.get('/communityroomprice', async function(req,resp) {
     }
 });
 
+// user accounts
+
+// look into HTTPS
+
+// handle customer sign in
 app.post('/customersignin', async function(req, resp) {
+    // Google token
     const token = req.body.token;
+    // verify token
     const payload = await login(token);
 
+    // if verification failed
     if (!payload) {
+        // token error
         resp.status(403).send('0token');
 
     } else {
+        // customer's Google ID
         const googleID = payload['sub'];
 
+        // look for customer in database
         const customer = await performQuery('SELECT * FROM customers WHERE googleId = ' + googleID);
 
+        // if no database error
         if (processQueryResult(customer, resp)) {
+            // if customer in database
             if (customer.length == 1) {
-                // create unique session ID
-
+                // refresh session
                 req.session.regenerate(function (error) {
+                    // if regeneration failed
                     if (error) {
+                        // session error
                         resp.status(500).send('0session');
 
                     } else {
+                        // set session variables
+                        req.session.active = true;
                         req.session.type = 'customer';
                         req.session.userID = customer[0]['id'];
 
+                        // customer's name
                         const customerDetails = {'fname': customer[0]['fName'], 'sname': customer[0]['lName']};
 
+                        // send customer's name
                         resp.status(200).send(JSON.stringify(customerDetails));
                     }
                 });
 
-
+            // if new customer
             } else {
+                // get maximum customer ID
                 const maxID = await performQuery('SELECT MAX(id) FROM customers');
 
+                // if no database error
                 if (processQueryResult(maxID, resp)) {
+                    // new customer ID
                     let newID = 0;
 
+                    // if previous IDs exist
                     if (maxID.length == 1) {
+                        // increment customer ID
                         newID = parseInt(maxID[0]['MAX(id)']) + 1;
-
                     }
 
+                    // add customer to database
                     const result = await performQuery('INSERT INTO customers (id, fName, lName, googleId, email) VALUES (' + newID + ', "' + payload['given_name'] + '", "' + payload['family_name'] + '", "' + googleID + '", "' + payload['email'] + '")');
 
+                    // if no database error
                     if (processQueryResult(result, resp)) {
+                        // if one row inserted
                         if (result['affectedRows'] == 1) {
-                            // new customer
-                            // prompt phone number and ... ?
+                            // inform client new customer added to database
+                            resp.status(201).send('1newcustomer');
 
                         } else {
+                            // database error
                             resp.status(500).send('0database');
                         }
                     }
                 }
             }
         }
-
-        //resp.status(200).send('successfully verified token integrity');
     }
 });
-
-
-
 
 module.exports = app;
