@@ -55,7 +55,7 @@
     }
 
     const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-    const dayNames = ["Mon", "Tues", "Wed", "Thur", "Fri", "Sat", "Sun"];
+    const dayNames = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
     function Calender () {
         let targetMon = new Date(); // Date of the monday of the week being looked at
         if (targetMon.getDay() != 1) {
@@ -67,7 +67,7 @@
             document.getElementById(j.toString() +'.').innerHTML = '<td>' + j + 'am</td>'
           }
           for(var j=12;j<=21;j++){
-            document.getElementById(j.toString() +'.').innerHTML = '<td>' + j + 'pm</td>'
+            document.getElementById(j.toString() +'.').innerHTML = '<td>' + (j-11).toString() + 'pm</td>'
           }
         }
 
@@ -78,6 +78,7 @@
             document.getElementById("tableDate").innerHTML = monthNames[targetMon.getMonth()] + " " + targetMon.getDate() + " - " + monthNames[tempDate.getMonth()] + " " + tempDate.getDate();
             headers = document.getElementById("calTable").rows[0];
             month= targetMon.getMonth()
+            document.getElementById('chosenDate').value = month
             for (i = 0; i < 7; i++) {
                 newDate = new Date(targetMon);
                 newDate.setDate(newDate.getDate() + i);
@@ -420,7 +421,8 @@
                   <option disabled selected>Select Room... </option> # Will fetch these from a database
                   <!--<option value="1">Music Room 1 (max 6 persons) £12/hour</option>-->
               </select>
-              <p class="mt-2" > Select the time by clicking below, then change the duration with the drop down. </p>
+              <p class="mt-2" > Select a day by clicking the top row, then change the time and the duration with the drop down. </p>
+              <h5>Currently booking for</h5><h5 id='chosenDate'></h5>
               <div class="row">
                 <div class="col"><button type="button" class="btn btn-primary newColor" onclick="calender.prevWeek()" id='calenderPrev'>Prev</button></div>
                 <div class="col" ><h3 id="tableDate"></h3></div>
@@ -430,13 +432,13 @@
                   <thead>
                     <tr style="background-color: #C2D6B6">
                       <th>Time</th>
-                      <th>Mon</th>
-                      <th>Tues</th>
-                      <th>Wed</th>
-                      <th>Thurs</th>
-                      <th>Fri</th>
-                      <th>Sat</th>
-                      <th>Sun</th>
+                      <th id='day1'>Mon</th>
+                      <th id='day2'>Tues</th>
+                      <th id='day3'>Wed</th>
+                      <th id='day4'>Thurs</th>
+                      <th id='day5'>Fri</th>
+                      <th id='day6'>Sat</th>
+                      <th id='day7'>Sun</th>
                     </tr>
                   </thead>
                   <colgroup>
@@ -524,6 +526,7 @@
                   <div id='bookingButtonDiv'>
                   </div>
               </div>
+              <p id='newBookingError'></p>
           </div>
           <script>
               calender = new Calender();

@@ -81,6 +81,48 @@ document.addEventListener("DOMContentLoaded", function () {
   updateRooms();
 
   fillFindBy();
+
+  document.getElementById('day1').addEventListener('click',function(){
+    document.getElementById('chosenDate').innerHTML = document.getElementById('day1').innerHTML
+  })
+  document.getElementById('day2').addEventListener('click',function(){
+    if(document.getElementById('day2').innerHTML.substring(4) == 1){
+      document.getElementById('chosenDate').value = document.getElementById('chosenDate').value + 1
+    }
+    document.getElementById('chosenDate').innerHTML = document.getElementById('day2').innerHTML
+
+  })
+  document.getElementById('day3').addEventListener('click',function(){
+    if(document.getElementById('day2').innerHTML.substring(4) == 1){
+      document.getElementById('chosenDate').value = document.getElementById('chosenDate').value + 1
+    }
+    document.getElementById('chosenDate').innerHTML = document.getElementById('day3').innerHTML
+  })
+  document.getElementById('day4').addEventListener('click',function(){
+    if(document.getElementById('day2').innerHTML.substring(4) == 1){
+      document.getElementById('chosenDate').value = document.getElementById('chosenDate').value + 1
+    }
+    document.getElementById('chosenDate').innerHTML = document.getElementById('day4').innerHTML
+  })
+  document.getElementById('day5').addEventListener('click',function(){
+    if(document.getElementById('day2').innerHTML.substring(4) == 1){
+      document.getElementById('chosenDate').value = document.getElementById('chosenDate').value + 1
+    }
+    document.getElementById('chosenDate').innerHTML = document.getElementById('day5').innerHTML
+  })
+  document.getElementById('day6').addEventListener('click',function(){
+    if(document.getElementById('day2').innerHTML.substring(4) == 1){
+      document.getElementById('chosenDate').value = document.getElementById('chosenDate').value + 1
+    }
+    document.getElementById('chosenDate').innerHTML = document.getElementById('day6').innerHTML
+  })
+  document.getElementById('day7').addEventListener('click',function(){
+    if(document.getElementById('day2').innerHTML.substring(4) == 1){
+      document.getElementById('chosenDate').value = document.getElementById('chosenDate').value + 1
+    }
+    document.getElementById('chosenDate').innerHTML = document.getElementById('day7').innerHTML
+  })
+
 });
 
 //runs get request to search for user in database and displays results
@@ -376,18 +418,38 @@ async function eventStatsView(id){
 async function newBooking(id){
   startTime = parseInt(document.getElementById('bookingStartTime').value) + 8;
   duration = document.getElementById('bookingDurationTime').value;
-  //startnew Date(2010, 6, 26).getTime() / 1000
+  console.log(document.getElementById('chosenDate').innerHTML)
+  day = document.getElementById('chosenDate').innerHTML.substring(4)
+  month =  document.getElementById('chosenDate').value
+  free = true
+  console.log(document.getElementById(startTime + '.' + day + '.' + month).innerHTML)
   if(duration == 0.5){
-    endTime = new Date(2020, 0, 25, startTime, 30, 0, 0).getTime()/1000;
+    endTime = new Date(2020, month, day, startTime, 30, 0, 0).getTime()/1000;
+    if(document.getElementById(startTime + '.' + day + '.' + month).innerHTML == 'Busy'){
+      document.getElementById('newBookingError').innerHTML = 'Room is busy at that time'
+      free = false
+    }
   }else if(duration == 1){
-    endTime = new Date(2020, 0, 25, startTime + 1, 0, 0, 0).getTime()/1000;
-
+    endTime = new Date(2020, month, day, startTime + 1, 0, 0, 0).getTime()/1000;
+    if(document.getElementById(startTime + '.' + day + '.' + month).innerHTML == 'Busy'){
+      document.getElementById('newBookingError').innerHTML = 'Room is busy at that time'
+      free = false
+    }
   }else if(duration == 1.5){
-    endTime = new Date(2020, 0, 25, startTime+1, 30, 0, 0).getTime()/1000;
+    endTime = new Date(2020, month, day, startTime+1, 30, 0, 0).getTime()/1000;
+    if(document.getElementById(startTime + '.' + day + '.' + month).innerHTML == 'Busy' || document.getElementById((parseInt(startTime)+1).toString() + '.' + day + '.' + month).innerHTML == 'Busy'){
+      document.getElementById('newBookingError').innerHTML = 'Room is busy at that time'
+      free=false
+    }
   }else{
-    endTime = new Date(2020, 0, 25, startTime+2, 0, 0, 0).getTime()/1000;
+    endTime = new Date(2020, month, day, startTime+2, 0, 0, 0).getTime()/1000;
+    if(document.getElementById(startTime + '.' + day + '.' + month).innerHTML == 'Busy' || document.getElementById((parseInt(startTime)+1).toString() + '.' + day + '.' + month).innerHTML == 'Busy'){
+      document.getElementById('newBookingError').innerHTML = 'Room is busy at that time'
+      free=false
+    }
   }
-  startTime = new Date(2020, 0, 25, startTime, 0, 0, 0).getTime()/1000;
+  if(free == true){
+  startTime = new Date(2020, month, day, startTime, 0, 0, 0).getTime()/1000;
   roomId = document.getElementById('bookingRoomDropdown').value;
   price = document.getElementById('totalBookingPrice').innerText;
   paid = 0
@@ -402,7 +464,7 @@ async function newBooking(id){
   if(!response.ok){
     throw new Error('problem adding new event ' + response.code);
   }
-
+}
 }
 
 async function fillPrice(){
@@ -454,13 +516,9 @@ async function fillBookingTable(){
     }else{
 
       var busy = JSON.parse(body);
-      console.log(busy)
       for(var i =0; i<busy["busy"].length; i++){
-
         for(var j= busy["busy"][i].start.substring(11,13); j<=busy["busy"][i].end.substring(11,13); j++ ){
-          console.log(j.toString() + '.' + (parseInt(busy["busy"][i].start.substring(5,7))-1) + '.' + busy["busy"][i].start.substring(2,4).padStart(2,'0'))
           if(document.getElementById(j.toString() + '.' + busy["busy"][i].start.substring(2,4)+ '.' + (parseInt(busy["busy"][i].start.substring(5,7))-1) ) != null){
-            console.log('yes')
             document.getElementById(j.toString() + '.' + busy["busy"][i].start.substring(2,4)+ '.' + (parseInt(busy["busy"][i].start.substring(5,7))-1) ).innerHTML = 'Busy';
           }
         }
