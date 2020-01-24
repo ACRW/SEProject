@@ -58,7 +58,9 @@ document.addEventListener("DOMContentLoaded", function () {
   document.getElementById("newBookingButton").addEventListener('click',function(){
     document.getElementById("findBy").hidden = false;
     document.getElementById("makeBooking").hidden = true;
+
   })
+
 
   updateRooms();
 
@@ -139,9 +141,15 @@ async function getUserBookings(customerID){
 async function updateRooms() {
     const rooms = await getRooms();
     roomDrop = document.getElementById("roomSelectDrop");
+    bookRoomDrop = document.getElementById("bookingRoomDropdown");
     for (i = 0; i < rooms.length; i++) {
         let option = document.createElement("option");
+        let option2 = document.createElement("option");
         option.text = rooms[i]["name"];
+        option2.text = rooms[i]["name"];
+        option.value = rooms[i]["id"];
+        option2.value = rooms[i]["id"];
+        bookRoomDrop.add(option2);
         roomDrop.add(option);
     }
 }
@@ -316,6 +324,7 @@ async function bookingView(id){
       var body = await response.text();
       var customers = JSON.parse(body);
       document.getElementById('customerInfo').innerHTML= 'Customer Name:' + customers[0].fName + ' ' + customers[0].lName;
+      document.getElementById('bookingButtonDiv').innerHTML = '<div class="col-sm-3"><a class="btn btn-primary newColor" href="#" role="button" onclick="newBooking('+customers[0].id+')">Book & Pay at desk</a></div>'
 
     }else{
       throw new Error('Error getting customers' + response.code);
@@ -346,4 +355,38 @@ async function eventStatsView(id){
     } catch (error) {
       alert ('Problem: ' + error);
     }
+}
+
+async function newBooking(id){
+  console.log(id)
+  startTime = parseInt(document.getElementById('bookingStartTime').value) + 8;
+  duration = document.getElementById('bookingDurationTime').value;
+  //startnew Date(2010, 6, 26).getTime() / 1000
+  if(duration == 1){
+    endTime = new Date(2020, 0, 25, startTime, 30, 0, 0).getTime()/1000;
+  }else if(duration == 2){
+    endTime = new Date(2020, 0, 25, startTime + 1, 0, 0, 0).getTime()/1000;
+
+  }else if(duration == 3){
+    endTime = new Date(2020, 0, 25, startTime+1, 30, 0, 0).getTime()/1000;
+  }else{
+    endTime = new Date(2020, 0, 25, startTime+2, 0, 0, 0).getTime()/1000;
+  }
+  startTime = new Date(2020, 0, 25, startTime, 0, 0, 0).getTime()/1000;
+  console.log(startTime)
+  roomId = document.getElementById('bookingRoomDropdown').value;
+  price = 10
+  paid = 5
+  let response = await fetch('http://localhost:8090/staffcommunitybooking',
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: 'customerid=' + id + '&roomid=' + roomId + '&start=' + startTime + '&end=' + endTime + '&price=' + price + '&paid=' + paid
+    });
+  if(!response.ok){
+    throw new Error('problem adding new event ' + response.code);
+  }
+
 }

@@ -393,7 +393,7 @@
               <h1> Room Booking </h1>
               <p class="mt-2 "> Book a room by first selecting which room you would like to book, then choosing the date, time and duration. </p>
 
-              <select class="browser-default custom-select newDropdown" >
+              <select class="browser-default custom-select newDropdown" id='bookingRoomDropdown' >
                   <option selected>Select Room... </option> # Will fetch these from a database
                   <!--<option value="1">Music Room 1 (max 6 persons) £12/hour</option>-->
               </select>
@@ -552,7 +552,23 @@
                     </tr>
                   </tbody>
               </table>
-              <select class="browser-default custom-select newDropdown">
+              <select class="browser-default custom-select newDropdown" id = 'bookingStartTime'>
+                  <option selected>Select Start Time... </option>
+                  <option value="1">9am</option>
+                  <option value="2">10am</option>
+                  <option value="3">11am</option>
+                  <option value="4">12pm</option>
+                  <option value="5">1pm</option>
+                  <option value="6">2pm</option>
+                  <option value="7">3pm</option>
+                  <option value="8">4pm</option>
+                  <option value="9">5pm</option>
+                  <option value="10">6pm</option>
+                  <option value="11">7pm</option>
+                  <option value="12">8pm</option>
+                  <option value="13">9pm</option>
+              </select>
+              <select class="browser-default custom-select newDropdown" id = 'bookingDurationTime'>
                   <option selected>Select Duration... </option>
                   <option value="1">30 minutes</option>
                   <option value="2">1 hour</option>
@@ -573,7 +589,8 @@
               </table>
               <div class="row" style="margin-bottom: 30px;">
                   <div class="col-sm-6"></div>
-                  <div class="col-sm-3"><a class="btn btn-primary newColor" href="#" role="button" >Book & Pay at desk</a></div>
+                  <div id='bookingButtonDiv'>
+                  </div>
               </div>
           </div>
           <script>
@@ -581,8 +598,6 @@
           </script>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-primary">Save changes</button>
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
         </div>
       </div>
     </div>
