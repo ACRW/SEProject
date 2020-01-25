@@ -1,15 +1,28 @@
+// for GET & POST methods
 const express = require('express');
 const app = express();
 
-//require login code
+// for session variables
+const session = require('express-session');
+// IMPORTANT - needs better secret
+app.use(session({
+    secret: 'tcrhub',
+    resave: false,
+    saveUninitialized: true
+}));
+
+// for Google sign in
 const login = require('./login');
 
+// for database
 const util = require('util');
 const mysql = require('mysql');
 
+// for client code
 app.use(express.static('client'));
 
-var bodyParser = require('body-parser');
+// for POST methods
+const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({extended: false}));
 
 // helper functions
@@ -243,6 +256,7 @@ app.get('/roomavailability', async function(req, resp) {
 // check customer in database
 async function checkCustomerExists(customerID, resp) {
     // try to get customer's details
+
     const customer = await performQuery('SELECT id, fName, lName, email, phone FROM customers WHERE id = ' + customerID);
 
     // if no database error
@@ -264,7 +278,9 @@ async function checkCustomerExists(customerID, resp) {
 // get all customers
 app.get('/customers', async function(req,resp) {
     // fetch customers
+
     const customers = await performQuery('SELECT id, fName, lName, email, phone FROM customers');
+
 
     // if no database error
     if (processQueryResult(customers, resp)) {
@@ -309,7 +325,9 @@ app.get('/customersearch', async function(req, resp) {
 
     } else {
         // get matching customers
+
         const customers = await performQuery('SELECT id, fName, lName, email, phone FROM customers WHERE ' + where + ' ORDER BY lName, fName');
+
 
         // if no database error
         if (processQueryResult(customers, resp)) {
@@ -322,6 +340,34 @@ app.get('/customersearch', async function(req, resp) {
                 // no matches
                 resp.status(200).send('0matches');
             }
+        }
+    }
+});
+
+// checks customer exists
+app.get('/customerexists', async function(req,resp) {
+    // fetch id
+    const id = req.query.id;
+
+    // where clause
+    let where = '';
+
+    // build search clause
+    where = addToSearchClause(id, 'id', where);
+
+    const customers = await performQuery('SELECT id, fName, lName, email, phone FROM customers WHERE ' + where );
+
+
+    // if no database error
+    if (processQueryResult(customers, resp)) {
+        // if matching customers found
+        if (customers.length > 0) {
+            // send list of customers
+            resp.status(200).send(JSON.stringify(customers));
+
+        } else {
+            // no matches
+            resp.status(200).send('0matches');
         }
     }
 });
@@ -543,6 +589,8 @@ app.post('/cancelbooking', async function(req, resp) {
     }
 });
 
+
+
 // need function to update booking e.g. due to payment
 
 // events
@@ -640,28 +688,114 @@ app.get('/eventstatistics', async function(req, resp) {
     }
 });
 
+//prices
+
+app.get('/communityroomprice', async function(req,resp) {
+
+    const id = req.query.id;
+    // where clause
+    let where = '';
+
+    where = addToSearchClause(id, 'id', where);
+    // fetch events
+    const price = await performQuery('SELECT name, pricePerHour FROM communityRooms WHERE '+ where);
+
+    // if no database error
+    if (processQueryResult(price, resp)) {
+        // if matching events found
+        if (price.length > 0) {
+            // send list of events
+            resp.status(200).send(JSON.stringify(price));
+
+        } else {
+            // no matches
+            resp.status(200).send('0matches');
+        }
+    }
+});
+
+// user accounts
+
+// look into HTTPS
+
+// handle customer sign in
 app.post('/customersignin', async function(req, resp) {
+    // Google token
     const token = req.body.token;
+    // verify token
     const payload = await login(token);
 
+    // if verification failed
     if (!payload) {
+        // token error
         resp.status(403).send('0token');
+
     } else {
+        // customer's Google ID
         const googleID = payload['sub'];
 
+        // look for customer in database
         const customer = await performQuery('SELECT * FROM customers WHERE googleId = ' + googleID);
 
+        // if no database error
         if (processQueryResult(customer, resp)) {
+            // if customer in database
             if (customer.length == 1) {
+                // refresh session
+                req.session.regenerate(function (error) {
+                    // if regeneration failed
+                    if (error) {
+                        // session error
+                        resp.status(500).send('0session');
 
+                    } else {
+                        // set session variables
+                        req.session.active = true;
+                        req.session.type = 'customer';
+                        req.session.userID = customer[0]['id'];
+
+                        // customer's name
+                        const customerDetails = {'fname': customer[0]['fName'], 'sname': customer[0]['lName']};
+
+                        // send customer's name
+                        resp.status(200).send(JSON.stringify(customerDetails));
+                    }
+                });
+
+            // if new customer
             } else {
-                //const result = await performQuery('INSERT INTO customers (fName, lName, googleId, email) VALUES ("' + payload['give_name'] + '", "' + payload['family_name'] + '", "' + googleID + '", "' + payload['email'] + '")');
+                // get maximum customer ID
+                const maxID = await performQuery('SELECT MAX(id) FROM customers');
 
-                //console.log(result);
+                // if no database error
+                if (processQueryResult(maxID, resp)) {
+                    // new customer ID
+                    let newID = 0;
+
+                    // if previous IDs exist
+                    if (maxID.length == 1) {
+                        // increment customer ID
+                        newID = parseInt(maxID[0]['MAX(id)']) + 1;
+                    }
+
+                    // add customer to database
+                    const result = await performQuery('INSERT INTO customers (id, fName, lName, googleId, email) VALUES (' + newID + ', "' + payload['given_name'] + '", "' + payload['family_name'] + '", "' + googleID + '", "' + payload['email'] + '")');
+
+                    // if no database error
+                    if (processQueryResult(result, resp)) {
+                        // if one row inserted
+                        if (result['affectedRows'] == 1) {
+                            // inform client new customer added to database
+                            resp.status(201).send('1newcustomer');
+
+                        } else {
+                            // database error
+                            resp.status(500).send('0database');
+                        }
+                    }
+                }
             }
         }
-
-        resp.status(200).send('successfully verified token integrity');
     }
 });
 

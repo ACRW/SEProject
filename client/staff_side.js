@@ -58,11 +58,71 @@ document.addEventListener("DOMContentLoaded", function () {
   document.getElementById("newBookingButton").addEventListener('click',function(){
     document.getElementById("findBy").hidden = false;
     document.getElementById("makeBooking").hidden = true;
+
+  })
+
+  document.getElementById('bookingRoomDropdown').addEventListener('change',function(){
+    fillPrice()
+    fillBookingTable()
+  });
+
+  document.getElementById('bookingDurationTime').addEventListener('change',function(){
+    calculatePrice()
+  });
+
+  document.getElementById('calenderNext').addEventListener('click',function(){
+    fillBookingTable()
+  })
+
+  document.getElementById('calenderPrev').addEventListener('click',function(){
+    fillBookingTable()
   })
 
   updateRooms();
 
   fillFindBy();
+
+  document.getElementById('day1').addEventListener('click',function(){
+    document.getElementById('chosenDate').innerHTML = document.getElementById('day1').innerHTML
+  })
+  document.getElementById('day2').addEventListener('click',function(){
+    if(document.getElementById('day2').innerHTML.substring(4) == 1){
+      document.getElementById('chosenDate').value = document.getElementById('chosenDate').value + 1
+    }
+    document.getElementById('chosenDate').innerHTML = document.getElementById('day2').innerHTML
+
+  })
+  document.getElementById('day3').addEventListener('click',function(){
+    if(document.getElementById('day2').innerHTML.substring(4) == 1){
+      document.getElementById('chosenDate').value = document.getElementById('chosenDate').value + 1
+    }
+    document.getElementById('chosenDate').innerHTML = document.getElementById('day3').innerHTML
+  })
+  document.getElementById('day4').addEventListener('click',function(){
+    if(document.getElementById('day2').innerHTML.substring(4) == 1){
+      document.getElementById('chosenDate').value = document.getElementById('chosenDate').value + 1
+    }
+    document.getElementById('chosenDate').innerHTML = document.getElementById('day4').innerHTML
+  })
+  document.getElementById('day5').addEventListener('click',function(){
+    if(document.getElementById('day2').innerHTML.substring(4) == 1){
+      document.getElementById('chosenDate').value = document.getElementById('chosenDate').value + 1
+    }
+    document.getElementById('chosenDate').innerHTML = document.getElementById('day5').innerHTML
+  })
+  document.getElementById('day6').addEventListener('click',function(){
+    if(document.getElementById('day2').innerHTML.substring(4) == 1){
+      document.getElementById('chosenDate').value = document.getElementById('chosenDate').value + 1
+    }
+    document.getElementById('chosenDate').innerHTML = document.getElementById('day6').innerHTML
+  })
+  document.getElementById('day7').addEventListener('click',function(){
+    if(document.getElementById('day2').innerHTML.substring(4) == 1){
+      document.getElementById('chosenDate').value = document.getElementById('chosenDate').value + 1
+    }
+    document.getElementById('chosenDate').innerHTML = document.getElementById('day7').innerHTML
+  })
+
 });
 
 //runs get request to search for user in database and displays results
@@ -71,6 +131,11 @@ async function searchForUser(){
   sName = document.getElementById("surnameSearch").value;
   email = document.getElementById("emailSearch").value;
   phoneNumber = document.getElementById("phoneNoSearch").value;
+
+  if((fName + sName + email + phoneNumber).length ==0 ){
+    document.getElementById('searchError').innerHTML = 'Please enter at least one parameter to search by'
+
+  }else{
   try{
     let response = await fetch('http://localhost:8090/customersearch?fname=' + fName + '&sname=' + sName + '&email=' + email + '&phone=' + phoneNumber,
       {
@@ -84,7 +149,7 @@ async function searchForUser(){
       if(body=='0matches'){
         document.getElementById('searchResults').innerHTML += '<h5> No results found </h5>';
         document.getElementById('byUser').hidden = true;
-      }else{
+      }else {
       var customers = JSON.parse(body);
       document.getElementById('byUser').hidden = true;
       document.getElementById('searchResults').innerHTML += '<h5> Found ' + customers.length + ' match in the database </h5>';
@@ -94,17 +159,28 @@ async function searchForUser(){
         document.getElementById('result'+i).addEventListener('click', getUserBookings(customers[i].id));
       }
     }
-    } else {
+    document.getElementById("searchModalFooter").hidden = true;
+  } else if(response.status == 400){
+    document.getElementById('searchError').innerHTML = 'Please enter at least one parameter to search by'
+  }else{
       throw new Error('Error getting customers' + response.code);
     }
     } catch (error) {
       alert ('Problem: ' + error);
     }
-  document.getElementById("searchModalFooter").hidden = true;
+  }
+
+
 }
 
 //creates tables from users community and hostel bookings
 async function getUserBookings(customerID){
+  if(customerID==''){
+    document.getElementById('usersBookingError').innerHTML = 'Error getting customer ID'
+  }else{
+  var exist =  await checkCustomerExists(customerID)
+
+  if(exist == true){
   try{
     let response = await fetch('http://localhost:8090/customerbookings?id=' + customerID,
       {
@@ -115,35 +191,55 @@ async function getUserBookings(customerID){
       });
       if(response.ok){
         var body = await response.text();
-
+        console.log(body)
         var bookings = JSON.parse(body);
-
-        for(var i=0;i<bookings['community'].length;i++){
-          tableRow='<tr><th scope="row">'+bookings['community'][i].bookingID+'</th><td>'+bookings['community'][i].start+'</td><td>'+bookings['community'][i].end+'</td><td>'+bookings['community'][i].priceOfBooking+'</td><td>'+bookings['community'][i].paid+'</td><td>'+ bookings['community'][i].name+'</td></tr>';
-          document.getElementById('usersCommunityBookingTableBody').innerHTML += tableRow;
+        if(bookings['community']!= null){
+          for(var i=0;i<bookings['community'].length;i++){
+            tableRow='<tr><th scope="row">'+bookings['community'][i].bookingID+'</th><td>'+bookings['community'][i].start+'</td><td>'+bookings['community'][i].end+'</td><td>'+bookings['community'][i].priceOfBooking+'</td><td>'+bookings['community'][i].paid+'</td><td>'+ bookings['community'][i].name+'</td></tr>';
+            document.getElementById('usersCommunityBookingTableBody').innerHTML += tableRow;
+          }
         }
-        console.log(bookings['hostel'][0]);
-        for(var i=0;i<bookings['hostel'].length;i++){
-          tableRow='<tr><th scope="row">'+bookings['hostel'][i].bookingID+'</th><td>'+bookings['hostel'][i].startDate+'</td><td>'+bookings['hostel'][i].endDate+'</td><td>'+bookings['hostel'][i].roomID+'</td><td>'+bookings['hostel'][i].pricePerNight+'</td><td>'+ bookings['hostel'][i].noOfPeople+'</td></tr>';
-          document.getElementById('usersHostelBookingTableBody').innerHTML += tableRow;
+        if(bookings['hostel']!= null){
+          for(var i=0;i<bookings['hostel'].length;i++){
+            tableRow='<tr><th scope="row">'+bookings['hostel'][i].bookingID+'</th><td>'+bookings['hostel'][i].startDate+'</td><td>'+bookings['hostel'][i].endDate+'</td><td>'+bookings['hostel'][i].roomID+'</td><td>'+bookings['hostel'][i].pricePerNight+'</td><td>'+ bookings['hostel'][i].noOfPeople+'</td></tr>';
+            document.getElementById('usersHostelBookingTableBody').innerHTML += tableRow;
+          }
         }
-      }else{
+        if(bookings['community'].length == null && bookings['hostel'].length == null){
+          document.getElementById('usersBookingError').innerHTML = 'User has no bookings'
+        }
+      } else{
         throw new Error('Error getting customers' + response.code);
       }
       } catch (error) {
         alert ('Problem: ' + error);
       }
+    }else{
+      document.getElementById('usersBookingError').innerHTML = 'User does not exist in the database'
+    }
+  }
 }
 
 //fills drop boxes
 async function updateRooms() {
-    const rooms = await getRooms();
+    const rooms = await getCommunityRooms();
+    if(rooms == 'Error'){
+      document.getElementById('errorMessage').innerHTML = 'Error fetching community rooms'
+    }else{
     roomDrop = document.getElementById("roomSelectDrop");
+    bookRoomDrop = document.getElementById("bookingRoomDropdown");
     for (i = 0; i < rooms.length; i++) {
         let option = document.createElement("option");
+        let option2 = document.createElement("option");
         option.text = rooms[i]["name"];
+        option2.text = rooms[i]["name"];
+        option.value = rooms[i]["id"];
+        option2.value = rooms[i]["id"];
+        bookRoomDrop.add(option2);
         roomDrop.add(option);
     }
+  }
+
 }
 
 function daysInMonth (year, month) {
@@ -160,16 +256,25 @@ function fillDayDrop(year, month, searchType){
   }
 }
 
-async function getRooms(startDate, endDate) { // Need to add error handling at some point.
+async function getCommunityRooms(startDate, endDate) { // Need to add error handling at some point.
+    try{
     let response = await fetch('http://localhost:8090/rooms?types=community', {
         method: "GET",
         headers: {
             "Content-Type": "application/json"
         }
     });
+    if(response.ok){
     let body = await response.text();
     var rooms = JSON.parse(body);
     return rooms["community"]
+  }else{
+    throw new Error('Error getting Rooms' + response.code);
+    return 'Error'
+  }
+  }catch (error){
+    alert ('Error: ' + error);
+  }
 }
 
 async function searchForAvaliability(){
@@ -178,26 +283,36 @@ async function searchForAvaliability(){
   month = document.getElementById("monthAvaliableSearch").value;
   day = document.getElementById("dayAvaliableSearch").value;
   dateCombined = year+ '-' + month + '-' + day;
+  if(roomName == '' || dateCombined== '--'){
+    document.getElementById(avaliabiltySearchError).innerHTML = 'Please fill all parameters for the search'
+  }else{
+  try{
   let response = await fetch('http://localhost:8090/rooms?types=community', {
       method: "GET",
       headers: {
           "Content-Type": "application/json"
       }
   });
+  if(response.ok){
   let body = await response.text();
   var rooms = JSON.parse(body);
   roomID = 0;
+  if(rooms['community'].length == 0){
+    document.getElementById(avaliabiltySearchError).innerHTML = 'No rooms found in the database'
+  }else{
   for(var i=0; i<rooms['community'].length; i++){
     if (rooms['community'][i].name == roomName){
       roomID = rooms['community'][i].id;
     }
   }
+
   let response2 = await fetch('http://localhost:8090/roomavailability?type=community&id='+roomID, {
       method: "GET",
       headers: {
           "Content-Type": "application/json"
       }
   });
+  if(response2.ok){
   let body2 = await response2.text();
   var availability = JSON.parse(body2);
   for(var i=1; i< 14; i++){
@@ -214,6 +329,20 @@ async function searchForAvaliability(){
   document.getElementById("roomAvailabilityTable").hidden = false;
   document.getElementById("byAvaliability").hidden = true;
   document.getElementById("searchModalFooter").hidden = true;
+}else{
+  throw new Error('Error getting Rooms' + response.code);
+  document.getElementById(avaliabiltySearchError).innerHTML = 'Error checking avaliabilty of room'
+
+}
+}
+}else{
+  throw new Error('Error getting Rooms' + response.code);
+  document.getElementById(avaliabiltySearchError).innerHTML = 'Error fetching rooms from the database'
+}
+}catch(error){
+  alert ('Error: ' + error);
+}
+}
 };
 
 async function searchForEvents(){
@@ -225,6 +354,9 @@ async function searchForEvents(){
   if(dateCombined.length != 10){
     dateCombined = ''
   }
+  if(name == '' && dateCombined== ''){
+    document.getElementById('eventSearchError').innerHTML = 'Please enter at least one parameter to search by'
+  }else{
   try{
     let response = await fetch('http://localhost:8090/eventsearch?name=' + name + '&date=' + dateCombined,
       {
@@ -248,11 +380,13 @@ async function searchForEvents(){
     }
     } else {
       throw new Error('Error getting customers' + response.code);
+      document.getElementById('eventSearchError').innerHTML = 'Please enter at least one parameter to search by'
     }
     } catch (error) {
-      alert ('Problem: ' + error);
+      alert ('Error: ' + error);
     }
   document.getElementById("searchModalFooter").hidden = true;
+}
 }
 
 async function fillFindBy(){
@@ -275,9 +409,10 @@ async function fillFindBy(){
 
     }else{
       throw new Error('Error getting customers' + response.code);
+      document.getElementById('errorMessage').innerHTML = 'Error fetching customers'
     }
     } catch (error) {
-      alert ('Problem: ' + error);
+      alert ('Error: ' + error);
     }
     try{
       let response = await fetch('http://localhost:8090/events',
@@ -290,20 +425,25 @@ async function fillFindBy(){
       if(response.ok){
         var body = await response.text();
         var events = JSON.parse(body);
-        for(var i = 0; i<customers.length; i++){
+        for(var i = 0; i<events.length; i++){
+
           document.getElementById('findByEventNameDropdown').innerHTML += '<a onclick="eventStatsView('+events[i].id+')">' + events[i].name + '</a>';
         }
       }else{
         throw new Error('Error getting events' + response.code);
+        document.getElementById('errorMessage').innerHTML = 'Error fetching events'
       }
       } catch (error) {
-        alert ('Problem: ' + error);
+        alert ('Error: ' + error);
       }
   }
 
 async function bookingView(id){
   document.getElementById('makeBooking').hidden = false;
   document.getElementById('findBy').hidden = true;
+  if(id == ''){
+    document.getElementById('errorMessage').innerHTML = 'No id supplied when searching for customer'
+  }else{
   try{
     let response = await fetch('http://localhost:8090/customersearch?id='+id,
       {
@@ -316,17 +456,18 @@ async function bookingView(id){
       var body = await response.text();
       var customers = JSON.parse(body);
       document.getElementById('customerInfo').innerHTML= 'Customer Name:' + customers[0].fName + ' ' + customers[0].lName;
+      document.getElementById('bookingButtonDiv').innerHTML = '<div class="col-sm-3"><a class="btn btn-primary newColor" href="#" role="button" onclick="newBooking('+customers[0].id+')">Book & Pay at desk</a></div>'
 
     }else{
       throw new Error('Error getting customers' + response.code);
     }
     } catch (error) {
-      alert ('Problem: ' + error);
+      alert ('Error: ' + error);
     }
+  }
 }
 
 async function eventStatsView(id){
-  console.log(id)
   try{
     let response = await fetch('http://localhost:8090/eventstatistics?id='+id,
       {
@@ -337,13 +478,166 @@ async function eventStatsView(id){
       });
     if(response.ok){
       var body = await response.text();
+      if(body == '0matches'){
+        document.getElementById('eventStatistics').innerHTML = "No matches found";
+      }else{
       var stats = JSON.parse(body);
       document.getElementById('eventStatistics').innerHTML = "Event Name: " + stats[0].name + " Description: " + stats[0].description + " Tickets Sold: " + stats[0].numSold + '/' + stats[0].capacity;
-
+    }
     }else{
       throw new Error('Error getting statistics' + response.code);
     }
     } catch (error) {
-      alert ('Problem: ' + error);
+      alert ('Error: ' + error);
+    }
+}
+
+async function newBooking(id){
+  startTime = parseInt(document.getElementById('bookingStartTime').value) + 8;
+  duration = document.getElementById('bookingDurationTime').value;
+  day = document.getElementById('chosenDate').innerHTML.substring(4)
+  month =  document.getElementById('chosenDate').value
+  free = true
+  if(startTime == '' || duration == '' || day == '' || month == ''){
+    document.getElementById('newBookingError').innerHTML = 'Please fill in all sections'
+  }else{
+  if(duration == 0.5){
+    endTime = new Date(2020, month, day, startTime, 30, 0, 0).getTime()/1000;
+    if(document.getElementById(startTime + '.' + day + '.' + month).innerHTML == 'Busy'){
+      document.getElementById('newBookingError').innerHTML = 'Room is busy at that time'
+      free = false
+    }
+  }else if(duration == 1){
+    endTime = new Date(2020, month, day, startTime + 1, 0, 0, 0).getTime()/1000;
+    if(document.getElementById(startTime + '.' + day + '.' + month).innerHTML == 'Busy'){
+      document.getElementById('newBookingError').innerHTML = 'Room is busy at that time'
+      free = false
+    }
+  }else if(duration == 1.5){
+    endTime = new Date(2020, month, day, startTime+1, 30, 0, 0).getTime()/1000;
+    if(document.getElementById(startTime + '.' + day + '.' + month).innerHTML == 'Busy' || document.getElementById((parseInt(startTime)+1).toString() + '.' + day + '.' + month).innerHTML == 'Busy'){
+      document.getElementById('newBookingError').innerHTML = 'Room is busy at that time'
+      free=false
+    }
+  }else{
+    endTime = new Date(2020, month, day, startTime+2, 0, 0, 0).getTime()/1000;
+    if(document.getElementById(startTime + '.' + day + '.' + month).innerHTML == 'Busy' || document.getElementById((parseInt(startTime)+1).toString() + '.' + day + '.' + month).innerHTML == 'Busy'){
+      document.getElementById('newBookingError').innerHTML = 'Room is busy at that time'
+      free=false
+    }
+  }
+  if(free == true){
+  startTime = new Date(2020, month, day, startTime, 0, 0, 0).getTime()/1000;
+  roomId = document.getElementById('bookingRoomDropdown').value;
+  price = document.getElementById('totalBookingPrice').innerText;
+  paid = 0
+  let response = await fetch('http://localhost:8090/staffcommunitybooking',
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: 'customerid=' + id + '&roomid=' + roomId + '&start=' + startTime + '&end=' + endTime + '&price=' + price + '&paid=' + paid
+    });
+  if(!response.ok){
+    throw new Error('problem adding new event ' + response.code);
+  }
+}
+}
+}
+
+async function fillPrice(){
+  roomId = document.getElementById('bookingRoomDropdown').value;
+  if(roomId==''){
+    document.getElementById('newBookingError').innerHTML='Room id not supplied'
+  }else{
+  try{
+    let response = await fetch('http://localhost:8090/communityroomprice?id='+roomId,
+      {
+        method: 'GET',
+        headers: {
+            "Content-Type": "application/json"
+          }
+      });
+    if(response.ok){
+      var body = await response.text();
+      if(body=='0matches'){
+    }else{
+      var price = JSON.parse(body);
+      document.getElementById('roomName').innerText = price[0].name;
+      document.getElementById('roomPricePerHour').innerText = price[0].pricePerHour
+    }
+    }else{
+      throw new Error('Error getting statistics' + response.code);
+    }
+    } catch (error) {
+      alert ('Error: ' + error);
+    }
+  }
+}
+
+function calculatePrice(){
+  price = document.getElementById('roomPricePerHour').innerText * document.getElementById('bookingDurationTime').value
+  document.getElementById('totalBookingPrice').innerText = price
+}
+
+async function fillBookingTable(){
+  roomId = document.getElementById('bookingRoomDropdown').value;
+  if(roomId==''){
+    document.getElementById('newBookingError').innerHTML='Room id not supplied'
+  }else{
+  try{
+    let response = await fetch('http://localhost:8090/roomavailability?type=community&id='+roomId,
+      {
+        method: 'GET',
+        headers: {
+            "Content-Type": "application/json"
+          }
+      });
+    if(response.ok){
+      var body = await response.text();
+    if(body=='0matches'){
+    }else{
+
+      var busy = JSON.parse(body);
+      for(var i =0; i<busy["busy"].length; i++){
+        for(var j= busy["busy"][i].start.substring(11,13); j<=busy["busy"][i].end.substring(11,13); j++ ){
+          if(document.getElementById(j.toString() + '.' + busy["busy"][i].start.substring(2,4)+ '.' + (parseInt(busy["busy"][i].start.substring(5,7))-1) ) != null){
+            document.getElementById(j.toString() + '.' + busy["busy"][i].start.substring(2,4)+ '.' + (parseInt(busy["busy"][i].start.substring(5,7))-1) ).innerHTML = 'Busy';
+          }
+        }
+      }
+    }
+    }else{
+      throw new Error('Error getting statistics' + response.code);
+    }
+    } catch (error) {
+      alert ('Error: ' + error);
+    }
+}
+}
+
+async function checkCustomerExists(id){
+  try{
+    let response = await fetch('http://localhost:8090/customerexists?id='+id,
+      {
+        method: 'GET',
+        headers: {
+            "Content-Type": "application/json"
+          }
+      });
+    if(response.ok){
+      var body = await response.text();
+      if(body == '0matches'){
+        return false
+      }else{
+        return true
+      }
+
+    }else{
+      throw new Error('Error checking for existance' + response.code);
+    }
+    } catch (error) {
+      alert ('Error: ' + error);
     }
 }
