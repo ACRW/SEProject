@@ -10,13 +10,20 @@ async function onSignIn(googleUser) {
         body: 'token=' + token
     });
 
+    const body = await response.text();
+
     if (!response.ok) {
 
         var auth2 = gapi.auth2.getAuthInstance();
         auth2.signOut();
 
-        alert('failed to verify token integrity. pls try again.')
-    } else {
+        alert('pls try again.')
 
+    } else {
+        if (response.status == 200) {
+            console.log(body)
+        } else if (response.status == 201) {
+            console.log('more action')
+        }
     }
 }

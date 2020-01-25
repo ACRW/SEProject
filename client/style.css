@@ -12,6 +12,7 @@
     width: 10px;
 }
 
+
 .hiddenTable {
     position: relative;
     /*margin: 0;
@@ -35,6 +36,10 @@
     background-color: #C2D6B6;
     font-size: 115%;
     color: black;
+    font-size: 115%;
+        
+    margin-top: 5px;
+    margin-bottom: 5px;
 }
 
 .bookingGraphic {
@@ -44,6 +49,12 @@
     z-index: 10;
     padding: 0;
     margin: 0;
+}
+
+.mainButton {
+  margin-top: 15px;
+  margin-left: 5px;
+  margin-right: 5px;
 }
 
 .mainButton {
