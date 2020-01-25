@@ -194,8 +194,9 @@
     <button type="button" class="btn btn-primary newColor mainButton" onclick="" data-toggle="modal" data-target="#notificationModal">Notifications</button>
     <button type="button" class="btn btn-primary newColor mainButton" onclick="" data-toggle="modal" data-target="#statisticsModal">Statistics</button>
   </div>
-
-
+  <div>
+    <p id='errorMessage'></p>
+  </div>
   <div class="modal" id="searchModal" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-lg" role="document">
       <div class="modal-content">
@@ -232,6 +233,7 @@
           </form>
           <form id='byEvent' hidden=true>
             <h5>Enter a event name or choose the date of the event </h5>
+            <p id='eventSearchError'></p>
             <div class="form-group">
               <label>Event Name</label>
               <input class="form-control" id="eventSearch" placeholder="Enter event name or leave blank"> <!--check valid -->
@@ -270,6 +272,7 @@
           <form id='byAvaliability' hidden=true>
             <div class="form-group">
               <h5>Choose a room and date to check room avaliabilty </h5>
+              <p id='avaliabiltySearchError'></p>
               <label>Room</label>
               <select class="browser-default custom-select newDropdown" id="roomSelectDrop">
                   <option selected>Select Room... </option> <!--check valid -->

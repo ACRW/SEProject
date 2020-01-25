@@ -175,8 +175,11 @@ async function searchForUser(){
 
 //creates tables from users community and hostel bookings
 async function getUserBookings(customerID){
+  if(customerID==''){
+    document.getElementById('usersBookingError').innerHTML = 'Error getting customer ID'
+  }else{
   var exist =  await checkCustomerExists(customerID)
-  console.log(exist)
+
   if(exist == true){
   try{
     let response = await fetch('http://localhost:8090/customerbookings?id=' + customerID,
@@ -202,12 +205,10 @@ async function getUserBookings(customerID){
             document.getElementById('usersHostelBookingTableBody').innerHTML += tableRow;
           }
         }
-
         if(bookings['community'].length == null && bookings['hostel'].length == null){
           document.getElementById('usersBookingError').innerHTML = 'User has no bookings'
-
         }
-      }else{
+      } else{
         throw new Error('Error getting customers' + response.code);
       }
       } catch (error) {
@@ -216,11 +217,15 @@ async function getUserBookings(customerID){
     }else{
       document.getElementById('usersBookingError').innerHTML = 'User does not exist in the database'
     }
+  }
 }
 
 //fills drop boxes
 async function updateRooms() {
-    const rooms = await getRooms();
+    const rooms = await getCommunityRooms();
+    if(rooms == 'Error'){
+      document.getElementById('errorMessage').innerHTML = 'Error fetching community rooms'
+    }else{
     roomDrop = document.getElementById("roomSelectDrop");
     bookRoomDrop = document.getElementById("bookingRoomDropdown");
     for (i = 0; i < rooms.length; i++) {
@@ -233,6 +238,7 @@ async function updateRooms() {
         bookRoomDrop.add(option2);
         roomDrop.add(option);
     }
+  }
 
 }
 
@@ -250,16 +256,25 @@ function fillDayDrop(year, month, searchType){
   }
 }
 
-async function getRooms(startDate, endDate) { // Need to add error handling at some point.
+async function getCommunityRooms(startDate, endDate) { // Need to add error handling at some point.
+    try{
     let response = await fetch('http://localhost:8090/rooms?types=community', {
         method: "GET",
         headers: {
             "Content-Type": "application/json"
         }
     });
+    if(response.ok){
     let body = await response.text();
     var rooms = JSON.parse(body);
     return rooms["community"]
+  }else{
+    throw new Error('Error getting Rooms' + response.code);
+    return 'Error'
+  }
+  }catch (error){
+    alert ('Error: ' + error);
+  }
 }
 
 async function searchForAvaliability(){
@@ -268,26 +283,36 @@ async function searchForAvaliability(){
   month = document.getElementById("monthAvaliableSearch").value;
   day = document.getElementById("dayAvaliableSearch").value;
   dateCombined = year+ '-' + month + '-' + day;
+  if(roomName == '' || dateCombined== '--'){
+    document.getElementById(avaliabiltySearchError).innerHTML = 'Please fill all parameters for the search'
+  }else{
+  try{
   let response = await fetch('http://localhost:8090/rooms?types=community', {
       method: "GET",
       headers: {
           "Content-Type": "application/json"
       }
   });
+  if(response.ok){
   let body = await response.text();
   var rooms = JSON.parse(body);
   roomID = 0;
+  if(rooms['community'].length == 0){
+    document.getElementById(avaliabiltySearchError).innerHTML = 'No rooms found in the database'
+  }else{
   for(var i=0; i<rooms['community'].length; i++){
     if (rooms['community'][i].name == roomName){
       roomID = rooms['community'][i].id;
     }
   }
+
   let response2 = await fetch('http://localhost:8090/roomavailability?type=community&id='+roomID, {
       method: "GET",
       headers: {
           "Content-Type": "application/json"
       }
   });
+  if(response2.ok){
   let body2 = await response2.text();
   var availability = JSON.parse(body2);
   for(var i=1; i< 14; i++){
@@ -304,6 +329,20 @@ async function searchForAvaliability(){
   document.getElementById("roomAvailabilityTable").hidden = false;
   document.getElementById("byAvaliability").hidden = true;
   document.getElementById("searchModalFooter").hidden = true;
+}else{
+  throw new Error('Error getting Rooms' + response.code);
+  document.getElementById(avaliabiltySearchError).innerHTML = 'Error checking avaliabilty of room'
+
+}
+}
+}else{
+  throw new Error('Error getting Rooms' + response.code);
+  document.getElementById(avaliabiltySearchError).innerHTML = 'Error fetching rooms from the database'
+}
+}catch(error){
+  alert ('Error: ' + error);
+}
+}
 };
 
 async function searchForEvents(){
@@ -315,6 +354,9 @@ async function searchForEvents(){
   if(dateCombined.length != 10){
     dateCombined = ''
   }
+  if(name == '' && dateCombined== ''){
+    document.getElementById('eventSearchError').innerHTML = 'Please enter at least one parameter to search by'
+  }else{
   try{
     let response = await fetch('http://localhost:8090/eventsearch?name=' + name + '&date=' + dateCombined,
       {
@@ -338,11 +380,13 @@ async function searchForEvents(){
     }
     } else {
       throw new Error('Error getting customers' + response.code);
+      document.getElementById('eventSearchError').innerHTML = 'Please enter at least one parameter to search by'
     }
     } catch (error) {
       alert ('Error: ' + error);
     }
   document.getElementById("searchModalFooter").hidden = true;
+}
 }
 
 async function fillFindBy(){
@@ -365,6 +409,7 @@ async function fillFindBy(){
 
     }else{
       throw new Error('Error getting customers' + response.code);
+      document.getElementById('errorMessage').innerHTML = 'Error fetching customers'
     }
     } catch (error) {
       alert ('Error: ' + error);
@@ -386,6 +431,7 @@ async function fillFindBy(){
         }
       }else{
         throw new Error('Error getting events' + response.code);
+        document.getElementById('errorMessage').innerHTML = 'Error fetching events'
       }
       } catch (error) {
         alert ('Error: ' + error);
@@ -395,6 +441,9 @@ async function fillFindBy(){
 async function bookingView(id){
   document.getElementById('makeBooking').hidden = false;
   document.getElementById('findBy').hidden = true;
+  if(id == ''){
+    document.getElementById('errorMessage').innerHTML = 'No id supplied when searching for customer'
+  }else{
   try{
     let response = await fetch('http://localhost:8090/customersearch?id='+id,
       {
@@ -415,6 +464,7 @@ async function bookingView(id){
     } catch (error) {
       alert ('Error: ' + error);
     }
+  }
 }
 
 async function eventStatsView(id){
@@ -428,9 +478,12 @@ async function eventStatsView(id){
       });
     if(response.ok){
       var body = await response.text();
+      if(body == '0matches'){
+        document.getElementById('eventStatistics').innerHTML = "No matches found";
+      }else{
       var stats = JSON.parse(body);
       document.getElementById('eventStatistics').innerHTML = "Event Name: " + stats[0].name + " Description: " + stats[0].description + " Tickets Sold: " + stats[0].numSold + '/' + stats[0].capacity;
-
+    }
     }else{
       throw new Error('Error getting statistics' + response.code);
     }
@@ -442,11 +495,12 @@ async function eventStatsView(id){
 async function newBooking(id){
   startTime = parseInt(document.getElementById('bookingStartTime').value) + 8;
   duration = document.getElementById('bookingDurationTime').value;
-  console.log(document.getElementById('chosenDate').innerHTML)
   day = document.getElementById('chosenDate').innerHTML.substring(4)
   month =  document.getElementById('chosenDate').value
   free = true
-  console.log(document.getElementById(startTime + '.' + day + '.' + month).innerHTML)
+  if(startTime == '' || duration == '' || day == '' || month == ''){
+    document.getElementById('newBookingError').innerHTML = 'Please fill in all sections'
+  }else{
   if(duration == 0.5){
     endTime = new Date(2020, month, day, startTime, 30, 0, 0).getTime()/1000;
     if(document.getElementById(startTime + '.' + day + '.' + month).innerHTML == 'Busy'){
@@ -490,10 +544,13 @@ async function newBooking(id){
   }
 }
 }
+}
 
 async function fillPrice(){
   roomId = document.getElementById('bookingRoomDropdown').value;
-
+  if(roomId==''){
+    document.getElementById('newBookingError').innerHTML='Room id not supplied'
+  }else{
   try{
     let response = await fetch('http://localhost:8090/communityroomprice?id='+roomId,
       {
@@ -516,7 +573,7 @@ async function fillPrice(){
     } catch (error) {
       alert ('Error: ' + error);
     }
-
+  }
 }
 
 function calculatePrice(){
@@ -526,6 +583,9 @@ function calculatePrice(){
 
 async function fillBookingTable(){
   roomId = document.getElementById('bookingRoomDropdown').value;
+  if(roomId==''){
+    document.getElementById('newBookingError').innerHTML='Room id not supplied'
+  }else{
   try{
     let response = await fetch('http://localhost:8090/roomavailability?type=community&id='+roomId,
       {
@@ -554,6 +614,7 @@ async function fillBookingTable(){
     } catch (error) {
       alert ('Error: ' + error);
     }
+}
 }
 
 async function checkCustomerExists(id){
