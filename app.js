@@ -316,6 +316,7 @@ app.get('/roomslargeenough', async function(req, resp) {
 async function checkCustomerExists(customerID, resp) {
     // try to get customer's details
 
+    try{
     const customer = await performQuery('SELECT id, fName, lName, email, phone FROM customers WHERE id = ' + customerID);
 
     // if no database error
@@ -327,8 +328,12 @@ async function checkCustomerExists(customerID, resp) {
         }
 
       }else{}
-    }
 
+  }catch (error) {
+    alert ('Error: ' + error);
+  }
+
+}
 
 // get all customers
 app.get('/customers', async function(req,resp) {
