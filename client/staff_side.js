@@ -66,6 +66,16 @@ document.addEventListener("DOMContentLoaded", function () {
     fillBookingTable()
   });
 
+  document.getElementById('numberOfGuests').addEventListener('change',function(){
+    //fillHostelPrice()
+    fillHostelDropdown()
+    fillHostelBookingTable()
+  });
+
+  document.getElementById('hostelRoomsLargeEnough').addEventListener('change',function(){
+    fillHostelPrice()
+  });
+
   document.getElementById('bookingDurationTime').addEventListener('change',function(){
     calculatePrice()
   });
@@ -122,6 +132,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     document.getElementById('chosenDate').innerHTML = document.getElementById('day7').innerHTML
   })
+
 
 });
 
@@ -254,6 +265,37 @@ function fillDayDrop(year, month, searchType){
     daysDrop.add(option);
 
   }
+}
+
+async function fillHostelDropdown(){
+  hostelRoomDrop = document.getElementById("hostelRoomsLargeEnough");
+  guestNum = document.getElementById('numberOfGuests').value
+  try{
+  let response = await fetch('http://localhost:8090/roomslargeenough?guestnum=' + guestNum, {
+      method: "GET",
+      headers: {
+          "Content-Type": "application/json"
+      }
+  });
+  if(response.ok){
+
+  let body = await response.text();
+  var rooms = JSON.parse(body);
+  for(var i=0; i<rooms.length;i++){
+    let option = document.createElement("option")
+    option.text = rooms[i].roomNumber.padStart(3,'0') + '£' + rooms[i].pricePerNight
+    option.value = rooms[i].id
+    hostelRoomDrop.add(option);
+
+  }
+}else{
+  throw new Error('Error getting Rooms' + response.code);
+  return 'Error'
+}
+}catch (error){
+  alert ('Error: ' + error);
+}
+
 }
 
 async function getCommunityRooms(startDate, endDate) { // Need to add error handling at some point.
@@ -402,9 +444,13 @@ async function fillFindBy(){
       var body = await response.text();
       var customers = JSON.parse(body);
       for(var i = 0; i<customers.length; i++){
-        document.getElementById('findByNameDropdown').innerHTML += '<a onclick="bookingView('+customers[i].id+')">' + customers[i].fName + ' ' + customers[i].lName + '</a>';
-        document.getElementById('findByPhoneNumberDropdown').innerHTML += '<a onclick="bookingView('+customers[i].id+')">' + customers[i].phone + '</a>';
-        document.getElementById('findByEmailDropdown').innerHTML += '<a onclick="bookingView('+customers[i].id+')">' + customers[i].email +  '</a>'
+        document.getElementById('findByNameDropdown0').innerHTML += '<a onclick="bookingView('+customers[i].id+')">' + customers[i].fName + ' ' + customers[i].lName + '</a>';
+        document.getElementById('findByPhoneNumberDropdown0').innerHTML += '<a onclick="bookingView('+customers[i].id+')">' + customers[i].phone + '</a>';
+        document.getElementById('findByEmailDropdown0').innerHTML += '<a onclick="bookingView('+customers[i].id+')">' + customers[i].email +  '</a>'
+        document.getElementById('findByNameDropdown1').innerHTML += '<a onclick="hostelBookingView('+customers[i].id+')">' + customers[i].fName + ' ' + customers[i].lName + '</a>';
+        document.getElementById('findByPhoneNumberDropdown1').innerHTML += '<a onclick="hostelBookingView('+customers[i].id+')">' + customers[i].phone + '</a>';
+        document.getElementById('findByEmailDropdown1').innerHTML += '<a onclick="hostelBookingView('+customers[i].id+')">' + customers[i].email +  '</a>'
+
       }
 
     }else{
@@ -457,6 +503,36 @@ async function bookingView(id){
       var customers = JSON.parse(body);
       document.getElementById('customerInfo').innerHTML= 'Customer Name:' + customers[0].fName + ' ' + customers[0].lName;
       document.getElementById('bookingButtonDiv').innerHTML = '<div class="col-sm-3"><a class="btn btn-primary newColor" href="#" role="button" onclick="newBooking('+customers[0].id+')">Book & Pay at desk</a></div>'
+
+    }else{
+      throw new Error('Error getting customers' + response.code);
+    }
+    } catch (error) {
+      alert ('Error: ' + error);
+    }
+  }
+}
+
+async function hostelBookingView(id){
+  document.getElementById('makeHostelBooking').hidden = false;
+  document.getElementById('findBy1').hidden = true;
+  console.log(id)
+  if(id == ''){
+    document.getElementById('errorMessage').innerHTML = 'No id supplied when searching for customer'
+  }else{
+  try{
+    let response = await fetch('http://localhost:8090/customersearch?id='+id,
+      {
+        method: 'GET',
+        headers: {
+            "Content-Type": "application/json"
+          }
+      });
+    if(response.ok){
+      var body = await response.text();
+      var customers = JSON.parse(body);
+      document.getElementById('customerInfo1').innerHTML= 'Customer Name:' + customers[0].fName + ' ' + customers[0].lName;
+      document.getElementById('hostelBookingButtonDiv').innerHTML = '<div class="col-sm-3"><a class="btn btn-primary newColor" href="#" role="button" onclick="newHostelBooking('+customers[0].id+')">Book & Pay at desk</a></div>'
 
     }else{
       throw new Error('Error getting customers' + response.code);
@@ -546,6 +622,41 @@ async function newBooking(id){
 }
 }
 
+async function newHostelBooking(id){
+  //startDay = document.getElementById('chosenHostelDate').innerHTML.substring(4)
+  //month =  document.getElementById('chosenHostelDate').value
+  startDay = 23
+  month = 1
+  endMonth = month
+  numberOfGuests = document.getElementById('numberOfGuests').value
+  numberOfNights = document.getElementById('numberOfNights').value
+  endDay = (startDay + numberOfNights) % daysInMonth(2020,month)
+  if(endDay<startDay){
+    endMonth = month +1
+
+  }else{
+    endMonth = month
+  }
+  console.log(endDay)
+  console.log(endMonth)
+  startTime = new Date(2020, month, startDay, 0, 0, 0, 0).getTime()/1000;
+  endTime = new Date(2020, endMonth, endDay, 0, 0, 0, 0).getTime()/1000;
+
+  roomId = document.getElementById('hostelRoomsLargeEnough').value;
+  let response = await fetch('http://localhost:8090/staffhostelbooking',
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: 'customerid=' + id + '&roomid=' + roomId + '&start=' + startTime + '&end=' + endTime
+    });
+  if(!response.ok){
+    throw new Error('problem adding new event ' + response.code);
+  }
+}
+
+
 async function fillPrice(){
   roomId = document.getElementById('bookingRoomDropdown').value;
   if(roomId==''){
@@ -576,6 +687,15 @@ async function fillPrice(){
   }
 }
 
+function fillHostelPrice(){
+    document.getElementById('numPeople').innerHTML= document.getElementById('numberOfGuests').value;
+
+    document.getElementById('hostelRoomPricePerHour').innerHTML = document.getElementById('hostelRoomsLargeEnough').options[document.getElementById('hostelRoomsLargeEnough').selectedIndex].text.substring(4);
+    console.log
+    document.getElementById('totalHostelBookingPrice').innerHTML = parseInt(document.getElementById('numPeople').innerHTML) * parseInt(document.getElementById('hostelRoomPricePerHour').innerHTML)
+
+}
+
 function calculatePrice(){
   price = document.getElementById('roomPricePerHour').innerText * document.getElementById('bookingDurationTime').value
   document.getElementById('totalBookingPrice').innerText = price
@@ -596,8 +716,6 @@ async function fillBookingTable(){
       });
     if(response.ok){
       var body = await response.text();
-    if(body=='0matches'){
-    }else{
 
       var busy = JSON.parse(body);
       for(var i =0; i<busy["busy"].length; i++){
@@ -605,7 +723,7 @@ async function fillBookingTable(){
           if(document.getElementById(j.toString() + '.' + busy["busy"][i].start.substring(2,4)+ '.' + (parseInt(busy["busy"][i].start.substring(5,7))-1) ) != null){
             document.getElementById(j.toString() + '.' + busy["busy"][i].start.substring(2,4)+ '.' + (parseInt(busy["busy"][i].start.substring(5,7))-1) ).innerHTML = 'Busy';
           }
-        }
+
       }
     }
     }else{
@@ -614,6 +732,45 @@ async function fillBookingTable(){
     } catch (error) {
       alert ('Error: ' + error);
     }
+}
+}
+
+async function fillHostelBookingTable(){
+  guestNum = document.getElementById('numberOfGuests').value;
+  if(guestNum==''){
+    document.getElementById('newHostelBookingError').innerHTML='Guest number not supplied'
+  }else{
+  month =  document.getElementById('chosenHostelDate').value
+  for(var i = 1; i<8;i++){
+    day = document.getElementById('hday'+i).innerHTML.substring(4)
+    if(day==1 && i!=1){
+      month = month +1
+    }
+
+    date = new Date(2020, month, day, 0, 0, 0, 0).getTime()/1000;
+  try{
+    let response = await fetch('http://localhost:8090/checkhostelavaliability?date='+ date +'&guestNum=' + guestNum,
+      {
+        method: 'GET',
+        headers: {
+            "Content-Type": "application/json"
+          }
+      });
+    if(response.ok){
+      var body = await response.text();
+      if(body == 'true'){
+        document.getElementById('hostelFull').innerHTML += '<td>Full</td>'
+      }else{
+        document.getElementById('hostelFull').innerHTML += '<td></td>'
+      }
+
+    }else{
+      throw new Error('Error getting room avaliabilty' + response.code);
+    }
+    } catch (error) {
+      alert ('Error: ' + error);
+    }
+}
 }
 }
 
@@ -633,7 +790,6 @@ async function checkCustomerExists(id){
       }else{
         return true
       }
-
     }else{
       throw new Error('Error checking for existance' + response.code);
     }
