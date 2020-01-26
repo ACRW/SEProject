@@ -64,6 +64,7 @@
         }
 
         let resetTable = function(){
+          document.getElementById('hostelFull').innerHTML = '<td>Full</td>'
           for(var j=9;j<=11;j++){
             document.getElementById(j.toString() +'.').innerHTML = '<td>' + j + 'am</td>'
           }
@@ -87,7 +88,6 @@
                 newDate.setDate(newDate.getDate() + i);
                 headers.cells[i + 1].innerHTML = dayNames[i] + " " + newDate.getDate();
                 headers2.cells[i + 1].innerHTML = dayNames[i] + " " + newDate.getDate();
-
                 if(newDate.getDate() == 1 && i!=0){
                   month = month + 1
                 }
@@ -95,6 +95,8 @@
                   document.getElementById(j.toString() +'.').innerHTML += '<td id="' + j + '.' + newDate.getDate() + '.' + month + '"></td>'
 
                 }
+                document.getElementById('hostelFull').innerHTML += '<td id=' + newDate.getDate() + '.' + month +'></td>'
+
 
             }
 
@@ -715,6 +717,7 @@
                 <tbody>
                   <tr id='hostelFull'>
                     <td>Full</td>
+
                   </tr>
                 </tbody>
             </table>

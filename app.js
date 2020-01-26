@@ -252,32 +252,7 @@ app.get('/roomavailability', async function(req, resp) {
 });
 
 
-//check if enough space for booking in range of nights
-app.get('/checkhostelavaliability', async function(req, resp) {
 
-    // search parameters
-    const guestNum = req.query.guestNum;
-    const date = req.query.date;
-    // where clause
-
-    const unavaliable = await performQuery('SELECT * FROM hostelBookings AS b, hostelRooms AS r WHERE startDate <= FROM_UNIXTIME('+date+') AND endDate >= FROM_UNIXTIME('+date+') AND noOfPeople>='+guestNum);
-
-    // if no database error
-    if (processQueryResult(unavaliable, resp)) {
-        // if customer in database
-        if (unavaliable.length > 0) {
-            // return true
-            resp.status(200).send('true');;
-        }
-        else{
-          resp.status(200).send('false');
-        }
-
-
-        // return false
-        return false;
-    }
-});
 
 //returns rooms large enough to house the number of guests
 app.get('/roomslargeenough', async function(req, resp) {
@@ -328,7 +303,7 @@ async function checkCustomerExists(customerID, resp) {
       }else{}
 
   }catch (error) {
-    alert ('Error: ' + error);
+    console.log ('Error: ' + error);
   }
 
 }
@@ -573,7 +548,7 @@ async function hostelBooking(customerID, roomID, start, end, resp) {
     // return false
     return false;
   }catch (error) {
-    alert ('Error: ' + error);
+    console.log ('Error: ' + error);
   }
 }
 
@@ -595,10 +570,14 @@ app.post('/staffhostelbooking', async function(req, resp) {
             // if all parameters specified
             if (roomID && start && end) {
                 // make booking
+                try{
                 if (await hostelBooking(customerID, roomID, start, end, resp)) {
                     // booking successful
                     resp.status(200).send('1success');
                 }
+              }catch(error){
+                console.log ('Error: ' + error);
+              }
 
             } else {
                 // parameter error
