@@ -287,8 +287,6 @@ app.get('/roomslargeenough', async function(req, resp) {
     // search parameters
     const guestNum = req.query.guestnum;
 
-    console.log(guestNum)
-
 
         // get matching customers
 

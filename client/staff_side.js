@@ -88,6 +88,13 @@ document.addEventListener("DOMContentLoaded", function () {
     fillBookingTable()
   })
 
+  document.getElementById('hostelCalenderNext').addEventListener('click',function(){
+    fillHostelBookingTable()
+  })
+
+  document.getElementById('hostelCalenderPrev').addEventListener('click',function(){
+    fillHostelBookingTable()
+  })
   updateRooms();
 
   fillFindBy();
@@ -103,36 +110,83 @@ document.addEventListener("DOMContentLoaded", function () {
 
   })
   document.getElementById('day3').addEventListener('click',function(){
-    if(document.getElementById('day2').innerHTML.substring(4) == 1){
+    if(document.getElementById('day3').innerHTML.substring(4) == 1){
       document.getElementById('chosenDate').value = document.getElementById('chosenDate').value + 1
     }
     document.getElementById('chosenDate').innerHTML = document.getElementById('day3').innerHTML
   })
   document.getElementById('day4').addEventListener('click',function(){
-    if(document.getElementById('day2').innerHTML.substring(4) == 1){
+    if(document.getElementById('day4').innerHTML.substring(4) == 1){
       document.getElementById('chosenDate').value = document.getElementById('chosenDate').value + 1
     }
     document.getElementById('chosenDate').innerHTML = document.getElementById('day4').innerHTML
   })
   document.getElementById('day5').addEventListener('click',function(){
-    if(document.getElementById('day2').innerHTML.substring(4) == 1){
+    if(document.getElementById('day5').innerHTML.substring(4) == 1){
       document.getElementById('chosenDate').value = document.getElementById('chosenDate').value + 1
     }
     document.getElementById('chosenDate').innerHTML = document.getElementById('day5').innerHTML
   })
   document.getElementById('day6').addEventListener('click',function(){
-    if(document.getElementById('day2').innerHTML.substring(4) == 1){
+    if(document.getElementById('day6').innerHTML.substring(4) == 1){
       document.getElementById('chosenDate').value = document.getElementById('chosenDate').value + 1
     }
     document.getElementById('chosenDate').innerHTML = document.getElementById('day6').innerHTML
   })
   document.getElementById('day7').addEventListener('click',function(){
-    if(document.getElementById('day2').innerHTML.substring(4) == 1){
+    if(document.getElementById('day7').innerHTML.substring(4) == 1){
       document.getElementById('chosenDate').value = document.getElementById('chosenDate').value + 1
     }
     document.getElementById('chosenDate').innerHTML = document.getElementById('day7').innerHTML
   })
 
+  document.getElementById('hday1').addEventListener('click',function(){
+    document.getElementById('chosenHostelDate').innerHTML = document.getElementById('hday1').innerHTML
+  })
+  document.getElementById('hday2').addEventListener('click',function(){
+    if(document.getElementById('hday2').innerHTML.substring(4) == 1){
+      document.getElementById('chosenHostelDate').value = document.getElementById('chosenHostelDate').value + 1
+    }
+    document.getElementById('chosenHostelDate').innerHTML = document.getElementById('hday2').innerHTML
+
+  })
+  document.getElementById('hday3').addEventListener('click',function(){
+    if(document.getElementById('hday3').innerHTML.substring(4) == 1){
+      document.getElementById('chosenHostelDate').value = document.getElementById('chosenHostelDate').value + 1
+    }
+    document.getElementById('chosenHostelDate').innerHTML = document.getElementById('hday3').innerHTML
+  })
+  document.getElementById('hday4').addEventListener('click',function(){
+    if(document.getElementById('hday4').innerHTML.substring(4) == 1){
+      document.getElementById('chosenHostelDate').value = document.getElementById('chosenHostelDate').value + 1
+    }
+    document.getElementById('chosenHostelDate').innerHTML = document.getElementById('hday4').innerHTML
+  })
+  document.getElementById('hday5').addEventListener('click',function(){
+    if(document.getElementById('hday5').innerHTML.substring(4) == 1){
+      document.getElementById('chosenHostelDate').value = document.getElementById('chosenHostelDate').value + 1
+    }
+    document.getElementById('chosenHostelDate').innerHTML = document.getElementById('hday5').innerHTML
+  })
+  document.getElementById('hday6').addEventListener('click',function(){
+    if(document.getElementById('hday6').innerHTML.substring(4) == 1){
+      document.getElementById('chosenHostelDate').value = document.getElementById('chosenHostelDate').value + 1
+    }
+    document.getElementById('chosenHostelDate').innerHTML = document.getElementById('hday6').innerHTML
+  })
+  document.getElementById('hday7').addEventListener('click',function(){
+    if(document.getElementById('hday7').innerHTML.substring(4) == 1){
+      document.getElementById('chosenHostelDate').value = document.getElementById('chosenHostelDate').value + 1
+    }
+    document.getElementById('chosenHostelDate').innerHTML = document.getElementById('hday7').innerHTML
+  })
+
+  document.getElementById('numberOfGuests').addEventListener('change',function(){
+    if(Number.isInteger(parseInt(document.getElementById('numberOfGuests').value)) == false){
+      document.getElementById('newHostelBookingError').innerHTML = 'Please enter an integer for number of guests'
+    }else{
+    document.getElementById('afterNumOfGuest').hidden = false
+  }})
 
 });
 
@@ -270,6 +324,10 @@ function fillDayDrop(year, month, searchType){
 async function fillHostelDropdown(){
   hostelRoomDrop = document.getElementById("hostelRoomsLargeEnough");
   guestNum = document.getElementById('numberOfGuests').value
+
+  if(Number.isInteger(parseInt(guestNum)) == false){
+  document.getElementById('newHostelBookingError').innerHTML= 'Please enter an integer for number of guests'
+}else{
   try{
   let response = await fetch('http://localhost:8090/roomslargeenough?guestnum=' + guestNum, {
       method: "GET",
@@ -280,6 +338,10 @@ async function fillHostelDropdown(){
   if(response.ok){
 
   let body = await response.text();
+  if(body == '0matches'){
+    document.getElementById('newHostelBookingError').innerHTML = 'No rooms large enough for number of guests try splitting party into several smaller ones.'
+    document.getElementById('afterNumOfGuest').hidden = true
+  }else{
   var rooms = JSON.parse(body);
   for(var i=0; i<rooms.length;i++){
     let option = document.createElement("option")
@@ -288,6 +350,7 @@ async function fillHostelDropdown(){
     hostelRoomDrop.add(option);
 
   }
+}
 }else{
   throw new Error('Error getting Rooms' + response.code);
   return 'Error'
@@ -295,7 +358,7 @@ async function fillHostelDropdown(){
 }catch (error){
   alert ('Error: ' + error);
 }
-
+}
 }
 
 async function getCommunityRooms(startDate, endDate) { // Need to add error handling at some point.
@@ -487,7 +550,7 @@ async function fillFindBy(){
 async function bookingView(id){
   document.getElementById('makeBooking').hidden = false;
   document.getElementById('findBy').hidden = true;
-  if(id == ''){
+  if(id == null){
     document.getElementById('errorMessage').innerHTML = 'No id supplied when searching for customer'
   }else{
   try{
@@ -516,8 +579,7 @@ async function bookingView(id){
 async function hostelBookingView(id){
   document.getElementById('makeHostelBooking').hidden = false;
   document.getElementById('findBy1').hidden = true;
-  console.log(id)
-  if(id == ''){
+  if(id == null){
     document.getElementById('errorMessage').innerHTML = 'No id supplied when searching for customer'
   }else{
   try{
@@ -574,7 +636,7 @@ async function newBooking(id){
   day = document.getElementById('chosenDate').innerHTML.substring(4)
   month =  document.getElementById('chosenDate').value
   free = true
-  if(startTime == '' || duration == '' || day == '' || month == ''){
+  if(startTime == '' || duration == '' || day == '' || month == null){
     document.getElementById('newBookingError').innerHTML = 'Please fill in all sections'
   }else{
   if(duration == 0.5){
@@ -617,28 +679,33 @@ async function newBooking(id){
     });
   if(!response.ok){
     throw new Error('problem adding new event ' + response.code);
+  }else{
+    document.getElementById('newBookingError').innerHTML='Booking successful'
+
   }
 }
 }
 }
 
 async function newHostelBooking(id){
-  //startDay = document.getElementById('chosenHostelDate').innerHTML.substring(4)
-  //month =  document.getElementById('chosenHostelDate').value
-  startDay = 23
-  month = 1
+  if(numberOfGuests)
+  startDay = document.getElementById('chosenHostelDate').innerHTML.substring(4)
+  month =  document.getElementById('chosenHostelDate').value
   endMonth = month
   numberOfGuests = document.getElementById('numberOfGuests').value
+  if(Number.isInteger(parseInt(numberOfGuests)) == false){
+    document.getElementById('newHostelBookingError').innerHTML= 'Please enter an integer for number of guests'
+  }else if(startDay == '' || numberOfGuests == '' || month == null){
+    document.getElementById('newHostelBookingError').innerHTML= 'Please fill in all fields to complete booking'
+  }else{
   numberOfNights = document.getElementById('numberOfNights').value
-  endDay = (startDay + numberOfNights) % daysInMonth(2020,month)
+  endDay = (parseInt(startDay) + parseInt(numberOfNights)) % daysInMonth(2020,month)
   if(endDay<startDay){
     endMonth = month +1
 
   }else{
     endMonth = month
   }
-  console.log(endDay)
-  console.log(endMonth)
   startTime = new Date(2020, month, startDay, 0, 0, 0, 0).getTime()/1000;
   endTime = new Date(2020, endMonth, endDay, 0, 0, 0, 0).getTime()/1000;
 
@@ -653,9 +720,12 @@ async function newHostelBooking(id){
     });
   if(!response.ok){
     throw new Error('problem adding new event ' + response.code);
+  }else{
+    document.getElementById('newHostelBookingError').innerHTML='Booking successful'
+    resetHostelBooking()
   }
 }
-
+}
 
 async function fillPrice(){
   roomId = document.getElementById('bookingRoomDropdown').value;
@@ -703,7 +773,7 @@ function calculatePrice(){
 
 async function fillBookingTable(){
   roomId = document.getElementById('bookingRoomDropdown').value;
-  if(roomId==''){
+  if(roomId==null){
     document.getElementById('newBookingError').innerHTML='Room id not supplied'
   }else{
   try{
@@ -736,11 +806,16 @@ async function fillBookingTable(){
 }
 
 async function fillHostelBookingTable(){
+
   guestNum = document.getElementById('numberOfGuests').value;
+  if(Number.isInteger(parseInt(guestNum)) == false){
+    document.getElementById('newHostelBookingError').innerHTML= 'Please enter an integer for number of guests'
+  }else {
   if(guestNum==''){
     document.getElementById('newHostelBookingError').innerHTML='Guest number not supplied'
   }else{
   month =  document.getElementById('chosenHostelDate').value
+  document.getElementById('hostelFull').innerHTML = '<td>Full</td>'
   for(var i = 1; i<8;i++){
     day = document.getElementById('hday'+i).innerHTML.substring(4)
     if(day==1 && i!=1){
@@ -758,6 +833,7 @@ async function fillHostelBookingTable(){
       });
     if(response.ok){
       var body = await response.text();
+
       if(body == 'true'){
         document.getElementById('hostelFull').innerHTML += '<td>Full</td>'
       }else{
@@ -770,6 +846,7 @@ async function fillHostelBookingTable(){
     } catch (error) {
       alert ('Error: ' + error);
     }
+}
 }
 }
 }
@@ -796,4 +873,9 @@ async function checkCustomerExists(id){
     } catch (error) {
       alert ('Error: ' + error);
     }
+}
+
+function resetHostelBooking(){
+  document.getElementById('afterNumOfGuest').hidden=true;
+  document.getElementById('numberOfGuests').value = '';
 }

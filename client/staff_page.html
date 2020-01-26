@@ -685,15 +685,16 @@
               <label>Number of guests</label>
               <input class="form-control" id="numberOfGuests" placeholder="Enter number of guests">
             </div>
+            <div id='afterNumOfGuest' hidden='true'>
             <select class="browser-default custom-select newDropdown" id="hostelRoomsLargeEnough" >
                 <option selected>Select Room... </option>
             </select>
             <p class="mt-2" > Select a day by clicking the top row, then change the time and the duration with the drop down. </p>
             <h5>Currently booking for</h5><h5 id='chosenHostelDate'></h5>
             <div class="row">
-              <div class="col"><button type="button" class="btn btn-primary newColor" onclick="calender.prevWeek()" id='calenderPrev'>Prev</button></div>
+              <div class="col"><button type="button" class="btn btn-primary newColor" onclick="calender.prevWeek()" id='hostelCalenderPrev'>Prev</button></div>
               <div class="col" ><h3 id="tableDate"></h3></div>
-              <div class="col"><button type="button" class="btn btn-primary newColor" onclick="calender.nextWeek()" style="float: right;" id ='calenderNext'>Next</a></div>
+              <div class="col"><button type="button" class="btn btn-primary newColor" onclick="calender.nextWeek()" style="float: right;" id ='hostelCalenderNext'>Next</a></div>
             </div>
             <table class="table table-striped newTable" id="hostelTable" style="margin-top:5px; text-align: center;">
                 <thead>
@@ -743,8 +744,10 @@
                 <div id='hostelBookingButtonDiv'>
                 </div>
             </div>
-            <p id='newHostelBookingError'></p>
+
         </div>
+        <p id='newHostelBookingError'></p>
+      </div>
         <script>
             calender = new Calender();
         </script>
