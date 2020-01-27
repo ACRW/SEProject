@@ -861,6 +861,8 @@ app.post('/newcustomer', async function(req, resp) {
                 if (processQueryResult(result, resp)) {
                     // if one row inserted
                     if (result['affectedRows'] == 1) {
+                        // create session here
+                        
                         // get customer's name
                         const customer = await performQuery('SELECT fName, lName FROM customers WHERE id = ' + customerID);
 
