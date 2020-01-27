@@ -14,7 +14,7 @@ async function onSignIn(googleUser) {
 
     if (!response.ok) {
 
-        var auth2 = gapi.auth2.getAuthInstance();
+        let auth2 = gapi.auth2.getAuthInstance();
         auth2.signOut();
 
         alert('pls try again.')

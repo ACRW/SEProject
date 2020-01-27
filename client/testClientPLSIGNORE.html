@@ -1,8 +1,38 @@
+<html>
 <head>
     <meta name = 'google-signin-client_id' content = '250191709665-ms18vru39atn7pkfb64g9eqg1iliv2ni.apps.googleusercontent.com'>
+
+    <style>
+        #signInCard {
+            max-width: 28rem;
+            margin: 60px auto 0;
+            float: none;
+        }
+
+        .display-4 {
+            font-size: 2rem !important;
+        }
+    </style>
+
+    <link rel = 'stylesheet' href = 'https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css' integrity = 'sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T' crossorigin = 'anonymous'>
+
+    <title>Welcome | TCR Hub</title>
 </head>
 <body>
-    <div class = 'g-signin2 pr-3' data-onsuccess = 'onSignIn'></div>
+    <nav class = 'navbar navbar-light bg-light'>
+        <a class = 'navbar-brand'>TCR Hub</a>
+    </nav>
+    
+    <div id = 'signInCard' class = 'card'>
+        <h1 class = 'display-4 card-header bg-light'>Sign In</h1>
+        <div id = 'signInCardBody' class = 'card-body'>
+    		<h5 class = 'card-title'>Click the button below to sign in.</h5>
+            <p class = 'card-text'>If you do not have a Google account, you will first be prompted to create one.</p>
+            <div class = 'g-signin2 pr-3' data-onsuccess = 'onSignIn'></div>
+        </div>
+    </div>
+
     <script src = 'https://apis.google.com/js/platform.js' async defer></script>
     <script src = 'testClientPLSIGNORE.js'></script>
 </body>
+</html>
