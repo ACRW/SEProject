@@ -3,7 +3,7 @@
     <meta name = 'google-signin-client_id' content = '250191709665-ms18vru39atn7pkfb64g9eqg1iliv2ni.apps.googleusercontent.com'>
 
     <style>
-        #signInCard {
+        .signInCard {
             max-width: 28rem;
             margin: 60px auto 0;
             float: none;
@@ -32,11 +32,17 @@
         .dropdown-menu {
             min-width: 1rem;
         }
+
+        .signInButton {
+            margin-right: 15px;
+            width: 6rem;
+            height: 2.5rem;
+        }
     </style>
 
     <link rel = 'stylesheet' href = 'https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css' integrity = 'sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T' crossorigin = 'anonymous'>
 
-    <title>Welcome | TCR Hub</title>
+    <title>TCR Hub</title>
 </head>
 <body>
     <nav class = 'navbar navbar-expand-md navbar-light bg-light'>
@@ -54,18 +60,43 @@
         </div>
     </nav>
 
-    <div id = 'signInCard' class = 'card'>
+    <div id = 'signInCard' class = 'card signInCard'>
         <h1 class = 'display-4 card-header bg-light'>Sign In</h1>
-        <div id = 'signInCardBody' class = 'card-body'>
+        <div class = 'card-body'>
     		<h5 class = 'card-title'>Click the button below to sign in.</h5>
             <p class = 'card-text'>If you do not have a Google account, you will first be prompted to create one.</p>
             <div class = 'g-signin2 pr-3' data-onsuccess = 'onSignIn' id = 'googleButton'></div>
             <div class = 'spinner-border spinner-border-sm text-muted' id = 'spinner' hidden></div>
         </div>
+    </div>
 
-        <div id = 'newCustomer' class = 'card-body' hidden>
-    		<h5 class = 'card-title'>Looks like you're new here!</h5>
-            <p class = 'card-text'>Some further information is required...</p>
+    <div id = 'newCustomerCard' class = 'card signInCard' hidden>
+        <h1 class = 'display-4 card-header bg-light'>Welcome!</h1>
+        <div class = 'card-body'>
+    		<h5 class = 'card-title'>It looks like you're new here.</h5>
+            <p class = 'card-text'>We just need a little more information before you can begin using our system. Please enter your preferred telephone number in the box below, then select continue.</p>
+            <form id = 'phoneNumberForm' class = 'mb-0'>
+                <input id = 'phoneInput' type = 'tel' class = 'form-control' placeholder = 'Telephone Number'>
+                <div class = 'form-group row justify-content-end mb-0 mt-3'>
+                    <button id = 'phoneContinue' type = 'submit' class = 'btn btn-secondary signInButton' disabled>Continue</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id = 'signOutCard' class = 'card signInCard' hidden>
+        <h1 class = 'display-4 card-header bg-light'>Goodbye</h1>
+        <div class = 'card-body'>
+    		<h5 class = 'card-title'>You've successfully signed out.</h5>
+            <p class = 'card-text'>To sign in again, please refresh the page.</p>
+        </div>
+    </div>
+
+    <div id = 'contentCard' class = 'card signInCard' hidden>
+        <h1 class = 'display-4 card-header bg-light'>Well hello there!</h1>
+        <div class = 'card-body'>
+    		<h5 class = 'card-title'>Customer-side content will be displayed here.</h5>
+            <p class = 'card-text'>For now, the functionality is demonstrated in a separate system.</p>
         </div>
     </div>
 
