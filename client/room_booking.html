@@ -69,23 +69,6 @@
             }
         }
         
-        this.getBookings = async function() { // Gets the bookings then displays them.
-            let roomID = document.getElementById("roomDrop").value; // The list is in order of room id but offset by one due to the default option
-            if (roomID == -1) {
-                return;
-            }
-            let response = await fetch('http://' + hostAddr + ":" + hostPort + '/roomavailability?type=community' + "&id=" + roomID, {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json"
-                }
-            });
-            let availability = await response.json();
-            bookings = availability["busy"];
-            displayBookings();
-            return;
-        }
-        
         let displayBookings = async function () { // Displays all the booking on the calender
             clearCalender();
             for (i = 0; i < bookings.length; i++) {
@@ -104,6 +87,23 @@
                 bookingGraphic.style.height = String(bookingLength * cellHeight) + "px";
                 startCell.appendChild(bookingGraphic);
             }
+        }
+        
+        this.getBookings = async function() { // Gets the bookings then displays them.
+            let roomID = document.getElementById("roomDrop").value; // The list is in order of room id but offset by one due to the default option
+            if (roomID == -1) {
+                return;
+            }
+            let response = await fetch('http://' + hostAddr + ":" + hostPort + '/roomavailability?type=community' + "&id=" + roomID, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            });
+            let availability = await response.json();
+            bookings = availability["busy"];
+            displayBookings();
+            return;
         }
         
         displayDates();

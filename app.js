@@ -251,12 +251,45 @@ app.get('/roomavailability', async function(req, resp) {
     }
 });
 
+
+
+
+//returns rooms large enough to house the number of guests
+app.get('/roomslargeenough', async function(req, resp) {
+    // need authentication here
+    // look into session variables
+
+    // search parameters
+    const guestNum = req.query.guestnum;
+
+
+        // get matching customers
+
+        const hostelRooms = await performQuery('SELECT * FROM hostelRooms WHERE noOfPeople >= '+ guestNum );
+
+
+        // if no database error
+        if (processQueryResult(hostelRooms, resp)) {
+            // if matching customers found
+            if (hostelRooms.length > 0) {
+                // send list of customers
+                resp.status(200).send(JSON.stringify(hostelRooms));
+
+            } else {
+                // no matches
+                resp.status(200).send('0matches');
+            }
+
+    }
+});
+
 // customers
 
 // check customer in database
 async function checkCustomerExists(customerID, resp) {
     // try to get customer's details
 
+    try{
     const customer = await performQuery('SELECT id, fName, lName, email, phone FROM customers WHERE id = ' + customerID);
 
     // if no database error
@@ -264,15 +297,15 @@ async function checkCustomerExists(customerID, resp) {
         // if customer in database
         if (customer.length == 1) {
             // return true
-            return true;
+            resp.status(200).send(JSON.stringify(true));;
         }
 
-        // ID error
-        resp.status(400).send('0customerID');
+      }else{}
 
-        // return false
-        return false;
-    }
+  }catch (error) {
+    console.log ('Error: ' + error);
+  }
+
 }
 
 // get all customers
@@ -495,7 +528,7 @@ app.post('/staffcommunitybooking', async function(req, resp) {
 // hostel room booking
 async function hostelBooking(customerID, roomID, start, end, resp) {
     // should check if free at specified times
-
+    try{
     // insert row
     const result = await performQuery('INSERT INTO hostelBookings (roomID, startDate, endDate, userId) VALUES (' + roomID + ', FROM_UNIXTIME(' + start + '), FROM_UNIXTIME(' + end + '), ' + customerID + ')');
 
@@ -514,11 +547,15 @@ async function hostelBooking(customerID, roomID, start, end, resp) {
 
     // return false
     return false;
+  }catch (error) {
+    console.log ('Error: ' + error);
+  }
 }
 
 // make hostel room booking on behalf of customer
 app.post('/staffhostelbooking', async function(req, resp) {
     // customer ID
+    console.log(req.body)
     const customerID = req.body.customerid;
 
     // if customer ID specified
@@ -533,10 +570,14 @@ app.post('/staffhostelbooking', async function(req, resp) {
             // if all parameters specified
             if (roomID && start && end) {
                 // make booking
+                try{
                 if (await hostelBooking(customerID, roomID, start, end, resp)) {
                     // booking successful
                     resp.status(200).send('1success');
                 }
+              }catch(error){
+                console.log ('Error: ' + error);
+              }
 
             } else {
                 // parameter error
