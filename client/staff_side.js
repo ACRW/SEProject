@@ -39,7 +39,7 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("dayAvaliableSearch").hidden = false;
     year = document.getElementById("yearAvaliableSearch").value;
     month = document.getElementById("monthAvaliableSearch").value;
-    fillDayDrop(year,month,"Avaliable")
+    fillDayDrop(year,month,"AvaliableSearch")
   });
 
   document.getElementById("yearEventSearch").addEventListener("change", function(){
@@ -52,7 +52,20 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("dayEventSearch").hidden = false;
     year = document.getElementById("yearEventSearch").value;
     month = document.getElementById("monthEventSearch").value;
-    fillDayDrop(year,month,"Event")
+    fillDayDrop(year,month,"EventSearch")
+  });
+
+  document.getElementById("yearEventNew").addEventListener("change", function(){
+    document.getElementById("monthEventNewLabel").hidden = false;
+    document.getElementById("monthEventNew").hidden = false;
+  });
+
+  document.getElementById("monthEventNew").addEventListener("change", function(){
+    document.getElementById("dayEventNewLabel").hidden = false;
+    document.getElementById("dayEventNew").hidden = false;
+    year = document.getElementById("yearEventNew").value;
+    month = document.getElementById("monthEventNew").value;
+    fillDayDrop(year,month,"EventNew")
   });
 
   document.getElementById("newBookingButton").addEventListener('click',function(){
@@ -189,6 +202,13 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById('afterNumOfGuest').hidden = false
   }})
 
+  document.getElementById('newTicketType').addEventListener('click',function(){
+    addTicketType()
+  })
+
+  document.getElementById('createNewEvent').addEventListener('click',function(){
+    createNewEvent()
+  })
 });
 
 //runs get request to search for user in database and displays results
@@ -312,7 +332,7 @@ function daysInMonth (year, month) {
 }
 
 function fillDayDrop(year, month, searchType){
-  daysDrop = document.getElementById("day"+searchType+"Search");
+  daysDrop = document.getElementById("day"+searchType);
   for(var i=1; i<=daysInMonth(year,month);i++){
     let option = document.createElement("option")
     option.text = i.toString().padStart(2,'0');
@@ -734,6 +754,7 @@ async function newHostelBooking(id){
       if(response.ok){
         var body = await response.text();
         var busy = JSON.parse(body)
+        console.log(busy)
         for(var i =0; i<busy["busy"].length; i++){
           for(var j = 0; j<days.length; j++){
             if(days[j] == busy['busy'][i].startDate.substring(8,10)+'.'+busy['busy'][i].startDate.substring(5,7) || days[j] == busy['busy'][i].endDate.substring(8,10)+'.'+busy['busy'][i].endDate.substring(5,7)){
@@ -833,9 +854,7 @@ async function fillBookingTable(){
           if(document.getElementById(j.toString() + '.' + busy["busy"][i].start.substring(2,4)+ '.' + (parseInt(busy["busy"][i].start.substring(5,7))-1) ) != null){
             document.getElementById(j.toString() + '.' + busy["busy"][i].start.substring(2,4)+ '.' + (parseInt(busy["busy"][i].start.substring(5,7))-1) ).innerHTML = 'Busy';
             startTime = new Date(2020, startMonth, startDay, 0, 0, 0, 0).getTime()/1000;
-
           }
-
       }
     }
     }else{
@@ -941,4 +960,46 @@ async function checkCustomerExists(id){
 function resetHostelBooking(){
   document.getElementById('afterNumOfGuest').hidden=true;
   document.getElementById('numberOfGuests').value = '';
+}
+
+
+function addTicketType(){
+  typeName = document.getElementById('nameOfTicket').value;
+  typePrice = document.getElementById('priceOfTicket').value;
+  if(Number.isInteger(parseInt(typePrice)) == false){
+    document.getElementById('newEventError').innerHTML= 'Please enter a number for the price'
+  }else{
+    document.getElementById('ticketTypes').innerHTML += typeName + ':' + typePrice +','
+  }
+}
+
+async function createNewEvent(){
+  ticketTypes = document.getElementById('ticketTypes').innerHTML
+  name = document.getElementById('nameOfEvent').value
+  description = document.getElementById('descriptionOfEvent').value
+  capacity = document.getElementById('capacityOfEvent').value
+  year = document.getElementById("yearEventNew").value;
+  month = document.getElementById("monthEventNew").value;
+  day = document.getElementById("dayEventNew").value;
+  startTime = document.getElementById("newEventStartTime").value + 8;
+  date = new Date(year, month, day, startTime, 0, 0, 0).getTime()/1000;
+  try{
+  let response = await fetch('http://localhost:8090/newevent',
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: 'tickets=' + ticketTypes + '&name=' + name + '&date=' + date+ '&description=' + description + '&capacity=' + capacity
+    });
+  if(!response.ok){
+    throw new Error('problem adding new event ' + response.code);
+  }else{
+    document.getElementById('newBookingError').innerHTML='Booking successful'
+
+  }
+}catch(error){
+  alert('Error' + error)
+}
+
 }

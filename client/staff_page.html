@@ -198,6 +198,7 @@
     <button type="button" class="btn btn-primary newColor mainButton" onclick="clearSearch()" data-toggle="modal" data-target="#searchModal">Search</button>
     <button type="button" class="btn btn-primary newColor mainButton" onclick="" data-toggle="modal" data-target="#newBookingModal" id='newBookingButton'>New Room Booking</button>
     <button type="button" class="btn btn-primary newColor mainButton" onclick="" data-toggle="modal" data-target="#newHostelBookingModal" id='newHostelBookingButton'>New Hostel Booking</button>
+    <button type="button" class="btn btn-primary newColor mainButton" onclick="" data-toggle="modal" data-target="#createNewEventModal" id='createNewEventModalButton'>Create New Event</button>
     <button type="button" class="btn btn-primary newColor mainButton" onclick="" data-toggle="modal" data-target="#notificationModal">Notifications</button>
     <button type="button" class="btn btn-primary newColor mainButton" onclick="" data-toggle="modal" data-target="#statisticsModal">Statistics</button>
   </div>
@@ -758,6 +759,95 @@
       <div class="modal-footer">
         <div id='hostelBookingButDiv'>
         </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id='createNewEventModal' tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Create New Event</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Name of New Event</label>
+          <input class="form-control" id="nameOfEvent" placeholder="Enter name of Event">
+        </div>
+        <div class="form-group">
+          <label>Description of New Event</label>
+          <input class="form-control" id="descriptionOfEvent" placeholder="Enter description of Event">
+        </div>
+        <div class="form-group">
+          <label>Capacity of New Event</label>
+          <input class="form-control" id="capacityOfEvent" placeholder="Enter capacity of Event">
+        </div>
+        <div class="form-group">
+          <label>Year</label>
+          <select class="browser-default custom-select newDropdown" id="yearEventNew">
+              <option selected>Select Year... </option> <!--check valid -->
+              <option value="2020">2020</option>
+              <option value="2021">2021</option>
+              <option value="2022">2022</option>
+              <option value="2023">2023</option>
+          </select>
+          <label id="monthEventNewLabel" hidden="true">Month</label>
+          <select class="browser-default custom-select newDropdown" id="monthEventNew" hidden="true">
+              <option selected>Select Month... </option>
+              <option value="01">January</option>
+              <option value="02">February</option>
+              <option value="03">March</option>
+              <option value="04">April</option>
+              <option value="05">May</option>
+              <option value="06">June</option>
+              <option value="07">July</option>
+              <option value="08">August</option>
+              <option value="09">September</option>
+              <option value="10">October</option>
+              <option value="11">November</option>
+              <option value="12">December</option>
+          </select>
+          <label id="dayEventNewLabel" hidden="true">Day</label>
+          <select class="browser-default custom-select newDropdown" id="dayEventNew" hidden="true">
+              <option selected>Select Day... </option>
+          </select>
+          <select class="browser-default custom-select newDropdown" id = 'newEventStartTime'>
+              <option disabled selected>Select Start Time... </option>
+              <option value="1">9am</option>
+              <option value="2">10am</option>
+              <option value="3">11am</option>
+              <option value="4">12pm</option>
+              <option value="5">1pm</option>
+              <option value="6">2pm</option>
+              <option value="7">3pm</option>
+              <option value="8">4pm</option>
+              <option value="9">5pm</option>
+              <option value="10">6pm</option>
+              <option value="11">7pm</option>
+              <option value="12">8pm</option>
+              <option value="13">9pm</option>
+          </select>
+        </div>
+        <h5>Create ticket types for the event</h5>
+        <p id='ticketTypes'></p>
+        <div class="form-group">
+          <label>Name of New Ticket</label>
+          <input class="form-control" id="nameOfTicket" placeholder="Enter name of ticket type">
+        </div>
+        <div class="form-group">
+          <label>Price of Ticket Type</label>
+          <input class="form-control" id="priceOfTicket" placeholder="Enter price of ticket type">
+        </div>
+        <button type="button" class="btn btn-primary" id='newTicketType'>Create New Ticket Type</button>
+        <p id='newEventError'></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" id='createNewEvent'>Create New Event</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
       </div>
     </div>
   </div>

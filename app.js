@@ -60,7 +60,7 @@ async function performQuery(query) {
         return result = await db.query(query);
     // if query fails
     } catch (err) {
-        // return error
+        // return errors
         return '0database';
     } finally {
         // disconnect databse
@@ -552,10 +552,47 @@ async function hostelBooking(customerID, roomID, start, end, resp) {
   }
 }
 
+// hostel room booking
+async function newEvent(name, description, start, capacity, tickets, resp) {
+    // should check if free at specified times
+    try{
+    // insert row
+    const result = await performQuery('INSERT INTO events (name, description, datetime, capacity) VALUES ("' + name + '", "' + description + '", FROM_UNIXTIME(' + start + '), ' + capacity + ')');
+
+    // if no database error
+    if (processQueryResult(result, resp)) {
+        // if correct number of rows inserted
+        if (result['affectedRows'] == 1) {
+            // return true
+            let where = '';
+
+            // build search clause
+            where = addToSearchClause(name, 'name', where);
+            where = addToSearchClause(description, 'description', where);
+            const id = await performQuery('SELECT id FROM events WHERE ' + where);
+            eventId = JSON.stringify(id)
+            for(var i=0;i<tickets.length-1;i++){
+              ticketInfo = tickets[i].split(':')
+            const result = await performQuery('INSERT INTO tickets (eventId, ticketType, ticketPrice) VALUES (' + id[0].id + ', "' + ticketInfo[0] + '", ' + ticketInfo[1]+')');
+
+          }
+          return true;
+        } else {
+            // database error
+            resp.status(500).send('0database');
+        }
+    }
+
+    // return false
+    return false;
+  }catch (error) {
+    console.log ('Error: ' + error);
+  }
+}
+
 // make hostel room booking on behalf of customer
 app.post('/staffhostelbooking', async function(req, resp) {
     // customer ID
-    console.log(req.body)
     const customerID = req.body.customerid;
 
     // if customer ID specified
@@ -729,6 +766,36 @@ app.get('/eventstatistics', async function(req, resp) {
     }
 });
 
+// make hostel room booking on behalf of customer
+app.post('/newevent', async function(req, resp) {
+    // customer ID
+    const name = req.body.name;
+    const description = req.body.description;
+    const capacity = req.body.capacity;
+    const ticketTypes = req.body.tickets;
+    const tickets = ticketTypes.split(',');
+    const date = req.body.date
+
+
+    // if all parameters specified
+    if (name && capacity && date && tickets) {
+                // make booking
+      try{
+        if (await newEvent(name, description, date, capacity, tickets, resp)) {
+                    // booking successful
+          resp.status(200).send('1success');
+        }
+      }catch(error){
+        console.log ('Error: ' + error);
+      }
+
+            } else {
+                // parameter error
+                resp.status(400).send('0parameters');
+            }
+
+});
+
 //prices
 
 app.get('/communityroomprice', async function(req,resp) {
@@ -827,7 +894,7 @@ app.post('/customersignin', async function(req, resp) {
                         // if one row inserted
                         if (result['affectedRows'] == 1) {
                             // inform client new customer added to database
-                            resp.status(201).send('1newcustomer');
+                            resp.status(201).send(JSON.stringify(newID));
 
                         } else {
                             // database error
@@ -837,6 +904,64 @@ app.post('/customersignin', async function(req, resp) {
                 }
             }
         }
+    }
+});
+
+// receive further information for new customer
+app.post('/newcustomer', async function(req, resp) {
+    // customer ID
+    const customerID = req.body.customerid;
+
+    // if customer ID specified
+    if (customerID) {
+        // phone number
+        const phone = req.body.phone;
+
+        // if phone number specified
+        if (phone) {
+            // check phone is a number
+            if (!isNaN(phone)) {
+                // update database
+                const result = await performQuery('UPDATE customers SET phone = "' + phone + '" WHERE id = ' + customerID);
+
+                // if no database error
+                if (processQueryResult(result, resp)) {
+                    // if one row inserted
+                    if (result['affectedRows'] == 1) {
+                        // create session here
+
+                        // get customer's name
+                        const customer = await performQuery('SELECT fName, lName FROM customers WHERE id = ' + customerID);
+
+                        // if no database error
+                        if (processQueryResult(customer, resp)) {
+                            // customer's name
+                            const customerDetails = {'fname': customer[0]['fName'], 'sname': customer[0]['lName']};
+
+                            // send customer's name
+                            resp.status(200).send(JSON.stringify(customerDetails));
+                        }
+
+                    // customer not in database
+                    } else {
+                        // customer ID error
+                        resp.status(400).send('0customerID');
+                    }
+                }
+
+            } else {
+                // phone number error
+                resp.status(400).send('0phone');
+            }
+
+        } else {
+            // phone number error
+            resp.status(400).send('0phone');
+        }
+
+    } else {
+        // customer ID error
+        resp.status(400).send('0customerID');
     }
 });
 
