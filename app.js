@@ -827,7 +827,7 @@ app.post('/customersignin', async function(req, resp) {
                         // if one row inserted
                         if (result['affectedRows'] == 1) {
                             // inform client new customer added to database
-                            resp.status(201).send('1newcustomer');
+                            resp.status(201).send(JSON.stringify(newID));
 
                         } else {
                             // database error
@@ -837,6 +837,64 @@ app.post('/customersignin', async function(req, resp) {
                 }
             }
         }
+    }
+});
+
+// receive further information for new customer
+app.post('/newcustomer', async function(req, resp) {
+    // customer ID
+    const customerID = req.body.customerid;
+
+    // if customer ID specified
+    if (customerID) {
+        // phone number
+        const phone = req.body.phone;
+
+        // if phone number specified
+        if (phone) {
+            // check phone is a number
+            if (!isNaN(phone)) {
+                // update database
+                const result = await performQuery('UPDATE customers SET phone = "' + phone + '" WHERE id = ' + customerID);
+
+                // if no database error
+                if (processQueryResult(result, resp)) {
+                    // if one row inserted
+                    if (result['affectedRows'] == 1) {
+                        // create session here
+                        
+                        // get customer's name
+                        const customer = await performQuery('SELECT fName, lName FROM customers WHERE id = ' + customerID);
+
+                        // if no database error
+                        if (processQueryResult(customer, resp)) {
+                            // customer's name
+                            const customerDetails = {'fname': customer[0]['fName'], 'sname': customer[0]['lName']};
+
+                            // send customer's name
+                            resp.status(200).send(JSON.stringify(customerDetails));
+                        }
+
+                    // customer not in database
+                    } else {
+                        // customer ID error
+                        resp.status(400).send('0customerID');
+                    }
+                }
+
+            } else {
+                // phone number error
+                resp.status(400).send('0phone');
+            }
+
+        } else {
+            // phone number error
+            resp.status(400).send('0phone');
+        }
+
+    } else {
+        // customer ID error
+        resp.status(400).send('0customerID');
     }
 });
 
