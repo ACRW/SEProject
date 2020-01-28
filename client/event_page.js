@@ -13,27 +13,29 @@ const paymentButton = document.getElementById("fat-btn");
 getEvents = async() => {
   const endpoint = `${url}${queryParams}`
   try{
-    const response = await fetch( endpoint, {
+    const response = await fetch( '/events', {
       method:"GET",
       headers:{
         "Content-Type": "application/json"
       }
     })
     if(response.ok){
+      console.log('test')
       if(response.body === '0matches' || response.body === '0database'){
         // get element do the replacement 
         responseField.innerHTML = "<p>Sorry, No events available.</p><p>Please wait for release.</p>";
         paymentButton.disable = true;
         paymentTable.style.display = "none";
       } else{
+        console.log('test');
         const jsonResponse = await response.json();
         // render json response
-        renderResponse(jsonResponse);
+        // renderResponse(jsonResponse);
       }
     }
     throw new Error('Error getting events.' + response.code);
   }catch(error){
-    console.log(error)
+    console.log(error+'test')
   }
 }
 // call the function

@@ -14,7 +14,7 @@
     const dayNames = ["Mon", "Tues", "Wed", "Thur", "Fri", "Sat", "Sun"];
     const hostAddr = "localhost";
     const hostPort = "8090"
-    
+
     function mod(n, m) { // Because javascript mod % is broken
         return ((n % m) + m) % m;
     }
@@ -39,6 +39,7 @@
         let eTable = document.getElementById("eventTable");
         let cellHeight = 50; // Height of calender rows
         let bookings = [];
+        
         let userBooking = {
             "element": document.createElement("div"),
             "date": -1,
@@ -55,6 +56,7 @@
         userBooking["element"].className = "peekGraphic newColor";
         userBooking["element"].style.width = String(tableDims.width * 0.11) + "px";
         userBooking["element"].style.height = String((userBooking["bookingLength"]/60) * 50) + "px";
+
         targetMon.setHours(0);
         targetMon.setMinutes(0);
         targetMon.setSeconds(1);
@@ -74,7 +76,7 @@
                 headers.cells[i + 1].innerHTML = dayNames[i] + " " + newDate.getDate();
             }
         }
-        
+
         let clearCalender = function () { // Clears all the contents of the calender to prevent them 'building up'.
             for (c = 1; c < table.rows[0].cells.length; c++) {
                 let target = eTable.rows[0].cells[c];
@@ -85,7 +87,7 @@
             
             eTable.rows[0].cells[1].appendChild(peekElement); // Redisplay booking peek
         }
-        
+
         let displayBookings = async function () { // Displays all the booking on the calender
             clearCalender();
             for (i = 0; i < bookings.length; i++) {
@@ -105,7 +107,7 @@
                 startCell.appendChild(bookingGraphic);
             }
         }
-        
+
         this.getBookings = async function() { // Gets the bookings then displays them.
             let roomID = document.getElementById("roomDrop").value; // The list is in order of room id but offset by one due to the default option
             if (roomID == -1) {
@@ -122,7 +124,7 @@
             displayBookings();
             return;
         }
-        
+
         this.bookingPeek = async function (e) { // Displays a potential booking over where the mouse hovers.
             tableDims = table.getBoundingClientRect();
             let calX = tableDims.left;
