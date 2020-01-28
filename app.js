@@ -61,6 +61,8 @@ async function performQuery(query) {
     // if query fails
     } catch (err) {
         // return error
+        console.log(query)
+        console.log(err)
         return '0database';
     } finally {
         // disconnect databse
@@ -552,10 +554,47 @@ async function hostelBooking(customerID, roomID, start, end, resp) {
   }
 }
 
+// hostel room booking
+async function newEvent(name, description, start, capacity, tickets, resp) {
+    // should check if free at specified times
+    try{
+    // insert row
+    const result = await performQuery('INSERT INTO events (name, description, datetime, capacity) VALUES ("' + name + '", "' + description + '", FROM_UNIXTIME(' + start + '), ' + capacity + ')');
+
+    // if no database error
+    if (processQueryResult(result, resp)) {
+        // if correct number of rows inserted
+        if (result['affectedRows'] == 1) {
+            // return true
+            let where = '';
+
+            // build search clause
+            where = addToSearchClause(name, 'name', where);
+            where = addToSearchClause(description, 'description', where);
+            const id = await performQuery('SELECT id FROM events WHERE ' + where);
+            eventId = JSON.stringify(id)
+            for(var i=0;i<tickets.length-1;i++){
+              ticketInfo = tickets[i].split(':')
+            const result = await performQuery('INSERT INTO tickets (eventId, ticketType, ticketPrice) VALUES (' + id[0].id + ', "' + ticketInfo[0] + '", ' + ticketInfo[1]+')');
+
+          }
+          return true;
+        } else {
+            // database error
+            resp.status(500).send('0database');
+        }
+    }
+
+    // return false
+    return false;
+  }catch (error) {
+    console.log ('Error: ' + error);
+  }
+}
+
 // make hostel room booking on behalf of customer
 app.post('/staffhostelbooking', async function(req, resp) {
     // customer ID
-    console.log(req.body)
     const customerID = req.body.customerid;
 
     // if customer ID specified
@@ -727,6 +766,38 @@ app.get('/eventstatistics', async function(req, resp) {
             }
         }
     }
+});
+
+// make hostel room booking on behalf of customer
+app.post('/newevent', async function(req, resp) {
+    // customer ID
+    const name = req.body.name;
+    const description = req.body.description;
+    const capacity = req.body.capacity;
+    const ticketTypes = req.body.tickets;
+    const tickets = ticketTypes.split(',');
+    const date = req.body.date
+    console.log(tickets)
+
+
+    // if all parameters specified
+    if (name && capacity && date && tickets) {
+                // make booking
+      try{
+        if (await newEvent(name, description, date, capacity, tickets, resp)) {
+                    // booking successful
+          console.log('yes')
+          resp.status(200).send('1success');
+        }
+      }catch(error){
+        console.log ('Error: ' + error);
+      }
+
+            } else {
+                // parameter error
+                resp.status(400).send('0parameters');
+            }
+
 });
 
 //prices
