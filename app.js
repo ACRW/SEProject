@@ -60,9 +60,7 @@ async function performQuery(query) {
         return result = await db.query(query);
     // if query fails
     } catch (err) {
-        // return error
-        console.log(query)
-        console.log(err)
+        // return errors
         return '0database';
     } finally {
         // disconnect databse
@@ -777,7 +775,6 @@ app.post('/newevent', async function(req, resp) {
     const ticketTypes = req.body.tickets;
     const tickets = ticketTypes.split(',');
     const date = req.body.date
-    console.log(tickets)
 
 
     // if all parameters specified
@@ -786,7 +783,6 @@ app.post('/newevent', async function(req, resp) {
       try{
         if (await newEvent(name, description, date, capacity, tickets, resp)) {
                     // booking successful
-          console.log('yes')
           resp.status(200).send('1success');
         }
       }catch(error){
@@ -933,7 +929,7 @@ app.post('/newcustomer', async function(req, resp) {
                     // if one row inserted
                     if (result['affectedRows'] == 1) {
                         // create session here
-                        
+
                         // get customer's name
                         const customer = await performQuery('SELECT fName, lName FROM customers WHERE id = ' + customerID);
 
