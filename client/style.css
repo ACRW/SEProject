@@ -15,10 +15,11 @@
 
 .hiddenTable {
     position: relative;
-    /*margin: 0;
-    padding: 0;*/
-    height: 700px;
-    
+    height: 702px;
+}
+
+.hiddenTable th {
+    position: relative;
 }
 
 .newColor {
@@ -48,7 +49,18 @@
     width: 100%;
     z-index: 10;
     padding: 0;
-    margin: 0;
+}
+
+.peekGraphic {
+    border-radius: 5px;
+    position: absolute;
+    width: 50px;
+    z-index: 10;
+    padding: 0;
+    margin-left: 8.3%;
+    margin-right: 8.3%;
+    margin-top: 12px;
+    left: 0px;
 }
 
 .mainButton {

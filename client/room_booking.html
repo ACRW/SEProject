@@ -39,7 +39,22 @@
         let eTable = document.getElementById("eventTable");
         let cellHeight = 50; // Height of calender rows
         let bookings = [];
+        let userBooking = {
+            "element": document.createElement("div"),
+            "date": -1,
+            "bookingLength": 60
+        }; // Bookings added by user.
+        let peekElement = document.createElement("div");
+        let tableDims = table.getBoundingClientRect();
+        let colWidth = tableDims.width * 0.13; // Width of the columns
         
+        peekElement.className = "peekGraphic newColor";
+        peekElement.style.width = String(tableDims.width * 0.11) + "px"
+        peekElement.style.height = String((userBooking["bookingLength"]/60) * 50) + "px";
+        eTable.rows[0].cells[1].appendChild(peekElement);
+        userBooking["element"].className = "peekGraphic newColor";
+        userBooking["element"].style.width = String(tableDims.width * 0.11) + "px";
+        userBooking["element"].style.height = String((userBooking["bookingLength"]/60) * 50) + "px";
         targetMon.setHours(0);
         targetMon.setMinutes(0);
         targetMon.setSeconds(1);
@@ -67,6 +82,8 @@
                     target.removeChild(target.firstChild);
                 }
             }
+            
+            eTable.rows[0].cells[1].appendChild(peekElement); // Redisplay booking peek
         }
         
         let displayBookings = async function () { // Displays all the booking on the calender
@@ -94,7 +111,7 @@
             if (roomID == -1) {
                 return;
             }
-            let response = await fetch('http://' + hostAddr + ":" + hostPort + '/roomavailability?type=community' + "&id=" + roomID, {
+            let response = await fetch('http://' + hostAddr + ":" + hostPort + '/roomavailability?type=community&id=' + roomID, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json"
@@ -104,6 +121,49 @@
             bookings = availability["busy"];
             displayBookings();
             return;
+        }
+        
+        this.bookingPeek = async function (e) { // Displays a potential booking over where the mouse hovers.
+            tableDims = table.getBoundingClientRect();
+            let calX = tableDims.left;
+            let calY = tableDims.top;
+            let leftCol = eTable.rows[0].cells[0].offsetWidth + calX; // pos of left column
+            let topRow = table.rows[0].offsetHeight + calY; // pos of top row
+
+            if (e.clientX > leftCol && e.clientY > topRow) { // Checks in table
+                let curColumn = Math.floor((e.clientX - leftCol) / colWidth);
+                let curRow = Math.floor((e.clientY - topRow) / cellHeight) + 1;
+                peekElement.style.top = String(curRow * cellHeight) + "px";
+                peekElement.style.left = String((curColumn * colWidth)) + "px";
+            }
+        }
+        
+        this.placeBooking = async function (e) {
+            if (userBooking["element"].parentNode) {
+                userBooking["element"].parentNode.removeChild(userBooking["element"])
+            }
+            
+            let calX = tableDims.left;
+            let calY = tableDims.top;
+            let leftCol = eTable.rows[0].cells[0].offsetWidth + calX; // pos of left column
+            let topRow = table.rows[0].offsetHeight + calY; // pos of top 
+            
+            if (e.clientX > leftCol && e.clientY > topRow) {
+                let curColumn = Math.floor((e.clientX - leftCol) / colWidth);
+                let curRow = Math.floor((e.clientY - topRow) / cellHeight) + 1;
+                userBooking["element"].style.top = String(curRow * cellHeight) + "px";
+                let selectedDate = new Date(targetMon);
+                selectedDate.setDate(targetMon.getDate() + curColumn);
+                userBooking["date"] = new Date();
+                eTable.rows[0].cells[curColumn + 1].appendChild(userBooking["element"]);
+            }
+        }
+        
+        this.setBookingLength = async function(e) { // Sets what the booking length should be
+            let lengthDrop = document.getElementById("lengthDrop");
+            userBooking["bookingLength"] = lengthDrop.value;
+            userBooking["element"].style.height = String((userBooking["bookingLength"]/60) * 50) + "px";
+            peekElement.style.height = String((userBooking["bookingLength"]/60) * 50) + "px";
         }
         
         displayDates();
@@ -140,7 +200,7 @@
     <h1> Room Booking </h1>
     <p class="mt-2 "> Book a room by first selecting which room you would like to book, then choosing the date, time and duration. </p>
 
-    <select class="browser-default custom-select newDropdown" id="roomDrop" onchange=calender.getBookings()>
+    <select class="browser-default custom-select newDropdown" id="roomDrop" onchange="calender.getBookings()">
         <option selected="selected" value="-1">Select Room... </option> # Will fetch these from a database
         <!--<option value="1">Music Room 1 (max 6 persons) £12/hour</option>-->
     </select>
@@ -150,28 +210,28 @@
         <div class="col" ><h3 id="tableDate"></h3></div>
         <div class="col"><button type="button" class="btn btn-primary newColor" onclick="calender.nextWeek()" style="float: right;">Next</a></div>
     </div>
-    <table class="table newTable newHeight hiddenTable" id="eventTable" style="margin-top:5px; text-align: center;"> <!-- Might be smarter to generate this with javascript. -->
+    <table class="table newTable newHeight hiddenTable" id="eventTable" style="margin-top:5px; text-align: center;" onclick="calender.placeBooking(event)" onmousemove="calender.bookingPeek(event)"> <!-- Might be smarter to generate this with javascript. -->
         <tr style="">
-            <th style="width:9%"></th>
-            <th style="width:13%"></th>
-            <th style="width:13%"></th>
-            <th style="width:13%"></th>
-            <th style="width:13%"></th>
-            <th style="width:13%"></th>
-            <th style="width:13%"></th>
-            <th style="width:13%"></th>
+            <th style="width:9%;"></th>
+            <th style="width:13%;"></th>
+            <th style="width:13%;"></th>
+            <th style="width:13%;"></th>
+            <th style="width:13%;"></th>
+            <th style="width:13%;"></th>
+            <th style="width:13%;"></th>
+            <th style="width:13%;"></th>
         </tr>
     <table class="table table-striped newTable newHeight" id="calTable" style="margin-top:-705px; text-align: center;"> <!-- Might be smarter to generate this with javascript. -->
         <thead>
           <tr style="background-color: #C2D6B6">
-            <th style="width:9%">Time</th>
-            <th style="width:13%">Mon</th>
-            <th style="width:13%">Tues</th>
-            <th style="width:13%">Wed</th>
-            <th style="width:13%">Thurs</th>
-            <th style="width:13%">Fri</th>
-            <th style="width:13%">Sat</th>
-            <th style="width:13%">Sun</th>
+            <th style="width:9%;">Time</th>
+            <th style="width:13%;">Mon</th>
+            <th style="width:13%;">Tues</th>
+            <th style="width:13%;">Wed</th>
+            <th style="width:13%;">Thurs</th>
+            <th style="width:13%;">Fri</th>
+            <th style="width:13%;">Sat</th>
+            <th style="width:13%;">Sun</th>
           </tr>
         </thead>
         <colgroup>
@@ -310,12 +370,11 @@
           </tr>
         </tbody>
     </table>
-    <select class="browser-default custom-select newDropdown">
-        <option selected>Select Duration... </option>
-        <option value="1">30 minutes</option>
-        <option value="2">1 hour</option>
-        <option value="3">1 hour 30 minutes</option>
-        <option value="4">2 hours</option>
+    <select class="browser-default custom-select newDropdown" id="lengthDrop" onchange="calender.setBookingLength(event)">
+        <option value="30">30 minutes</option>
+        <option selected="selected" value="60">1 hour</option>
+        <option value="90">1 hour 30 minutes</option>
+        <option value="120">2 hours</option>
     </select>
     <table class="table" style="margin-top:30px">
         <tr>
