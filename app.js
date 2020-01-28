@@ -74,11 +74,9 @@ function processQueryResult(result, response) {
     if (result == '0database') {
         // send response
         response.status(500).send('0database');
-
         // return false
         return false;
     }
-
     // else return true
     return true;
 }
@@ -92,11 +90,9 @@ function addToSearchClause(parameter, field, whereClause) {
             // add 'AND' to clause
             whereClause += ' AND ';
         }
-
         // add parameter
         whereClause += field + ' LIKE "%' + parameter + '%"';
     }
-
     // return search clause
     return whereClause;
 }
@@ -130,7 +126,6 @@ app.get('/rooms', async function(req, resp) {
                     rooms['community'] = community;
                 }
             }
-
             // if hostel rooms requested
             if (types != 'community') {
                 // get rooms
@@ -145,12 +140,10 @@ app.get('/rooms', async function(req, resp) {
 
             // return rooms
             resp.status(200).send(JSON.stringify(rooms));
-
         } else {
             // types error
             resp.status(400).send('0types');
         }
-
     } else {
         // types error
         resp.status(400).send('0types');
@@ -193,14 +186,12 @@ app.get('/roomavailability', async function(req, resp) {
                             // send response
                             resp.status(200).send(JSON.stringify(response));
                         }
-
                     // room does not exist
                     } else {
                         // ID error
                         resp.status(400).send('0id');
                     }
                 }
-
                 break;
 
             // if hostel room
@@ -236,7 +227,6 @@ app.get('/roomavailability', async function(req, resp) {
                         resp.status(400).send('0id');
                     }
                 }
-
                 break;
 
             // if room type invalid
@@ -244,29 +234,19 @@ app.get('/roomavailability', async function(req, resp) {
                 //type error
                 resp.status(400).send('0type');
         }
-
     } else {
         // ID error
         resp.status(400).send('0id');
     }
 });
 
-
-
-
 //returns rooms large enough to house the number of guests
 app.get('/roomslargeenough', async function(req, resp) {
-    // need authentication here
-    // look into session variables
-
     // search parameters
     const guestNum = req.query.guestnum;
 
-
-        // get matching customers
-
+        // get matching hostel rooms
         const hostelRooms = await performQuery('SELECT * FROM hostelRooms WHERE noOfPeople >= '+ guestNum );
-
 
         // if no database error
         if (processQueryResult(hostelRooms, resp)) {
@@ -280,7 +260,7 @@ app.get('/roomslargeenough', async function(req, resp) {
                 resp.status(200).send('0matches');
             }
 
-    }
+          }
 });
 
 // customers
@@ -288,32 +268,29 @@ app.get('/roomslargeenough', async function(req, resp) {
 // check customer in database
 async function checkCustomerExists(customerID, resp) {
     // try to get customer's details
-
     try{
-    const customer = await performQuery('SELECT id, fName, lName, email, phone FROM customers WHERE id = ' + customerID);
+      const customer = await performQuery('SELECT id, fName, lName, email, phone FROM customers WHERE id = ' + customerID);
 
-    // if no database error
-    if (processQueryResult(customer, resp)) {
-        // if customer in database
-        if (customer.length == 1) {
-            // return true
-            resp.status(200).send(JSON.stringify(true));;
+      // if no database error
+      if (processQueryResult(customer, resp)) {
+          // if customer in database
+          if (customer.length == 1) {
+              // return true
+              resp.status(200).send(JSON.stringify(true));;
+            }
+          }else{
+            //no matches
+            resp.status(200).send('0matches');
+          }
+        }catch (error) {
+          console.log ('Error: ' + error);
         }
-
-      }else{}
-
-  }catch (error) {
-    console.log ('Error: ' + error);
-  }
-
 }
 
 // get all customers
 app.get('/customers', async function(req,resp) {
     // fetch customers
-
     const customers = await performQuery('SELECT id, fName, lName, email, phone FROM customers');
-
 
     // if no database error
     if (processQueryResult(customers, resp)) {
@@ -331,8 +308,6 @@ app.get('/customers', async function(req,resp) {
 
 // customer search
 app.get('/customersearch', async function(req, resp) {
-    // need authentication here
-    // look into session variables
 
     // search parameters
     const id = req.query.id;
@@ -358,9 +333,7 @@ app.get('/customersearch', async function(req, resp) {
 
     } else {
         // get matching customers
-
         const customers = await performQuery('SELECT id, fName, lName, email, phone FROM customers WHERE ' + where + ' ORDER BY lName, fName');
-
 
         // if no database error
         if (processQueryResult(customers, resp)) {
@@ -389,7 +362,6 @@ app.get('/customerexists', async function(req,resp) {
     where = addToSearchClause(id, 'id', where);
 
     const customers = await performQuery('SELECT id, fName, lName, email, phone FROM customers WHERE ' + where );
-
 
     // if no database error
     if (processQueryResult(customers, resp)) {
@@ -484,7 +456,6 @@ async function communityBooking(customerID, roomID, start, end, price, paid, res
             resp.status(500).send('0database');
         }
     }
-
     // return false
     return false;
 }
@@ -512,13 +483,11 @@ app.post('/staffcommunitybooking', async function(req, resp) {
                     // booking successful
                     resp.status(200).send('1success');
                 }
-
             } else {
                 // parameter error
                 resp.status(400).send('0parameters');
             }
         }
-
     } else {
         // customer ID error
         resp.status(400).send('0customerID');
@@ -529,27 +498,27 @@ app.post('/staffcommunitybooking', async function(req, resp) {
 async function hostelBooking(customerID, roomID, start, end, resp) {
     // should check if free at specified times
     try{
-    // insert row
-    const result = await performQuery('INSERT INTO hostelBookings (roomID, startDate, endDate, userId) VALUES (' + roomID + ', FROM_UNIXTIME(' + start + '), FROM_UNIXTIME(' + end + '), ' + customerID + ')');
+      // insert row
+      const result = await performQuery('INSERT INTO hostelBookings (roomID, startDate, endDate, userId) VALUES (' + roomID + ', FROM_UNIXTIME(' + start + '), FROM_UNIXTIME(' + end + '), ' + customerID + ')');
 
-    // if no database error
-    if (processQueryResult(result, resp)) {
-        // if correct number of rows inserted
-        if (result['affectedRows'] == 1) {
-            // return true
-            return true;
+      // if no database error
+      if (processQueryResult(result, resp)) {
+          // if correct number of rows inserted
+          if (result['affectedRows'] == 1) {
+              // return true
+              return true;
 
-        } else {
-            // database error
-            resp.status(500).send('0database');
+            } else {
+              // database error
+              resp.status(500).send('0database');
+            }
         }
-    }
 
-    // return false
-    return false;
-  }catch (error) {
-    console.log ('Error: ' + error);
-  }
+        // return false
+        return false;
+      }catch (error) {
+        console.log ('Error: ' + error);
+      }
 }
 
 // hostel room booking
@@ -569,14 +538,17 @@ async function newEvent(name, description, start, capacity, tickets, resp) {
             // build search clause
             where = addToSearchClause(name, 'name', where);
             where = addToSearchClause(description, 'description', where);
+
+            //get event id
             const id = await performQuery('SELECT id FROM events WHERE ' + where);
             eventId = JSON.stringify(id)
+
+            //add new ticket type
             for(var i=0;i<tickets.length-1;i++){
               ticketInfo = tickets[i].split(':')
-            const result = await performQuery('INSERT INTO tickets (eventId, ticketType, ticketPrice) VALUES (' + id[0].id + ', "' + ticketInfo[0] + '", ' + ticketInfo[1]+')');
-
-          }
-          return true;
+              const result = await performQuery('INSERT INTO tickets (eventId, ticketType, ticketPrice) VALUES (' + id[0].id + ', "' + ticketInfo[0] + '", ' + ticketInfo[1]+')');
+            }
+            return true;
         } else {
             // database error
             resp.status(500).send('0database');
@@ -621,7 +593,6 @@ app.post('/staffhostelbooking', async function(req, resp) {
                 resp.status(400).send('0parameters');
             }
         }
-
     } else {
         // customer ID error
         resp.status(400).send('0customerID');
@@ -655,12 +626,10 @@ app.post('/cancelbooking', async function(req, resp) {
                     resp.status(400).send('0booking');
                 }
             }
-
         } else {
             // type error
             resp.status(400).send('0type');
         }
-
     } else {
         // booking ID error
         resp.status(400).send('0id');
@@ -735,7 +704,6 @@ app.get('/eventstatistics', async function(req, resp) {
     // search parameters
     const id = req.query.id;
 
-
     // where clause
     let where = '';
 
@@ -776,7 +744,6 @@ app.post('/newevent', async function(req, resp) {
     const tickets = ticketTypes.split(',');
     const date = req.body.date
 
-
     // if all parameters specified
     if (name && capacity && date && tickets) {
                 // make booking
@@ -789,17 +756,15 @@ app.post('/newevent', async function(req, resp) {
         console.log ('Error: ' + error);
       }
 
-            } else {
-                // parameter error
-                resp.status(400).send('0parameters');
-            }
-
+      } else {
+        // parameter error
+        resp.status(400).send('0parameters');
+      }
 });
 
 //prices
 
 app.get('/communityroomprice', async function(req,resp) {
-
     const id = req.query.id;
     // where clause
     let where = '';
@@ -948,17 +913,14 @@ app.post('/newcustomer', async function(req, resp) {
                         resp.status(400).send('0customerID');
                     }
                 }
-
             } else {
                 // phone number error
                 resp.status(400).send('0phone');
             }
-
         } else {
             // phone number error
             resp.status(400).send('0phone');
         }
-
     } else {
         // customer ID error
         resp.status(400).send('0customerID');
