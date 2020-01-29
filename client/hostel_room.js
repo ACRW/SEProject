@@ -125,11 +125,14 @@ function daysInMonth(year, month) {
 function fillDayDrop(year, month,dayValue){
   daysDrop = document.getElementById(dayValue);
   for(var i=1; i<=daysInMonth(year,month);i++){
-  	let option = document.createElement("option")
-    option.text = i.toString().padStart(2,'0');
-    
-    daysDrop.add(option);
-  
-
+    var d = new Date();
+    var today=d.getDate();
+    if(i>=today){
+      let option = document.createElement("option")
+      option.text = i.toString().padStart(2,'0'); 
+      daysDrop.add(option); 
+    }
   }
 }
+
+
