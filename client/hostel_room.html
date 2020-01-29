@@ -2,22 +2,19 @@
 <html lang="en">
 <head>
 
-	<title>hostel room</title>
+	<title>TCR Hub hostel room booking page</title>
 
 	<meta charset=utf-8>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <link rel="stylesheet" href="style.css">
 
 	
 	
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-
-
-
-
 
 
 	
@@ -27,24 +24,24 @@
 <br>
 
 <div class="container">
-  <h2>Book your rooms here.</h2>
+  <h2>Hostel Room Booking.</h2>
   <p>The Hub boasts 5 bedrooms which sleep between 3 and 8 people in a combination of bunks and single beds.</p>
   <!-- Nav tabs -->
   <ul class="nav nav-tabs" role="tablist">
     <li class="nav-item">
-      <a class="nav-link active" data-toggle="tab" href="#type1">room 1</a>
+      <a class="nav-link active" data-toggle="tab" href="#type1" style="color: #A5B686;font-size: 25px;">Room 1</a>
     </li>
     <li class="nav-item">
-      <a class="nav-link" data-toggle="tab" href="#type2">room 2</a>
+      <a class="nav-link" data-toggle="tab" href="#type2" style="color: #A5B686 ;font-size: 25px;">Room 2</a>
     </li>
     <li class="nav-item">
-      <a class="nav-link" data-toggle="tab" href="#type3">room 3</a>
+      <a class="nav-link" data-toggle="tab" href="#type3" style="color: #A5B686 ;font-size: 25px;">Room 3</a>
     </li>
     <li class="nav-item">
-      <a class="nav-link" data-toggle="tab" href="#type4">room 4</a>
+      <a class="nav-link" data-toggle="tab" href="#type4" style="color: #A5B686 ;font-size: 25px;">Room 4</a>
     </li>
       <li class="nav-item">
-      <a class="nav-link" data-toggle="tab" href="#type5">room 5</a>
+      <a class="nav-link" data-toggle="tab" href="#type5" style="color: #A5B686 ;font-size: 25px;">Room 5</a>
     </li>
   </ul>
 
@@ -52,32 +49,32 @@
   <div class="tab-content">
 
     <div id="type1" class="container tab-pane active"><br>
-      
-      	<h3>room information1</h3>
+
+      <img name="eventPic" id="0" src="webimage/Accommodation.jpg" alt='room' >
+
+      <div style=' margin-top: 20px; '>
+        <h3>Description: Room 1 sleeps 8 in bunk beds.</h3>
+        <p>They are very well equipped.  We have wi-fi across the Hub.  
+          It is approximately 10 minutes walk into the town centre.  Here you can shop 'til you drop.</p>
+        <p>We welcome hen and stag groups, guests at private parties and attendees at any function.  
+          Call us to discuss your requirements on 01833 690150.</p>
+        <p>Attendees on courses in the area may book with us direct. A minimum of two people 
+          are required to stay at any one time and at least 5 days notice must be given.  
+          We welcome individuals and groups to stay.</p>
+      </div>
 
 	 	<div class="form-group">
-              <img name="eventPic" id="0" src="webimage/Accommodation.jpg">
-              
-              <br>
 
-              <label>Description: Room 1 sleeps 8 in bunk beds.</label>
-              <p>They are very well equipped.  We have wi-fi across the Hub.  
-                It is approximately 10 minutes walk into the town centre.  Here you can shop 'til you drop.</p>
-              <p>We welcome hen and stag groups, guests at private parties and attendees at any function.  
-                Call us to discuss your requirements on 01833 690150.</p>
-              <p>Attendees on courses in the area may book with us direct. A minimum of two people 
-                are required to stay at any one time and at least 5 days notice must be given.  
-                We welcome individuals and groups to stay.</p>
+      <h3>Please fill in the following information</h3>
 
-              <br>
 
               <label>Number of people: </label>
-              <input type="number" max='5' value='0' >
+              <input type="number" max='8' min='1' value='1' >
 
               <br>
 
               <label >Year:</label>
-              <select class="browser-default custom-select " id='year1' >
+              <select class="browser-default custom-select newDropdown " id='year1' >
                   <option selected>Select Year... </option>
                   <option value="01">2020</option>
                   <option value="02">2021</option>
@@ -86,7 +83,7 @@
               <br>
 
               <label id='month'>Month:</label>
-              <select class="browser-default custom-select "  id='month1'>
+              <select class="browser-default custom-select newDropdown"  id='month1'>
                   <option selected>Select Month... </option>
                   <option value="01">January</option>
                   <option value="02">February</option>
@@ -103,7 +100,7 @@
               </select>
 
               <label >Day:</label>
-              <select class="browser-default custom-select" id='day1'>
+              <select class="browser-default custom-select newDropdown" id='day1'>
                   <option selected>Select Day... </option>
               </select>
 
@@ -119,40 +116,39 @@
 
               <div class="row" style="margin-bottom: 30px;">
                 <div class="col-sm-6"></div>
-                <div class="col-sm-2"><a class="btn btn-primary" href="#" role="button" >Book and pay now</a></div>
+                <div class="col-sm-2"><a class="btn btn-primary newColor" href="#" role="button" >Book and pay now</a></div>
                 <div class="col-sm-1" style="text-align: center;"><h5>or</h5></div>
-                <div class="col-sm-2"><a class="btn btn-primary" href="#" role="button" >Book and pay at desk</a></div>
+                <div class="col-sm-2"><a class="btn btn-primary newColor" href="#" role="button" >Book and pay at desk</a></div>
               </div>
 
         </div>
     </div>
 
     <div id="type2" class="container tab-pane fade"><br>
-      <h3>room information2</h3>
+      <img name="eventPic" id="0" src="webimage/Accommodation.jpg" alt='room'>     
+      
+      <div style=' margin-top: 20px; '>
+      <h3>Description: Room 2 sleeps 8 in bunk beds</h3>
+      <p>They are very well equipped.  We have wi-fi across the Hub.  
+        It is approximately 10 minutes walk into the town centre.  Here you can shop 'til you drop.</p>
+      <p>We welcome hen and stag groups, guests at private parties and attendees at any function.  
+        Call us to discuss your requirements on 01833 690150.</p>
+      <p>Attendees on courses in the area may book with us direct. A minimum of two people 
+        are required to stay at any one time and at least 5 days notice must be given.  
+        We welcome individuals and groups to stay.</p>
+      </div>
 
 	 	<div class="form-group">
-              <img name="eventPic" id="0" src="webimage/Accommodation.jpg">
-                      
-              <br>
 
-              <label>Description: Room 2 sleeps 8 in bunk beds</label>
-              <p>They are very well equipped.  We have wi-fi across the Hub.  
-                It is approximately 10 minutes walk into the town centre.  Here you can shop 'til you drop.</p>
-              <p>We welcome hen and stag groups, guests at private parties and attendees at any function.  
-                Call us to discuss your requirements on 01833 690150.</p>
-              <p>Attendees on courses in the area may book with us direct. A minimum of two people 
-                are required to stay at any one time and at least 5 days notice must be given.  
-                We welcome individuals and groups to stay.</p>
-
-              <br>
-
+              <h3>Please fill in the following information</h3>
+       
               <label>Number of people: </label>
-              <input type="number" max='5' value='0' >
+              <input type="number" max='8' min='1' value='1' >
 
               <br>
 
               <label >Year:</label>
-              <select class="browser-default custom-select " id='year2' >
+              <select class="browser-default custom-select newDropdown " id='year2' >
                   <option selected>Select Year... </option>
                   <option value="01">2020</option>
                   <option value="02">2021</option>
@@ -161,7 +157,7 @@
               <br>
 
               <label id='month'>Month:</label>
-              <select class="browser-default custom-select "  id='month2'>
+              <select class="browser-default custom-select newDropdown"  id='month2'>
                   <option selected>Select Month... </option>
                   <option value="01">January</option>
                   <option value="02">February</option>
@@ -178,7 +174,7 @@
               </select>
 
               <label >Day:</label>
-              <select class="browser-default custom-select" id='day2'>
+              <select class="browser-default custom-select newDropdown" id='day2'>
                   <option selected>Select Day... </option>
               </select>
 
@@ -194,41 +190,40 @@
 
               <div class="row" style="margin-bottom: 30px;">
                 <div class="col-sm-6"></div>
-                <div class="col-sm-2"><a class="btn btn-primary" href="#" role="button" >Book and pay now</a></div>
+                <div class="col-sm-2"><a class="btn btn-primary newColor" href="#" role="button" >Book and pay now</a></div>
                 <div class="col-sm-1" style="text-align: center;"><h5>or</h5></div>
-                <div class="col-sm-2"><a class="btn btn-primary" href="#" role="button" >Book and pay at desk</a></div>
+                <div class="col-sm-2"><a class="btn btn-primary newColor" href="#" role="button" >Book and pay at desk</a></div>
               </div>
 
         </div>
     </div>
 
     <div id="type3" class="container tab-pane fade"><br>
-      <h3>room information3</h3>
+       <img name="eventPic" id="0" src="webimage/Accommodation.jpg" alt='room'>
+
+        <div style=' margin-top: 20px; '>
+        <h3>Description: Room 3 sleeps 6 in bunk beds.</h3>
+        <p>They are very well equipped.  We have wi-fi across the Hub.  
+          It is approximately 10 minutes walk into the town centre.  Here you can shop 'til you drop.</p>
+        <p>We welcome hen and stag groups, guests at private parties and attendees at any function.  
+          Call us to discuss your requirements on 01833 690150.</p>
+        <p>Attendees on courses in the area may book with us direct. A minimum of two people 
+          are required to stay at any one time and at least 5 days notice must be given.  
+          We welcome individuals and groups to stay.</p>
+         </div> 
+
 
 	 	<div class="form-group">
-              <img name="eventPic" id="0" src="webimage/Accommodation.jpg">
-              
-                      
-              <br>
 
-              <label>Description: Room 3 sleeps 6 in bunk beds.</label>
-              <p>They are very well equipped.  We have wi-fi across the Hub.  
-                It is approximately 10 minutes walk into the town centre.  Here you can shop 'til you drop.</p>
-              <p>We welcome hen and stag groups, guests at private parties and attendees at any function.  
-                Call us to discuss your requirements on 01833 690150.</p>
-              <p>Attendees on courses in the area may book with us direct. A minimum of two people 
-                are required to stay at any one time and at least 5 days notice must be given.  
-                We welcome individuals and groups to stay.</p>
-
-              <br>
+      <h3>Please fill in the following information</h3>
 
               <label>Number of people: </label>
-              <input type="number" max='5' value='0' >
+              <input type="number" max='6' min='1' value='1' >
 
               <br>
 
               <label >Year:</label>
-              <select class="browser-default custom-select " id='year3' >
+              <select class="browser-default custom-select newDropdown" id='year3' >
                   <option selected>Select Year... </option>
                   <option value="01">2020</option>
                   <option value="02">2021</option>
@@ -237,7 +232,7 @@
               <br>
 
               <label id='month'>Month:</label>
-              <select class="browser-default custom-select "  id='month3'>
+              <select class="browser-default custom-select newDropdown"  id='month3'>
                   <option selected>Select Month... </option>
                   <option value="01">January</option>
                   <option value="02">February</option>
@@ -254,7 +249,7 @@
               </select>
 
               <label >Day:</label>
-              <select class="browser-default custom-select" id='day3'>
+              <select class="browser-default custom-select newDropdown" id='day3'>
                   <option selected>Select Day... </option>
               </select>
 
@@ -270,40 +265,41 @@
 
               <div class="row" style="margin-bottom: 30px;">
                 <div class="col-sm-6"></div>
-                <div class="col-sm-2"><a class="btn btn-primary" href="#" role="button" >Book and pay now</a></div>
+                <div class="col-sm-2"><a class="btn btn-primary newColor" href="#" role="button" >Book and pay now</a></div>
                 <div class="col-sm-1" style="text-align: center;"><h5>or</h5></div>
-                <div class="col-sm-2"><a class="btn btn-primary" href="#" role="button" >Book and pay at desk</a></div>
+                <div class="col-sm-2"><a class="btn btn-primary newColor" href="#" role="button" >Book and pay at desk</a></div>
               </div>
 
         </div>
     </div>
 
     <div id="type4" class="container tab-pane fade"><br>
-      <h3>room information4</h3>
+      <img name="eventPic" id="0" src="webimage/Accommodation.jpg" alt='room'>
+                      
+       
+        <div style=' margin-top: 20px; '>
+        <h3>Description: Room 4 sleeps 3 in 1 single and 1 pair of bunk beds.</h3>
+        <p>They are very well equipped.  We have wi-fi across the Hub.  
+          It is approximately 10 minutes walk into the town centre.  Here you can shop 'til you drop.</p>
+        <p>We welcome hen and stag groups, guests at private parties and attendees at any function.  
+          Call us to discuss your requirements on 01833 690150.</p>
+        <p>Attendees on courses in the area may book with us direct. A minimum of two people 
+          are required to stay at any one time and at least 5 days notice must be given.  
+          We welcome individuals and groups to stay.</p>
+        </div>
+
 
 	 	<div class="form-group">
-              <img name="eventPic" id="0" src="webimage/Accommodation.jpg">
-                      
-              <br>
+      <h3>Please fill in the following information</h3>
 
-              <label>Description: Room 4 sleeps 3 in 1 single and 1 pair of bunk beds.</label>
-              <p>They are very well equipped.  We have wi-fi across the Hub.  
-                It is approximately 10 minutes walk into the town centre.  Here you can shop 'til you drop.</p>
-              <p>We welcome hen and stag groups, guests at private parties and attendees at any function.  
-                Call us to discuss your requirements on 01833 690150.</p>
-              <p>Attendees on courses in the area may book with us direct. A minimum of two people 
-                are required to stay at any one time and at least 5 days notice must be given.  
-                We welcome individuals and groups to stay.</p>
-
-              <br>
 
               <label>Number of people: </label>
-              <input type="number" max='5' value='0' >
+              <input type="number" max='3' min='1' value='1' >
 
               <br>
 
               <label >Year:</label>
-              <select class="browser-default custom-select " id='year4' >
+              <select class="browser-default custom-select newDropdown" id='year4' >
                   <option selected>Select Year... </option>
                   <option value="01">2020</option>
                   <option value="02">2021</option>
@@ -312,7 +308,7 @@
               <br>
 
               <label id='month'>Month:</label>
-              <select class="browser-default custom-select "  id='month4'>
+              <select class="browser-default custom-select newDropdown"  id='month4'>
                   <option selected>Select Month... </option>
                   <option value="01">January</option>
                   <option value="02">February</option>
@@ -329,7 +325,7 @@
               </select>
 
               <label >Day:</label>
-              <select class="browser-default custom-select" id='day4'>
+              <select class="browser-default custom-select newDropdown" id='day4'>
                   <option selected>Select Day... </option>
               </select>
 
@@ -345,40 +341,38 @@
 
               <div class="row" style="margin-bottom: 30px;">
                 <div class="col-sm-6"></div>
-                <div class="col-sm-2"><a class="btn btn-primary" href="#" role="button" >Book and pay now</a></div>
+                <div class="col-sm-2"><a class="btn btn-primary newColor" href="#" role="button" >Book and pay now</a></div>
                 <div class="col-sm-1" style="text-align: center;"><h5>or</h5></div>
-                <div class="col-sm-2"><a class="btn btn-primary" href="#" role="button" >Book and pay at desk</a></div>
+                <div class="col-sm-2"><a class="btn btn-primary newColor" href="#" role="button" >Book and pay at desk</a></div>
               </div>
 
         </div>
     </div>
 
     <div id="type5" class="container tab-pane fade"><br>
-      <h3>room information5</h3>
+       <img name="eventPic" id="0" src="webimage/Accommodation.jpg">
+
+        <div style=' margin-top: 20px; '>
+        <h3>Description: Room 5 sleeps 8 in bunk beds.</h3>
+        <p>They are very well equipped.  We have wi-fi across the Hub.  
+          It is approximately 10 minutes walk into the town centre.  Here you can shop 'til you drop.</p>
+        <p>We welcome hen and stag groups, guests at private parties and attendees at any function.  
+          Call us to discuss your requirements on 01833 690150.</p>
+        <p>Attendees on courses in the area may book with us direct. A minimum of two people 
+          are required to stay at any one time and at least 5 days notice must be given.  
+          We welcome individuals and groups to stay.</p>
+        </div>
+
 
 	 	<div class="form-group">
-              <img name="eventPic" id="0" src="webimage/Accommodation.jpg">
-                      
-              <br>
-
-              <label>Description: Room 5 sleeps 8 in bunk beds.</label>
-              <p>They are very well equipped.  We have wi-fi across the Hub.  
-                It is approximately 10 minutes walk into the town centre.  Here you can shop 'til you drop.</p>
-              <p>We welcome hen and stag groups, guests at private parties and attendees at any function.  
-                Call us to discuss your requirements on 01833 690150.</p>
-              <p>Attendees on courses in the area may book with us direct. A minimum of two people 
-                are required to stay at any one time and at least 5 days notice must be given.  
-                We welcome individuals and groups to stay.</p>
-
-              <br>
-
+      <h3>Please fill in the following information.</h3>
               <label>Number of people: </label>
-              <input type="number" max='5' value='0' >
+              <input type="number" max='8' min='1' value='1' >
 
               <br>
 
               <label >Year:</label>
-              <select class="browser-default custom-select " id='year5' >
+              <select class="browser-default custom-select newDropdown" id='year5' >
                   <option selected>Select Year... </option>
                   <option value="01">2020</option>
                   <option value="02">2021</option>
@@ -387,7 +381,7 @@
               <br>
 
               <label id='month'>Month:</label>
-              <select class="browser-default custom-select "  id='month5'>
+              <select class="browser-default custom-select newDropdown"  id='month5'>
                   <option selected>Select Month... </option>
                   <option value="01">January</option>
                   <option value="02">February</option>
@@ -403,8 +397,10 @@
                   <option value="12">December</option>
               </select>
 
+              <br>
+
               <label >Day:</label>
-              <select class="browser-default custom-select" id='day5'>
+              <select class="browser-default custom-select newDropdown" id='day5'>
                   <option selected>Select Day... </option>
               </select>
 
@@ -420,9 +416,9 @@
 
               <div class="row" style="margin-bottom: 30px;">
                 <div class="col-sm-6"></div>
-                <div class="col-sm-2"><a class="btn btn-primary" href="#" role="button" >Book and pay now</a></div>
+                <div class="col-sm-2"><a class="btn btn-primary newColor" href="#" role="button" >Book & pay now</a></div>
                 <div class="col-sm-1" style="text-align: center;"><h5>or</h5></div>
-                <div class="col-sm-2"><a class="btn btn-primary" href="#" role="button" >Book and pay at desk</a></div>
+                <div class="col-sm-2"><a class="btn btn-primary newColor" href="#" role="button" >Book & pay at desk</a></div>
               </div>
 
         </div>
