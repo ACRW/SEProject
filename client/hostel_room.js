@@ -3,9 +3,9 @@ console.log(document.getElementsByName('maxPeople'))
 
 // // Selecting page elements
 // const eventPic = document.getElementsByName("eventPic");
- const responseField = document.getElementById("responseField");
+ const responseField = document.getElementsByName("responseField");
  const payButtons = document.getElementsByClassName("row")
- const paymentTable = document.getElementById("paymentTable");
+ const paymentTable = document.getElementsByClassName("table");
 // const paymentButton = document.getElementById("fat-btn");
 
 // AJAX function
@@ -60,7 +60,8 @@ updateHostel = async() => {
     const maxPeople = document.getElementsByName('maxPeople');
     const roomNum = document.getElementsByName('roomNum');
     const pricePerNight = document.getElementsByName('pricePerNight');
-    for(i=0; i<maxPeople.length; i++){
+
+    for(i=0; i<rooms.length; i++){
       maxPeople[i].max = rooms[i]['noOfPeople']
       roomNum[i].innerHTML = rooms[i]['roomNumber']
       pricePerNight[i].innerHTML = rooms[i]['pricePerNight']
