@@ -68,7 +68,7 @@
         </div>
 
         <label>Number of people: </label>
-        <input type="number" name = 'maxPeople' min='1' value='1' >
+        <input type="number" name = 'maxPeople' min='0' value='0' >
         <br>
       
         <label >Year:</label>
@@ -100,12 +100,16 @@
             <option selected>Select Day... </option>
         </select>
 
+        <label>Number of nights: </label>
+        <input type="number" name = 'numNights' min='0' value='0' >
+        <br><br>
+
         <label >Any special requirement(s)? </label>
-        <textarea rows="4" cols="100">Do you needs an extra bed? Do you like to use the ketchen?</textarea>
+        <textarea rows="4" cols="100">Do you need an extra bed? Do you like to use the ketchen?</textarea>
 
         <table class="table" style="margin-top:30px">
           <tr>
-            <td>Room</td>
+            <td>Room Number</td>
             <td>Price per person per night</td>
             <td>number of people</td> 
             <td>Selected Date</td>
@@ -114,17 +118,20 @@
           <tr>
             <td name='roomNum'>--</td>
             <td name='pricePerNight'>--</td>
-            <td>--</td>
-            <td>--</td>
-            <td>--</td>
+            <td name='numOfPeople'>--</td>
+            <td name='duration'>--</td>
+            <td name='total Price'>--</td>
           </tr>
         </table>
 
         <div class="row" style="margin-bottom: 30px;" hidden=true>
           <div class="col-sm-6"></div>
-          <div class="col-sm-2"><a class="btn btn-primary newColor" href="#" role="button" >Book and pay now</a></div>
-          <div class="col-sm-1" style="text-align: center;"><h5>or</h5></div>
-          <div class="col-sm-2"><a class="btn btn-primary newColor" href="#" role="button" >Book and pay at desk</a></div>
+          <div class="col-sm-4"></div>
+          <div class="col-sm-2"><a class="btn btn-primary newColor" href="#" role="button" name='submit'>Book and pay now</a></div>
+        </div>
+
+        <div name="SubmittionResponse">
+
         </div>
 
       </div>
@@ -153,7 +160,7 @@
         </div>
 
         <label>Number of people: </label>
-        <input type="number" name = 'maxPeople' min='1' value='1' >
+        <input type="number" name = 'maxPeople' min='0' value='0' >
         <br>
 
         <label >Year:</label>
@@ -185,12 +192,16 @@
             <option selected>Select Day... </option>
         </select>
 
+        <label>Number of nights: </label>
+        <input type="number" name = 'numNights' min='0' value='0' >
+        <br><br>
+
         <label >Any special requirement(s)? </label>
-        <textarea rows="4" cols="100">Do you needs an extra bed? Do you like to use the ketchen?</textarea>
+        <textarea rows="4" cols="100">Do you need an extra bed? Do you like to use the ketchen?</textarea>
 
         <table class="table" style="margin-top:30px">
           <tr>
-            <td>Room</td>
+            <td>Room Number</td>
             <td>Price per person per night</td>
             <td>number of people</td> 
             <td>Selected Date</td>
@@ -199,17 +210,20 @@
           <tr>
             <td name='roomNum'>--</td>
             <td name='pricePerNight'>--</td>
-            <td>--</td>
-            <td>--</td>
-            <td>--</td>
+            <td name='numOfPeople'>--</td>
+            <td name='duration'>--</td>
+            <td name='total Price'>--</td>
           </tr>
         </table>
 
         <div class="row" style="margin-bottom: 30px;" hidden=true>
           <div class="col-sm-6"></div>
-          <div class="col-sm-2"><a class="btn btn-primary newColor" href="#" role="button" >Book and pay now</a></div>
-          <div class="col-sm-1" style="text-align: center;"><h5>or</h5></div>
-          <div class="col-sm-2"><a class="btn btn-primary newColor" href="#" role="button" >Book and pay at desk</a></div>
+          <div class="col-sm-4"></div>
+          <div class="col-sm-2"><a class="btn btn-primary newColor" href="#" role="button" name='submit'>Book and pay now</a></div>
+        </div>
+
+        <div name="SubmittionResponse">
+
         </div>
 
       </div>
@@ -239,7 +253,8 @@
         </div>
 
         <label>Number of people: </label>
-        <input name = 'maxPeople' type="number" min='1' value='1' >
+        <input name = 'maxPeople' type="number" min='0' value='0' >
+        <br>
 
         <label >Year:</label>
         <select class="browser-default custom-select newDropdown" id='year3' >
@@ -270,12 +285,16 @@
             <option selected>Select Day... </option>
         </select>
 
+        <label>Number of nights: </label>
+        <input type="number" name = 'numNights' min='0' value='0' >
+        <br><br>
+
         <label >Any special requirement(s)? </label>
-        <textarea rows="4" cols="100">Do you needs an extra bed? Do you like to use the ketchen?</textarea>
+        <textarea rows="4" cols="100">Do you need an extra bed? Do you like to use the ketchen?</textarea>
 
         <table class="table" style="margin-top:30px">
           <tr>
-            <td>Room</td>
+            <td>Room Number</td>
             <td>Price per person per night</td>
             <td>number of people</td> 
             <td>Selected Date</td>
@@ -284,17 +303,20 @@
           <tr>
             <td name='roomNum'>--</td>
             <td name='pricePerNight'>--</td>
-            <td>--</td>
-            <td>--</td>
-            <td>--</td>
+            <td name='numOfPeople'>--</td>
+            <td name='duration'>--</td>
+            <td name='total Price'>--</td>
           </tr>
         </table>
 
         <div class="row" style="margin-bottom: 30px;" hidden=true>
           <div class="col-sm-6"></div>
-          <div class="col-sm-2"><a class="btn btn-primary newColor" href="#" role="button" >Book and pay now</a></div>
-          <div class="col-sm-1" style="text-align: center;"><h5>or</h5></div>
-          <div class="col-sm-2"><a class="btn btn-primary newColor" href="#" role="button" >Book and pay at desk</a></div>
+          <div class="col-sm-4"></div>
+          <div class="col-sm-2"><a class="btn btn-primary newColor" href="#" role="button" name='submit'>Book and pay now</a></div>
+        </div>
+
+        <div name="SubmittionResponse">
+
         </div>
 
       </div>
@@ -323,7 +345,8 @@
         </div>
 
         <label>Number of people: </label>
-        <input type="number" name = 'maxPeople'  min='1' value='1' >
+        <input type="number" name = 'maxPeople'  min='0' value='0' >
+        <br>
 
         <label >Year:</label>
         <select class="browser-default custom-select newDropdown" id='year4' >
@@ -354,12 +377,16 @@
             <option selected>Select Day... </option>
         </select>
 
+        <label>Number of nights: </label>
+        <input type="number" name = 'numNights' min='0' value='0' >
+        <br><br>
+
         <label >Any special requirement(s)? </label>
-        <textarea rows="4" cols="100">Do you needs an extra bed? Do you like to use the ketchen?</textarea>
+        <textarea rows="4" cols="100">Do you need an extra bed? Do you like to use the ketchen?</textarea>
 
         <table class="table" style="margin-top:30px">
           <tr>
-            <td>Room</td>
+            <td>Room Number</td>
             <td>Price per person per night</td>
             <td>number of people</td> 
             <td>Selected Date</td>
@@ -368,17 +395,20 @@
           <tr>
             <td name='roomNum'>--</td>
             <td name='pricePerNight'>--</td>
-            <td>--</td>
-            <td>--</td>
-            <td>--</td>
+            <td name='numOfPeople'>--</td>
+            <td name='duration'>--</td>
+            <td name='total Price'>--</td>
           </tr>
         </table>
 
         <div class="row" style="margin-bottom: 30px;" hidden=true>
           <div class="col-sm-6"></div>
-          <div class="col-sm-2"><a class="btn btn-primary newColor" href="#" role="button" >Book and pay now</a></div>
-          <div class="col-sm-1" style="text-align: center;"><h5>or</h5></div>
-          <div class="col-sm-2"><a class="btn btn-primary newColor" href="#" role="button" >Book and pay at desk</a></div>
+          <div class="col-sm-4"></div>
+          <div class="col-sm-2"><a class="btn btn-primary newColor" href="#" role="button" name='submit'>Book and pay now</a></div>
+        </div>
+
+        <div name="SubmittionResponse">
+
         </div>
 
       </div>
@@ -404,7 +434,8 @@
 
         </div>
         <label>Number of people: </label>
-        <input type="number" name = 'maxPeople' min='1' value='1' >
+        <input type="number" name = 'maxPeople' min='0' value='0' >
+        <br>
 
         <label >Year:</label>
         <select class="browser-default custom-select newDropdown" id='year5' >
@@ -435,12 +466,16 @@
             <option selected>Select Day... </option>
         </select>
 
+        <label>Number of nights: </label>
+        <input type="number" name = 'numNights' min='0' value='0' >
+        <br><br>
+
         <label >Any special requirement(s)? </label>
-        <textarea rows="4" cols="100">Do you needs an extra bed? Do you like to use the ketchen?</textarea>
+        <textarea rows="4" cols="100">Do you need an extra bed? Do you like to use the ketchen?</textarea>
 
         <table class="table" style="margin-top:30px">
           <tr>
-            <td>Room</td>
+            <td>Room Number</td>
             <td>Price per person per night</td>
             <td>number of people</td>
             <td>Selected Date</td>
@@ -449,17 +484,20 @@
           <tr>
             <td name='roomNum'>--</td>
             <td name='pricePerNight'>--</td>
-            <td>--</td>
-            <td>--</td>
-            <td>--</td>
+            <td name='numOfPeople'>--</td>
+            <td name='duration'>--</td>
+            <td name='total Price'>--</td>
           </tr>
         </table>
 
         <div class="row" style="margin-bottom: 30px;" hidden=true>
           <div class="col-sm-6"></div>
-          <div class="col-sm-2"><a class="btn btn-primary newColor" href="#" role="button" >Book & pay now</a></div>
-          <div class="col-sm-1" style="text-align: center;"><h5>or</h5></div>
-          <div class="col-sm-2"><a class="btn btn-primary newColor" href="#" role="button" >Book & pay at desk</a></div>
+          <div class="col-sm-4"></div>
+          <div class="col-sm-2"><a class="btn btn-primary newColor" href="#" role="button" name='submit'>Book and pay now</a></div>
+        </div>
+
+        <div name="SubmittionResponse">
+
         </div>
 
       </div>
