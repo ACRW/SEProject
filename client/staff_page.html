@@ -92,7 +92,7 @@
                   month = month + 1
                 }
                 for(var j=9;j<=21;j++){
-                  document.getElementById(j.toString() +'.').innerHTML += '<td id="' + j + '.' + newDate.getDate() + '.' + month + '"></td>'
+                  document.getElementById(j.toString() +'.').innerHTML += '<td id="' + j + '.' + newDate.getDate().toString().padStart(2,'0') + '.' + month + '"></td>'
 
                 }
                 document.getElementById('hostelFull').innerHTML += '<td id=' + newDate.getDate() + '.' + month +'></td>'
@@ -189,6 +189,10 @@
     function hideShow(id) {
       document.getElementById(id).classList.toggle("show");
     }
+
+    function setUser(customerID){
+      document.getElementById('customerId').value = customerID
+        }
   </script>
 </head>
 <body>
@@ -205,6 +209,7 @@
 
   <div>
     <p id='errorMessage'></p>
+    <div id='customerId'></div>
   </div>
 
   <div class="modal" id="searchModal" tabindex="-1" role="dialog">
