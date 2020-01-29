@@ -9,14 +9,10 @@
 
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
   <link rel="stylesheet" href="style.css">
-
-	
 	
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-
-
 	
 </head>
 <body>
@@ -63,65 +59,54 @@
           We welcome individuals and groups to stay.</p>
       </div>
 
-	 	<div class="form-group">
+  	 	<div class="form-group">
 
-      <h3>Please fill in the following information</h3>
+        <h3>Please fill in the following information</h3>
 
+        <label>Number of people: </label>
+        <input type="number" max='8' min='1' value='1' >
+        <br>
+      
+        <label >Year:</label>
+        <select class="browser-default custom-select newDropdown " id='year1' >
+            <option selected>Select Year... </option>
+            <option value="01">2020</option>
+            <option value="02">2021</option>
+        </select>
+        
+        <label id='month'>Month:</label>
+        <select class="browser-default custom-select newDropdown"  id='month1'>
+            <option selected>Select Month... </option>
+            <option value="01">January</option>
+            <option value="02">February</option>
+            <option value="03">March</option>
+            <option value="04">April</option>
+            <option value="05">May</option>
+            <option value="06">June</option>
+            <option value="07">July</option>
+            <option value="08">August</option>
+            <option value="09">September</option>
+            <option value="10">October</option>
+            <option value="11">November</option>
+            <option value="12">December</option>
+        </select>
 
-              <label>Number of people: </label>
-              <input type="number" max='8' min='1' value='1' >
+        <label >Day:</label>
+        <select class="browser-default custom-select newDropdown" id='day1'>
+            <option selected>Select Day... </option>
+        </select>
 
-              <br>
+        <label >Any special requirement(s)? </label>
+        <textarea rows="4" cols="100">Do you needs an extra bed? Do you like to use the ketchen?</textarea>
 
-              <label >Year:</label>
-              <select class="browser-default custom-select newDropdown " id='year1' >
-                  <option selected>Select Year... </option>
-                  <option value="01">2020</option>
-                  <option value="02">2021</option>
-              </select>
-
-              <br>
-
-              <label id='month'>Month:</label>
-              <select class="browser-default custom-select newDropdown"  id='month1'>
-                  <option selected>Select Month... </option>
-                  <option value="01">January</option>
-                  <option value="02">February</option>
-                  <option value="03">March</option>
-                  <option value="04">April</option>
-                  <option value="05">May</option>
-                  <option value="06">June</option>
-                  <option value="07">July</option>
-                  <option value="08">August</option>
-                  <option value="09">September</option>
-                  <option value="10">October</option>
-                  <option value="11">November</option>
-                  <option value="12">December</option>
-              </select>
-
-              <label >Day:</label>
-              <select class="browser-default custom-select newDropdown" id='day1'>
-                  <option selected>Select Day... </option>
-              </select>
-
-              <br>
-
-              <label >Any special requirement(s)? </label>
-
-              <br>
-
-              <textarea rows="4" cols="100">Do you needs an extra bed? Do you like to use the ketchen?</textarea>
-
-              <br>
-
-              <div class="row" style="margin-bottom: 30px;">
-                <div class="col-sm-6"></div>
-                <div class="col-sm-2"><a class="btn btn-primary newColor" href="#" role="button" >Book and pay now</a></div>
-                <div class="col-sm-1" style="text-align: center;"><h5>or</h5></div>
-                <div class="col-sm-2"><a class="btn btn-primary newColor" href="#" role="button" >Book and pay at desk</a></div>
-              </div>
-
+        <div class="row" style="margin-bottom: 30px;">
+          <div class="col-sm-6"></div>
+          <div class="col-sm-2"><a class="btn btn-primary newColor" href="#" role="button" >Book and pay now</a></div>
+          <div class="col-sm-1" style="text-align: center;"><h5>or</h5></div>
+          <div class="col-sm-2"><a class="btn btn-primary newColor" href="#" role="button" >Book and pay at desk</a></div>
         </div>
+
+      </div>
     </div>
 
     <div id="type2" class="container tab-pane fade"><br>
@@ -138,64 +123,54 @@
         We welcome individuals and groups to stay.</p>
       </div>
 
-	 	<div class="form-group">
+  	 	<div class="form-group">
 
-              <h3>Please fill in the following information</h3>
-       
-              <label>Number of people: </label>
-              <input type="number" max='8' min='1' value='1' >
+        <h3>Please fill in the following information</h3>
 
-              <br>
+        <label>Number of people: </label>
+        <input type="number" max='8' min='1' value='1' >
+        <br>
 
-              <label >Year:</label>
-              <select class="browser-default custom-select newDropdown " id='year2' >
-                  <option selected>Select Year... </option>
-                  <option value="01">2020</option>
-                  <option value="02">2021</option>
-              </select>
+        <label >Year:</label>
+        <select class="browser-default custom-select newDropdown " id='year2' >
+            <option selected>Select Year... </option>
+            <option value="01">2020</option>
+            <option value="02">2021</option>
+        </select>
 
-              <br>
+        <label id='month'>Month:</label>
+        <select class="browser-default custom-select newDropdown"  id='month2'>
+            <option selected>Select Month... </option>
+            <option value="01">January</option>
+            <option value="02">February</option>
+            <option value="03">March</option>
+            <option value="04">April</option>
+            <option value="05">May</option>
+            <option value="06">June</option>
+            <option value="07">July</option>
+            <option value="08">August</option>
+            <option value="09">September</option>
+            <option value="10">October</option>
+            <option value="11">November</option>
+            <option value="12">December</option>
+        </select>
 
-              <label id='month'>Month:</label>
-              <select class="browser-default custom-select newDropdown"  id='month2'>
-                  <option selected>Select Month... </option>
-                  <option value="01">January</option>
-                  <option value="02">February</option>
-                  <option value="03">March</option>
-                  <option value="04">April</option>
-                  <option value="05">May</option>
-                  <option value="06">June</option>
-                  <option value="07">July</option>
-                  <option value="08">August</option>
-                  <option value="09">September</option>
-                  <option value="10">October</option>
-                  <option value="11">November</option>
-                  <option value="12">December</option>
-              </select>
+        <label >Day:</label>
+        <select class="browser-default custom-select newDropdown" id='day2'>
+            <option selected>Select Day... </option>
+        </select>
 
-              <label >Day:</label>
-              <select class="browser-default custom-select newDropdown" id='day2'>
-                  <option selected>Select Day... </option>
-              </select>
+        <label >Any special requirement(s)? </label>
+        <textarea rows="4" cols="100">Do you needs an extra bed? Do you like to use the ketchen?</textarea>
 
-              <br>
-
-              <label >Any special requirement(s)? </label>
-
-              <br>
-
-              <textarea rows="4" cols="100">Do you needs an extra bed? Do you like to use the ketchen?</textarea>
-
-              <br>
-
-              <div class="row" style="margin-bottom: 30px;">
-                <div class="col-sm-6"></div>
-                <div class="col-sm-2"><a class="btn btn-primary newColor" href="#" role="button" >Book and pay now</a></div>
-                <div class="col-sm-1" style="text-align: center;"><h5>or</h5></div>
-                <div class="col-sm-2"><a class="btn btn-primary newColor" href="#" role="button" >Book and pay at desk</a></div>
-              </div>
-
+        <div class="row" style="margin-bottom: 30px;">
+          <div class="col-sm-6"></div>
+          <div class="col-sm-2"><a class="btn btn-primary newColor" href="#" role="button" >Book and pay now</a></div>
+          <div class="col-sm-1" style="text-align: center;"><h5>or</h5></div>
+          <div class="col-sm-2"><a class="btn btn-primary newColor" href="#" role="button" >Book and pay at desk</a></div>
         </div>
+
+      </div>
     </div>
 
     <div id="type3" class="container tab-pane fade"><br>
@@ -213,71 +188,59 @@
          </div> 
 
 
-	 	<div class="form-group">
+  	 	<div class="form-group">
 
-      <h3>Please fill in the following information</h3>
+        <h3>Please fill in the following information</h3>
 
-              <label>Number of people: </label>
-              <input type="number" max='6' min='1' value='1' >
+        <label>Number of people: </label>
+        <input type="number" max='6' min='1' value='1' >
 
-              <br>
+        <label >Year:</label>
+        <select class="browser-default custom-select newDropdown" id='year3' >
+            <option selected>Select Year... </option>
+            <option value="01">2020</option>
+            <option value="02">2021</option>
+        </select>
 
-              <label >Year:</label>
-              <select class="browser-default custom-select newDropdown" id='year3' >
-                  <option selected>Select Year... </option>
-                  <option value="01">2020</option>
-                  <option value="02">2021</option>
-              </select>
+        <label id='month'>Month:</label>
+        <select class="browser-default custom-select newDropdown"  id='month3'>
+            <option selected>Select Month... </option>
+            <option value="01">January</option>
+            <option value="02">February</option>
+            <option value="03">March</option>
+            <option value="04">April</option>
+            <option value="05">May</option>
+            <option value="06">June</option>
+            <option value="07">July</option>
+            <option value="08">August</option>
+            <option value="09">September</option>
+            <option value="10">October</option>
+            <option value="11">November</option>
+            <option value="12">December</option>
+        </select>
 
-              <br>
+        <label >Day:</label>
+        <select class="browser-default custom-select newDropdown" id='day3'>
+            <option selected>Select Day... </option>
+        </select>
 
-              <label id='month'>Month:</label>
-              <select class="browser-default custom-select newDropdown"  id='month3'>
-                  <option selected>Select Month... </option>
-                  <option value="01">January</option>
-                  <option value="02">February</option>
-                  <option value="03">March</option>
-                  <option value="04">April</option>
-                  <option value="05">May</option>
-                  <option value="06">June</option>
-                  <option value="07">July</option>
-                  <option value="08">August</option>
-                  <option value="09">September</option>
-                  <option value="10">October</option>
-                  <option value="11">November</option>
-                  <option value="12">December</option>
-              </select>
+        <label >Any special requirement(s)? </label>
+        <textarea rows="4" cols="100">Do you needs an extra bed? Do you like to use the ketchen?</textarea>
 
-              <label >Day:</label>
-              <select class="browser-default custom-select newDropdown" id='day3'>
-                  <option selected>Select Day... </option>
-              </select>
-
-              <br>
-
-              <label >Any special requirement(s)? </label>
-
-              <br>
-
-              <textarea rows="4" cols="100">Do you needs an extra bed? Do you like to use the ketchen?</textarea>
-
-              <br>
-
-              <div class="row" style="margin-bottom: 30px;">
-                <div class="col-sm-6"></div>
-                <div class="col-sm-2"><a class="btn btn-primary newColor" href="#" role="button" >Book and pay now</a></div>
-                <div class="col-sm-1" style="text-align: center;"><h5>or</h5></div>
-                <div class="col-sm-2"><a class="btn btn-primary newColor" href="#" role="button" >Book and pay at desk</a></div>
-              </div>
-
+        <div class="row" style="margin-bottom: 30px;">
+          <div class="col-sm-6"></div>
+          <div class="col-sm-2"><a class="btn btn-primary newColor" href="#" role="button" >Book and pay now</a></div>
+          <div class="col-sm-1" style="text-align: center;"><h5>or</h5></div>
+          <div class="col-sm-2"><a class="btn btn-primary newColor" href="#" role="button" >Book and pay at desk</a></div>
         </div>
+
+      </div>
     </div>
 
     <div id="type4" class="container tab-pane fade"><br>
       <img name="eventPic" id="0" src="webimage/Accommodation.jpg" alt='room'>
-                      
-       
-        <div style=' margin-top: 20px; '>
+                       
+      <div style=' margin-top: 20px; '>
         <h3>Description: Room 4 sleeps 3 in 1 single and 1 pair of bunk beds.</h3>
         <p>They are very well equipped.  We have wi-fi across the Hub.  
           It is approximately 10 minutes walk into the town centre.  Here you can shop 'til you drop.</p>
@@ -286,73 +249,61 @@
         <p>Attendees on courses in the area may book with us direct. A minimum of two people 
           are required to stay at any one time and at least 5 days notice must be given.  
           We welcome individuals and groups to stay.</p>
+      </div>
+
+
+      <div class="form-group">
+        <h3>Please fill in the following information</h3>
+
+        <label>Number of people: </label>
+        <input type="number" max='3' min='1' value='1' >
+
+        <label >Year:</label>
+        <select class="browser-default custom-select newDropdown" id='year4' >
+            <option selected>Select Year... </option>
+            <option value="01">2020</option>
+            <option value="02">2021</option>
+        </select>
+
+        <label id='month'>Month:</label>
+        <select class="browser-default custom-select newDropdown"  id='month4'>
+            <option selected>Select Month... </option>
+            <option value="01">January</option>
+            <option value="02">February</option>
+            <option value="03">March</option>
+            <option value="04">April</option>
+            <option value="05">May</option>
+            <option value="06">June</option>
+            <option value="07">July</option>
+            <option value="08">August</option>
+            <option value="09">September</option>
+            <option value="10">October</option>
+            <option value="11">November</option>
+            <option value="12">December</option>
+        </select>
+
+        <label >Day:</label>
+        <select class="browser-default custom-select newDropdown" id='day4'>
+            <option selected>Select Day... </option>
+        </select>
+
+        <label >Any special requirement(s)? </label>
+        <textarea rows="4" cols="100">Do you needs an extra bed? Do you like to use the ketchen?</textarea>
+
+        <div class="row" style="margin-bottom: 30px;">
+          <div class="col-sm-6"></div>
+          <div class="col-sm-2"><a class="btn btn-primary newColor" href="#" role="button" >Book and pay now</a></div>
+          <div class="col-sm-1" style="text-align: center;"><h5>or</h5></div>
+          <div class="col-sm-2"><a class="btn btn-primary newColor" href="#" role="button" >Book and pay at desk</a></div>
         </div>
 
-
-	 	<div class="form-group">
-      <h3>Please fill in the following information</h3>
-
-
-              <label>Number of people: </label>
-              <input type="number" max='3' min='1' value='1' >
-
-              <br>
-
-              <label >Year:</label>
-              <select class="browser-default custom-select newDropdown" id='year4' >
-                  <option selected>Select Year... </option>
-                  <option value="01">2020</option>
-                  <option value="02">2021</option>
-              </select>
-
-              <br>
-
-              <label id='month'>Month:</label>
-              <select class="browser-default custom-select newDropdown"  id='month4'>
-                  <option selected>Select Month... </option>
-                  <option value="01">January</option>
-                  <option value="02">February</option>
-                  <option value="03">March</option>
-                  <option value="04">April</option>
-                  <option value="05">May</option>
-                  <option value="06">June</option>
-                  <option value="07">July</option>
-                  <option value="08">August</option>
-                  <option value="09">September</option>
-                  <option value="10">October</option>
-                  <option value="11">November</option>
-                  <option value="12">December</option>
-              </select>
-
-              <label >Day:</label>
-              <select class="browser-default custom-select newDropdown" id='day4'>
-                  <option selected>Select Day... </option>
-              </select>
-
-              <br>
-
-              <label >Any special requirement(s)? </label>
-
-              <br>
-
-              <textarea rows="4" cols="100">Do you needs an extra bed? Do you like to use the ketchen?</textarea>
-
-              <br>
-
-              <div class="row" style="margin-bottom: 30px;">
-                <div class="col-sm-6"></div>
-                <div class="col-sm-2"><a class="btn btn-primary newColor" href="#" role="button" >Book and pay now</a></div>
-                <div class="col-sm-1" style="text-align: center;"><h5>or</h5></div>
-                <div class="col-sm-2"><a class="btn btn-primary newColor" href="#" role="button" >Book and pay at desk</a></div>
-              </div>
-
-        </div>
+      </div>
     </div>
 
     <div id="type5" class="container tab-pane fade"><br>
-       <img name="eventPic" id="0" src="webimage/Accommodation.jpg">
+      <img name="eventPic" id="0" src="webimage/Accommodation.jpg">
 
-        <div style=' margin-top: 20px; '>
+      <div style=' margin-top: 20px; '>
         <h3>Description: Room 5 sleeps 8 in bunk beds.</h3>
         <p>They are very well equipped.  We have wi-fi across the Hub.  
           It is approximately 10 minutes walk into the town centre.  Here you can shop 'til you drop.</p>
@@ -361,67 +312,54 @@
         <p>Attendees on courses in the area may book with us direct. A minimum of two people 
           are required to stay at any one time and at least 5 days notice must be given.  
           We welcome individuals and groups to stay.</p>
+      </div>
+
+  	 	<div class="form-group">
+        <h3>Please fill in the following information.</h3>
+        <label>Number of people: </label>
+        <input type="number" max='8' min='1' value='1' >
+
+        <label >Year:</label>
+        <select class="browser-default custom-select newDropdown" id='year5' >
+            <option selected>Select Year... </option>
+            <option value="01">2020</option>
+            <option value="02">2021</option>
+        </select>
+
+        <label id='month'>Month:</label>
+        <select class="browser-default custom-select newDropdown"  id='month5'>
+            <option selected>Select Month... </option>
+            <option value="01">January</option>
+            <option value="02">February</option>
+            <option value="03">March</option>
+            <option value="04">April</option>
+            <option value="05">May</option>
+            <option value="06">June</option>
+            <option value="07">July</option>
+            <option value="08">August</option>
+            <option value="09">September</option>
+            <option value="10">October</option>
+            <option value="11">November</option>
+            <option value="12">December</option>
+        </select>
+
+        <label >Day:</label>
+        <select class="browser-default custom-select newDropdown" id='day5'>
+            <option selected>Select Day... </option>
+        </select>
+
+        <label >Any special requirement(s)? </label>
+
+        <textarea rows="4" cols="100">Do you needs an extra bed? Do you like to use the ketchen?</textarea>
+
+        <div class="row" style="margin-bottom: 30px;">
+          <div class="col-sm-6"></div>
+          <div class="col-sm-2"><a class="btn btn-primary newColor" href="#" role="button" >Book & pay now</a></div>
+          <div class="col-sm-1" style="text-align: center;"><h5>or</h5></div>
+          <div class="col-sm-2"><a class="btn btn-primary newColor" href="#" role="button" >Book & pay at desk</a></div>
         </div>
 
-
-	 	<div class="form-group">
-      <h3>Please fill in the following information.</h3>
-              <label>Number of people: </label>
-              <input type="number" max='8' min='1' value='1' >
-
-              <br>
-
-              <label >Year:</label>
-              <select class="browser-default custom-select newDropdown" id='year5' >
-                  <option selected>Select Year... </option>
-                  <option value="01">2020</option>
-                  <option value="02">2021</option>
-              </select>
-
-              <br>
-
-              <label id='month'>Month:</label>
-              <select class="browser-default custom-select newDropdown"  id='month5'>
-                  <option selected>Select Month... </option>
-                  <option value="01">January</option>
-                  <option value="02">February</option>
-                  <option value="03">March</option>
-                  <option value="04">April</option>
-                  <option value="05">May</option>
-                  <option value="06">June</option>
-                  <option value="07">July</option>
-                  <option value="08">August</option>
-                  <option value="09">September</option>
-                  <option value="10">October</option>
-                  <option value="11">November</option>
-                  <option value="12">December</option>
-              </select>
-
-              <br>
-
-              <label >Day:</label>
-              <select class="browser-default custom-select newDropdown" id='day5'>
-                  <option selected>Select Day... </option>
-              </select>
-
-              <br>
-
-              <label >Any special requirement(s)? </label>
-
-              <br>
-
-              <textarea rows="4" cols="100">Do you needs an extra bed? Do you like to use the ketchen?</textarea>
-
-              <br>
-
-              <div class="row" style="margin-bottom: 30px;">
-                <div class="col-sm-6"></div>
-                <div class="col-sm-2"><a class="btn btn-primary newColor" href="#" role="button" >Book & pay now</a></div>
-                <div class="col-sm-1" style="text-align: center;"><h5>or</h5></div>
-                <div class="col-sm-2"><a class="btn btn-primary newColor" href="#" role="button" >Book & pay at desk</a></div>
-              </div>
-
-        </div>
+      </div>
     </div>
 
   </div>
