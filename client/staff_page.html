@@ -55,6 +55,7 @@
       document.getElementById('searchError').innerHTML = '';
     }
 
+    //define day and month names
     const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
     const dayNames = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
     function Calender () {
@@ -78,11 +79,15 @@
             let tempDate = new Date(targetMon);
             tempDate.setDate(tempDate.getDate() + 6);
             document.getElementById("tableDate").innerHTML = monthNames[targetMon.getMonth()] + " " + targetMon.getDate() + " - " + monthNames[tempDate.getMonth()] + " " + tempDate.getDate();
+
+            //find headers of avaliabilty tables
             headers = document.getElementById("calTable").rows[0];
             headers2 = document.getElementById('hostelTable').rows[0];
             month= targetMon.getMonth()
             document.getElementById('chosenDate').value = month
             document.getElementById('chosenHostelDate').value = month
+
+            //for days of the week
             for (i = 0; i < 7; i++) {
                 newDate = new Date(targetMon);
                 newDate.setDate(newDate.getDate() + i);
@@ -96,11 +101,7 @@
 
                 }
                 document.getElementById('hostelFull').innerHTML += '<td id=' + newDate.getDate() + '.' + month +'></td>'
-
-
             }
-
-
         }
         document.addEventListener("DOMContentLoaded", function () {
           displayDates();
@@ -211,6 +212,7 @@
     <p id='errorMessage'></p>
     <div id='customerId'></div>
   </div>
+
 
   <div class="modal" id="searchModal" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-lg" role="document">
@@ -558,6 +560,7 @@
     </div>
   </div>
 
+
   <div class="modal" id='notificationModal' tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
@@ -577,6 +580,7 @@
       </div>
     </div>
   </div>
+
 
   <div class="modal" id='viewUsersBookingsModal' tabindex="-1" role="dialog">
     <div class="modal-dialog modal-lg" role="document">
@@ -625,6 +629,7 @@
     </div>
   </div>
 
+
   <div class="modal" id='statisticsModal' tabindex="-1" role="dialog">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
@@ -649,6 +654,7 @@
   </div>
 </div>
 </div>
+
 
 <div class="modal" id="newHostelBookingModal" tabindex="-1" role="dialog">
   <div class="modal-dialog modal-lg" role="document">
@@ -768,6 +774,7 @@
     </div>
   </div>
 </div>
+
 
 <div class="modal" id='createNewEventModal' tabindex="-1" role="dialog">
   <div class="modal-dialog" role="document">
