@@ -13,14 +13,26 @@
     const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
     const dayNames = ["Mon", "Tues", "Wed", "Thur", "Fri", "Sat", "Sun"];
     const hostAddr = "localhost";
-    const hostPort = "8090"
+    const hostPort = "8090";
+    let rooms;
 
     function mod(n, m) { // Because javascript mod % is broken
         return ((n % m) + m) % m;
     }
+    
+    async function getRooms(startDate, endDate) { // Need to add error handling at some point.
+        let response = await fetch('http://' + hostAddr + ":" + hostPort + '/rooms?types=community', {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        });
+        rooms = await response.json();
+        return rooms["community"]
+    }
 
     async function updateRooms() {
-        const rooms = await getRooms();
+        rooms = await getRooms();
         roomDrop = document.getElementById("roomDrop");
         for (i = 0; i < rooms.length; i++) {
             let option = document.createElement("option");
@@ -52,11 +64,12 @@
         peekElement.className = "peekGraphic newColor";
         peekElement.style.width = String(tableDims.width * 0.11) + "px"
         peekElement.style.height = String((userBooking["bookingLength"]/60) * 50) + "px";
+        peekElement.style.visibility = "hidden";
         eTable.rows[0].cells[1].appendChild(peekElement);
         userBooking["element"].className = "peekGraphic newColor";
         userBooking["element"].style.width = String(tableDims.width * 0.11) + "px";
         userBooking["element"].style.height = String((userBooking["bookingLength"]/60) * 50) + "px";
-
+        userBooking["element"].innerHTML = "<p>Dom Newman </p>";
         targetMon.setHours(0);
         targetMon.setMinutes(0);
         targetMon.setSeconds(1);
@@ -88,28 +101,40 @@
             eTable.rows[0].cells[1].appendChild(peekElement); // Redisplay booking peek
         }
 
-        let displayBookings = async function () { // Displays all the booking on the calender
+        let displayBookings = async function () { // Displays all the bookings on the calender
             clearCalender();
             for (i = 0; i < bookings.length; i++) {
-                let ss = bookings[i]["start"].split(/[- :TZ]/);
-                let es = bookings[i]["end"].split(/[- :TZ]/);
-                let startTime = new Date(Date.UTC(ss[0], ss[1] - 1, ss[2], ss[3], ss[4], 0));
-                let endTime = new Date(Date.UTC(es[0], es[1] - 1, es[2], es[3], es[4], 0));
-                if (startTime <= targetMon || startTime >= targetSun) {
+                if (bookings[i]["startTime"] <= targetMon || bookings[i]["startTime"] >= targetSun) {
                     continue; // Continues if booking is not in this week.
                 }
-                let startCell = eTable.rows[0].cells[mod(startTime.getDay() - 1, 7) + 1];
-                let bookingGraphic = document.createElement("div");
-                bookingGraphic.className = "bookingGraphic newColor";
-                bookingGraphic.style.top = String(((startTime.getHours() - 9) * 50) + 50) + "px";
-                let bookingLength = (endTime.getHours() - startTime.getHours()) + (endTime.getMinutes() - startTime.getMinutes()) / 60;
-                bookingGraphic.style.height = String(bookingLength * cellHeight) + "px";
-                startCell.appendChild(bookingGraphic);
+                let startCell = eTable.rows[0].cells[mod(bookings[i]["startTime"].getDay() - 1, 7) + 1];
+                if (bookings[i]["element"] == null) {
+                    let bookingGraphic = document.createElement("div");
+                    bookingGraphic.className = "bookingGraphic newColor";
+                    bookingGraphic.style.top = String(((bookings[i]["startTime"].getHours() - 9) * 50) + 50) + "px";
+                    bookingGraphic.style.height = String(bookings[i]["bookingLength"] * cellHeight) + "px";
+                    bookings[i]["element"] = bookingGraphic;
+                    bookings[i]["element"].innerHTML = "<p>Booked <br>" + 
+                        String(bookings[i]["startTime"].getHours()).padStart(2, '0') + ":" + 
+                        String(bookings[i]["startTime"].getMinutes()).padStart(2, '0') + " - " + 
+                        String(bookings[i]["endTime"].getHours()).padStart(2, '0') + ":" + 
+                        String(bookings[i]["endTime"].getMinutes()).padStart(2, '0') + "</p>";
+                }
+                startCell.appendChild(bookings[i]["element"]);
             }
         }
-
-        this.getBookings = async function() { // Gets the bookings then displays them.
+        
+        this.changeRoom = async function () {
+            tableDims = table.getBoundingClientRect();
             let roomID = document.getElementById("roomDrop").value; // The list is in order of room id but offset by one due to the default option
+            await getBookings(roomID);
+            displayBookings();
+            console.log(roomID + 1)
+            document.getElementById("roomDesc").innerHTML = rooms[parseInt(roomID) + 1]["description"];
+        }
+
+        let getBookings = async function(roomID) { // Gets the bookings and formats them nicely
+            console.log(roomID);
             if (roomID == -1) {
                 return;
             }
@@ -120,9 +145,30 @@
                 }
             });
             let availability = await response.json();
-            bookings = availability["busy"];
-            displayBookings();
+            rawBookings = availability["busy"];
+            bookings = []; // Reset bookings
+            for (i = 0; i < rawBookings.length; i++) {
+                let ss = rawBookings[i]["start"].split(/[- :TZ]/);
+                let es = rawBookings[i]["end"].split(/[- :TZ]/);
+                let startTime = new Date(Date.UTC(ss[0], ss[1] - 1, ss[2], ss[3], ss[4], 0));
+                let endTime = new Date(Date.UTC(es[0], es[1] - 1, es[2], es[3], es[4], 0));
+                let bookingLength = (endTime.getHours() - startTime.getHours()) + (endTime.getMinutes() - startTime.getMinutes()) / 60;
+                bookings.push({
+                    "startTime": startTime,
+                    "endTime": endTime,
+                    "bookingLength": bookingLength,
+                    "element": null
+                });
+            }
             return;
+        }
+        
+        this.leaveMouse = function () {
+            //peekElement.style.visibility = "hidden";
+        }
+        
+        this.mouseEnter = function () {
+            peekElement.style.visibility = "visible";
         }
 
         this.bookingPeek = async function (e) { // Displays a potential booking over where the mouse hovers.
@@ -184,35 +230,37 @@
             displayBookings();
         }
     }
-
-    async function getRooms(startDate, endDate) { // Need to add error handling at some point.
-        let response = await fetch('http://' + hostAddr + ":" + hostPort + '/rooms?types=community', {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json"
-            }
-        });
-        let rooms = await response.json();
-        return rooms["community"]
-    }
   </script>
 </head>
 <body>
 <div class="container" style="font-size: 100%; position: relative;">
     <h1> Room Booking </h1>
     <p class="mt-2 "> Book a room by first selecting which room you would like to book, then choosing the date, time and duration. </p>
-
-    <select class="browser-default custom-select newDropdown" id="roomDrop" onchange="calender.getBookings()">
-        <option selected="selected" value="-1">Select Room... </option> # Will fetch these from a database
-        <!--<option value="1">Music Room 1 (max 6 persons) £12/hour</option>-->
-    </select>
-    <p class="mt-2" > Select the time by clicking below, then change the duration with the drop down. </p>
+    <div class="row" style="margin-bottom: 5px;">
+        <div class="col-sm-8">
+            <select class="browser-default custom-select newDropdown" id="roomDrop" onchange="calender.changeRoom()">
+                <option selected="selected" value="-1">Select Room... </option> # Will fetch these from a database
+                <!--<option value="1">Music Room 1 (max 6 persons) £12/hour</option>-->
+            </select>            
+        </div>
+        <div class="col-sm-4">
+            <select class="browser-default custom-select newDropdown" id="lengthDrop" onchange="calender.setBookingLength(event)">
+                <option value="30">30 minutes</option>
+                <option selected="selected" value="60">1 hour</option>
+                <option value="90">1 hour 30 minutes</option>
+                <option value="120">2 hours</option>
+            </select>
+        </div>
+    </div>
+    <p id="roomDesc"></p>
+    <p class="mt-2" > Select the time by selecting the date you want below. </p>
     <div class="row">
         <div class="col"><button type="button" class="btn btn-primary newColor" onclick="calender.prevWeek()">Prev</button></div>
         <div class="col" ><h3 id="tableDate"></h3></div>
         <div class="col"><button type="button" class="btn btn-primary newColor" onclick="calender.nextWeek()" style="float: right;">Next</a></div>
     </div>
-    <table class="table newTable newHeight hiddenTable" id="eventTable" style="margin-top:5px; text-align: center;" onclick="calender.placeBooking(event)" onmousemove="calender.bookingPeek(event)"> <!-- Might be smarter to generate this with javascript. -->
+    <div onmouseout="calender.leaveMouse()" onmouseenter="calender.mouseEnter()">
+    <table class="table newTable newHeight hiddenTable" id="eventTable" style="margin-top:5px; text-align: center;" onclick="calender.placeBooking(event)" onmousemove="calender.bookingPeek(event)" > <!-- Might be smarter to generate this with javascript. -->
         <tr style="">
             <th style="width:9%;"></th>
             <th style="width:13%;"></th>
@@ -223,6 +271,7 @@
             <th style="width:13%;"></th>
             <th style="width:13%;"></th>
         </tr>
+    </div>
     <table class="table table-striped newTable newHeight" id="calTable" style="margin-top:-705px; text-align: center;"> <!-- Might be smarter to generate this with javascript. -->
         <thead>
           <tr style="background-color: #C2D6B6">
@@ -372,12 +421,6 @@
           </tr>
         </tbody>
     </table>
-    <select class="browser-default custom-select newDropdown" id="lengthDrop" onchange="calender.setBookingLength(event)">
-        <option value="30">30 minutes</option>
-        <option selected="selected" value="60">1 hour</option>
-        <option value="90">1 hour 30 minutes</option>
-        <option value="120">2 hours</option>
-    </select>
     <table class="table" style="margin-top:30px">
         <tr>
             <td>Room</td>

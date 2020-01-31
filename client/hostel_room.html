@@ -20,7 +20,7 @@
 <br>
 
 <div class="container">
-  <h2>Hostel Room Booking.</h2>
+  <h2>Book your bedrooms here.</h2>
   <p>The Hub boasts 5 bedrooms which sleep between 3 and 8 people in a combination of bunks and single beds.</p>
   <!-- Nav tabs -->
   <ul class="nav nav-tabs" role="tablist">
@@ -63,8 +63,12 @@
 
         <h3>Please fill in the following information</h3>
 
+        <div name="responseField">
+
+        </div>
+
         <label>Number of people: </label>
-        <input type="number" max='8' min='1' value='1' >
+        <input type="number" name = 'maxPeople' min='0' value='0' >
         <br>
       
         <label >Year:</label>
@@ -96,14 +100,38 @@
             <option selected>Select Day... </option>
         </select>
 
-        <label >Any special requirement(s)? </label>
-        <textarea rows="4" cols="100">Do you needs an extra bed? Do you like to use the ketchen?</textarea>
+        <label>Number of nights: </label>
+        <input type="number" name = 'numNights' min='0' value='0' >
+        <br><br>
 
-        <div class="row" style="margin-bottom: 30px;">
+        <label >Any special requirement(s)? </label>
+        <textarea rows="4" cols="100">Do you need an extra bed? Do you like to use the ketchen?</textarea>
+
+        <table class="table" style="margin-top:30px">
+          <tr>
+            <td>Room Number</td>
+            <td>Price per person per night</td>
+            <td>number of people</td> 
+            <td>Selected Date</td>
+            <td>Total Price</td>
+          </tr>
+          <tr>
+            <td name='roomNum'>--</td>
+            <td name='pricePerNight'>--</td>
+            <td name='numOfPeople'>--</td>
+            <td name='duration'>--</td>
+            <td name='total Price'>--</td>
+          </tr>
+        </table>
+
+        <div class="row" style="margin-bottom: 30px;" hidden=true>
           <div class="col-sm-6"></div>
-          <div class="col-sm-2"><a class="btn btn-primary newColor" href="#" role="button" >Book and pay now</a></div>
-          <div class="col-sm-1" style="text-align: center;"><h5>or</h5></div>
-          <div class="col-sm-2"><a class="btn btn-primary newColor" href="#" role="button" >Book and pay at desk</a></div>
+          <div class="col-sm-4"></div>
+          <div class="col-sm-2"><a class="btn btn-primary newColor" href="#" role="button" name='submit'>Book and pay now</a></div>
+        </div>
+
+        <div name="SubmittionResponse">
+
         </div>
 
       </div>
@@ -127,8 +155,12 @@
 
         <h3>Please fill in the following information</h3>
 
+        <div name="responseField">
+
+        </div>
+
         <label>Number of people: </label>
-        <input type="number" max='8' min='1' value='1' >
+        <input type="number" name = 'maxPeople' min='0' value='0' >
         <br>
 
         <label >Year:</label>
@@ -160,14 +192,38 @@
             <option selected>Select Day... </option>
         </select>
 
-        <label >Any special requirement(s)? </label>
-        <textarea rows="4" cols="100">Do you needs an extra bed? Do you like to use the ketchen?</textarea>
+        <label>Number of nights: </label>
+        <input type="number" name = 'numNights' min='0' value='0' >
+        <br><br>
 
-        <div class="row" style="margin-bottom: 30px;">
+        <label >Any special requirement(s)? </label>
+        <textarea rows="4" cols="100">Do you need an extra bed? Do you like to use the ketchen?</textarea>
+
+        <table class="table" style="margin-top:30px">
+          <tr>
+            <td>Room Number</td>
+            <td>Price per person per night</td>
+            <td>number of people</td> 
+            <td>Selected Date</td>
+            <td>Total Price</td>
+          </tr>
+          <tr>
+            <td name='roomNum'>--</td>
+            <td name='pricePerNight'>--</td>
+            <td name='numOfPeople'>--</td>
+            <td name='duration'>--</td>
+            <td name='total Price'>--</td>
+          </tr>
+        </table>
+
+        <div class="row" style="margin-bottom: 30px;" hidden=true>
           <div class="col-sm-6"></div>
-          <div class="col-sm-2"><a class="btn btn-primary newColor" href="#" role="button" >Book and pay now</a></div>
-          <div class="col-sm-1" style="text-align: center;"><h5>or</h5></div>
-          <div class="col-sm-2"><a class="btn btn-primary newColor" href="#" role="button" >Book and pay at desk</a></div>
+          <div class="col-sm-4"></div>
+          <div class="col-sm-2"><a class="btn btn-primary newColor" href="#" role="button" name='submit'>Book and pay now</a></div>
+        </div>
+
+        <div name="SubmittionResponse">
+
         </div>
 
       </div>
@@ -192,8 +248,13 @@
 
         <h3>Please fill in the following information</h3>
 
+        <div name="responseField">
+
+        </div>
+
         <label>Number of people: </label>
-        <input type="number" max='6' min='1' value='1' >
+        <input name = 'maxPeople' type="number" min='0' value='0' >
+        <br>
 
         <label >Year:</label>
         <select class="browser-default custom-select newDropdown" id='year3' >
@@ -224,14 +285,38 @@
             <option selected>Select Day... </option>
         </select>
 
-        <label >Any special requirement(s)? </label>
-        <textarea rows="4" cols="100">Do you needs an extra bed? Do you like to use the ketchen?</textarea>
+        <label>Number of nights: </label>
+        <input type="number" name = 'numNights' min='0' value='0' >
+        <br><br>
 
-        <div class="row" style="margin-bottom: 30px;">
+        <label >Any special requirement(s)? </label>
+        <textarea rows="4" cols="100">Do you need an extra bed? Do you like to use the ketchen?</textarea>
+
+        <table class="table" style="margin-top:30px">
+          <tr>
+            <td>Room Number</td>
+            <td>Price per person per night</td>
+            <td>number of people</td> 
+            <td>Selected Date</td>
+            <td>Total Price</td>
+          </tr>
+          <tr>
+            <td name='roomNum'>--</td>
+            <td name='pricePerNight'>--</td>
+            <td name='numOfPeople'>--</td>
+            <td name='duration'>--</td>
+            <td name='total Price'>--</td>
+          </tr>
+        </table>
+
+        <div class="row" style="margin-bottom: 30px;" hidden=true>
           <div class="col-sm-6"></div>
-          <div class="col-sm-2"><a class="btn btn-primary newColor" href="#" role="button" >Book and pay now</a></div>
-          <div class="col-sm-1" style="text-align: center;"><h5>or</h5></div>
-          <div class="col-sm-2"><a class="btn btn-primary newColor" href="#" role="button" >Book and pay at desk</a></div>
+          <div class="col-sm-4"></div>
+          <div class="col-sm-2"><a class="btn btn-primary newColor" href="#" role="button" name='submit'>Book and pay now</a></div>
+        </div>
+
+        <div name="SubmittionResponse">
+
         </div>
 
       </div>
@@ -255,8 +340,13 @@
       <div class="form-group">
         <h3>Please fill in the following information</h3>
 
+        <div name="responseField">
+
+        </div>
+
         <label>Number of people: </label>
-        <input type="number" max='3' min='1' value='1' >
+        <input type="number" name = 'maxPeople'  min='0' value='0' >
+        <br>
 
         <label >Year:</label>
         <select class="browser-default custom-select newDropdown" id='year4' >
@@ -287,14 +377,38 @@
             <option selected>Select Day... </option>
         </select>
 
-        <label >Any special requirement(s)? </label>
-        <textarea rows="4" cols="100">Do you needs an extra bed? Do you like to use the ketchen?</textarea>
+        <label>Number of nights: </label>
+        <input type="number" name = 'numNights' min='0' value='0' >
+        <br><br>
 
-        <div class="row" style="margin-bottom: 30px;">
+        <label >Any special requirement(s)? </label>
+        <textarea rows="4" cols="100">Do you need an extra bed? Do you like to use the ketchen?</textarea>
+
+        <table class="table" style="margin-top:30px">
+          <tr>
+            <td>Room Number</td>
+            <td>Price per person per night</td>
+            <td>number of people</td> 
+            <td>Selected Date</td>
+            <td>Total Price</td>
+          </tr>
+          <tr>
+            <td name='roomNum'>--</td>
+            <td name='pricePerNight'>--</td>
+            <td name='numOfPeople'>--</td>
+            <td name='duration'>--</td>
+            <td name='total Price'>--</td>
+          </tr>
+        </table>
+
+        <div class="row" style="margin-bottom: 30px;" hidden=true>
           <div class="col-sm-6"></div>
-          <div class="col-sm-2"><a class="btn btn-primary newColor" href="#" role="button" >Book and pay now</a></div>
-          <div class="col-sm-1" style="text-align: center;"><h5>or</h5></div>
-          <div class="col-sm-2"><a class="btn btn-primary newColor" href="#" role="button" >Book and pay at desk</a></div>
+          <div class="col-sm-4"></div>
+          <div class="col-sm-2"><a class="btn btn-primary newColor" href="#" role="button" name='submit'>Book and pay now</a></div>
+        </div>
+
+        <div name="SubmittionResponse">
+
         </div>
 
       </div>
@@ -316,8 +430,12 @@
 
   	 	<div class="form-group">
         <h3>Please fill in the following information.</h3>
+        <div name="responseField">
+
+        </div>
         <label>Number of people: </label>
-        <input type="number" max='8' min='1' value='1' >
+        <input type="number" name = 'maxPeople' min='0' value='0' >
+        <br>
 
         <label >Year:</label>
         <select class="browser-default custom-select newDropdown" id='year5' >
@@ -348,15 +466,38 @@
             <option selected>Select Day... </option>
         </select>
 
+        <label>Number of nights: </label>
+        <input type="number" name = 'numNights' min='0' value='0' >
+        <br><br>
+
         <label >Any special requirement(s)? </label>
+        <textarea rows="4" cols="100">Do you need an extra bed? Do you like to use the ketchen?</textarea>
 
-        <textarea rows="4" cols="100">Do you needs an extra bed? Do you like to use the ketchen?</textarea>
+        <table class="table" style="margin-top:30px">
+          <tr>
+            <td>Room Number</td>
+            <td>Price per person per night</td>
+            <td>number of people</td>
+            <td>Selected Date</td>
+            <td>Total Price</td>
+          </tr>
+          <tr>
+            <td name='roomNum'>--</td>
+            <td name='pricePerNight'>--</td>
+            <td name='numOfPeople'>--</td>
+            <td name='duration'>--</td>
+            <td name='total Price'>--</td>
+          </tr>
+        </table>
 
-        <div class="row" style="margin-bottom: 30px;">
+        <div class="row" style="margin-bottom: 30px;" hidden=true>
           <div class="col-sm-6"></div>
-          <div class="col-sm-2"><a class="btn btn-primary newColor" href="#" role="button" >Book & pay now</a></div>
-          <div class="col-sm-1" style="text-align: center;"><h5>or</h5></div>
-          <div class="col-sm-2"><a class="btn btn-primary newColor" href="#" role="button" >Book & pay at desk</a></div>
+          <div class="col-sm-4"></div>
+          <div class="col-sm-2"><a class="btn btn-primary newColor" href="#" role="button" name='submit'>Book and pay now</a></div>
+        </div>
+
+        <div name="SubmittionResponse">
+
         </div>
 
       </div>

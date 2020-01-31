@@ -276,11 +276,12 @@ async function checkCustomerExists(customerID, resp) {
           // if customer in database
           if (customer.length == 1) {
               // return true
-              resp.status(200).send(JSON.stringify(true));;
+              return true
             }
+            return false
           }else{
             //no matches
-            resp.status(200).send('0matches');
+            return false
           }
         }catch (error) {
           console.log ('Error: ' + error);
@@ -420,11 +421,11 @@ async function bookings(customerID, resp) {
 app.get('/customerbookings', async function(req, resp) {
     // customer ID
     const customerID = req.query.id;
-
     // if ID specified
     if (customerID) {
         // check customer exists
         if (await checkCustomerExists(customerID, resp)) {
+
             // get dictionary of bookings
             const bookingsToReturn = await bookings(customerID, resp);
             // send bookings
