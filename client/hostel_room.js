@@ -216,16 +216,46 @@ function daysInMonth(year, month) {
 
 
 function fillDayDrop(year, month,dayValue){
-  daysDrop = document.getElementById(dayValue);
-  for(var i=1; i<=daysInMonth(year,month);i++){
-    var d = new Date();
-    var today=d.getDate();
-    if(i>=today){
-      let option = document.createElement("option")
-      option.text = i.toString().padStart(2,'0'); 
-      daysDrop.add(option); 
-    }
+
+  var selec=document.getElementById(dayValue)
+  for (var i=0 ;i<selec.options.length;){
+    selec.removeChild(selec.options[i]); 
   }
+
+  var d = new Date();
+  var today=d.getDate();
+  var currentYear=d.getFullYear();
+  var currentMonth = d.getMonth()+1;
+  var nomonth=Number(month)
+  var noyear=Number(year)
+
+  if(noyear==currentYear &&nomonth==currentMonth){
+    daysDrop = document.getElementById(dayValue);
+    
+    for(var i=1; i<= daysInMonth(year,month);i++){
+      if (i>=today){
+        
+        
+        let option = document.createElement("option")
+        option.text = i.toString().padStart(2,'0'); 
+        daysDrop.add(option); 
+      }
+     
+    }
+  } else{
+    daysDrop = document.getElementById(dayValue);
+   
+      for(var i=1; i<=daysInMonth(year,month);i++){
+
+        
+        let option = document.createElement("option")
+        option.text = i.toString().padStart(2,'0'); 
+        daysDrop.add(option); 
+      }
+    }
+
 }
+  
+
 
 
