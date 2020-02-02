@@ -173,6 +173,7 @@
 
         this.bookingPeek = async function (e) { // Displays a potential booking over where the mouse hovers.
             tableDims = table.getBoundingClientRect();
+            colWidth = tableDims.width * 0.13; 
             let calX = tableDims.left;
             let calY = tableDims.top;
             let leftCol = eTable.rows[0].cells[0].offsetWidth + calX; // pos of left column
