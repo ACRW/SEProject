@@ -788,6 +788,38 @@ app.get('/communityroomprice', async function(req,resp) {
     }
 });
 
+//booking requests
+
+app.get('/bookingrequests', async function(req,resp){
+
+  //set up request object
+  let request = {}
+
+  //fetch all activity requests
+  const activityRequests = await performQuery('SELECT r.id, r.dateTime, a.name, a.description, a.price, a.roomNeeded, c.fName, c.lName, c.email, c.phone FROM activityRequests AS r INNER JOIN customers AS c ON r.userId = c.id INNER JOIN activities AS a ON r.activityId = a.id ')
+  console.log(activityRequests)
+  if(processQueryResult(activityRequests, resp)){
+
+    //fetch all community booking requests
+    const communityRequests = await performQuery('SELECT r.id, r.start, r.end, r.priceOfBooking, co.name, co.description, cu.fName, cu.lName, cu.email, cu.phone  FROM tcr_hub.communityRequest AS r INNER JOIN tcr_hub.customers AS cu ON r.userId = cu.id INNER JOIN tcr_hub.communityRooms AS co ON r.roomId = co.id ')
+    console.log(communityRequests)
+    if(processQueryResult(activityRequests, resp)){
+
+      //fetch all hostel room bookings
+      const hostelRequests = await performQuery('SELECT r.id, r.startDate, r.endDate, r.price, r.noOfPeople, hr.roomNumber, c.fName, c.lName, c.email, c.phone  FROM hostelRequests AS r INNER JOIN customers AS c ON r.userId = c.id INNER JOIN hostelRooms AS hr ON r.roomId = hr.id ')
+      console.log(hostelRequests)
+      if(processQueryResult(hostelRequests,resp)){
+        request['activity'] = activityRequests
+        request['community'] = communityRequests
+        request['hostel'] = hostelRequests
+
+        resp.status(200).send(JSON.stringify(request));
+      }
+    }
+  }
+
+});
+
 // user accounts
 
 // look into HTTPS

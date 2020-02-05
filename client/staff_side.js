@@ -289,6 +289,11 @@ document.addEventListener("DOMContentLoaded", function () {
   document.getElementById('customerId').addEventListener('change',function(){
     getUserBookings()
   })
+
+  //when notifications selected
+  document.getElementById('notificationButton').addEventListener('click',function(){
+    getNotifications()
+  })
 });
 
 //runs get request to search for user in database and displays results
@@ -1450,5 +1455,30 @@ async function createNewEvent(){
 }catch(error){
   alert('Error' + error)
 }
+}
 
+//get all bookings still awaiting approval
+async function getNotifications(){
+
+  //get all requests
+  try{
+    let response = await fetch('http://localhost:8090/bookingrequests',
+    {
+      method: 'GET',
+      headers: {
+          "Content-Type": "application/json"
+        }
+    });
+
+    //if response is ok
+    if(response.ok){
+      var body = await response.text();
+      var requests = JSON.parse(body)
+      console.log(requests)
+    }else{
+      throw new Error('Error  ' + response.code);
+    }
+  }catch(error){
+    alert('Error' + error)
+  }
 }
