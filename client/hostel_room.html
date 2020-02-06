@@ -13,6 +13,57 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+  <style type="text/css">
+      #cldFrame{
+      position: relative;
+      width: 440px;
+      
+    }
+    #cldBody{
+        
+        
+        width: 420px;
+    }
+    #top{
+        position: relative;
+        height: 60px;
+        text-align: center;
+        line-height: 60px;
+    }
+    #topDate{
+        font-size: 30px;
+    }
+    .curDate{
+        color: red;
+        font-weight: bold;
+    }
+    
+    table{
+        background-color: #C2D6B6;
+    }
+    #week td{
+        font-size: 20px;
+        font-weight: bold;
+    }
+    td{
+        height: 60px;
+        width: 60px;
+        text-align: center;
+        
+        font-size: 20px;
+    }
+    #left, #right{
+        position: absolute;
+        width: 60px;
+        height: 60px;
+    }
+    #left{left: 0px;}
+    #right{right: 0px;}
+    #left:hover, #right:hover{
+        background-color: rgba(30, 30, 30, 0.2);
+    }
+  </style>
 	
 </head>
 <body>
@@ -20,24 +71,24 @@
 <br>
 
 <div class="container">
-  <h2>Book your bedrooms here.</h2>
+  <h2 style="color: #A5B686 ;">Book your bedrooms here.</h2>
   <p>The Hub boasts 5 bedrooms which sleep between 3 and 8 people in a combination of bunks and single beds.</p>
   <!-- Nav tabs -->
   <ul class="nav nav-tabs" role="tablist">
     <li class="nav-item">
-      <a class="nav-link active" data-toggle="tab" href="#type1" style="color: #A5B686;font-size: 25px;">Room 1</a>
+      <a class="nav-link active" data-toggle="tab" href="#type1" style="color:gray;font-size: 25px;">Room 1</a>
     </li>
     <li class="nav-item">
-      <a class="nav-link" data-toggle="tab" href="#type2" style="color: #A5B686 ;font-size: 25px;">Room 2</a>
+      <a class="nav-link" data-toggle="tab" href="#type2" style="color:gray;font-size: 25px;">Room 2</a>
     </li>
     <li class="nav-item">
-      <a class="nav-link" data-toggle="tab" href="#type3" style="color: #A5B686 ;font-size: 25px;">Room 3</a>
+      <a class="nav-link" data-toggle="tab" href="#type3" style=" color:gray;font-size: 25px;">Room 3</a>
     </li>
     <li class="nav-item">
-      <a class="nav-link" data-toggle="tab" href="#type4" style="color: #A5B686 ;font-size: 25px;">Room 4</a>
+      <a class="nav-link" data-toggle="tab" href="#type4" style="color:gray;font-size: 25px;">Room 4</a>
     </li>
       <li class="nav-item">
-      <a class="nav-link" data-toggle="tab" href="#type5" style="color: #A5B686 ;font-size: 25px;">Room 5</a>
+      <a class="nav-link" data-toggle="tab" href="#type5" style="color:gray;font-size: 25px;">Room 5</a>
     </li>
   </ul>
 
@@ -45,8 +96,11 @@
   <div class="tab-content">
 
     <div id="type1" class="container tab-pane active"><br>
-
-      <img name="eventPic" id="0" src="webimage/Accommodation.jpg" alt='room' >
+      
+      <div style="width: 400px;height: 380px; display: flex;align-items: center;">
+        <img name="eventPic" id="0" src="webimage/Accommodation.jpg" alt='room' style="width: auto;height: 100%">
+      </div>
+      
 
       <div style=' margin-top: 20px; '>
         <h3>Description: Room 1 sleeps 8 in bunk beds.</h3>
@@ -68,63 +122,72 @@
         </div>
 
         <label>Number of people: </label>
-        <input type="number" name = 'maxPeople' min='0' value='0' >
+        <input type="number" name = 'maxPeople' min='0' value='0' id='maxpeople'>
         <br>
-      
-        <label >Year:</label>
-        <select class="browser-default custom-select newDropdown " id='year1' >
-            <option selected>Select Year... </option>
-            <option value="2020">2020</option>
-            <option value="2021">2021</option>
-        </select>
+      </div>
+
+<!--calendar-->
+      <div class="calendar form-group">
+        <p>Please choose the start date and the end date of your booking from the calendar:</p>
+
+        <div id="cldFrame">
+          <div id="cldBody">
+              <table >
+                <thead>
+                  <tr>
+                    <td colspan="7">
+                        <div id="top">
+                            <span id="left">&lt;</span>
+                            <span id="topDate">waitforjs</span>
+                            <span id="right">&gt;</span>
+                        </div>
+                    </td>
+                  </tr>
+                  <tr id="week">
+                      <td>Sun</td>
+                      <td>Mon</td>
+                      <td>Tue</td>
+                      <td>Wed</td>
+                      <td>Thu</td>
+                      <td>Fri</td>
+                      <td>Sat</td>
+                  </tr>
+                  </thead>
+                  <tbody id="tbody"></tbody>
+              </table>
+          </div>
+        </div>
+        <br>
+        <p>Start Date:</p> <P id='startdate1'>--</P>
+        <p>End Date:</p> <P id='enddate1'>--</P>
+      </div>
+
         
-        <label id='month'>Month:</label>
-        <select class="browser-default custom-select newDropdown"  id='month1'>
-            <option selected>Select Month... </option>
-            <option value="01">January</option>
-            <option value="02">February</option>
-            <option value="03">March</option>
-            <option value="04">April</option>
-            <option value="05">May</option>
-            <option value="06">June</option>
-            <option value="07">July</option>
-            <option value="08">August</option>
-            <option value="09">September</option>
-            <option value="10">October</option>
-            <option value="11">November</option>
-            <option value="12">December</option>
-        </select>
-
-        <label >Day:</label>
-        <select class="browser-default custom-select newDropdown" id='day1'>
-            <option selected>Select Day... </option>
-        </select>
-
-        <label>Number of nights: </label>
-        <input type="number" name = 'numNights' min='0' value='0' >
-        <br><br>
-
-        <label >Any special requirement(s)? </label>
-        <textarea rows="4" cols="100">Do you need an extra bed? Do you like to use the ketchen?</textarea>
+      <div class="form-group" style="padding-top: 20px;">
+        <p>Please check your information in the table:</p>
 
         <table class="table" style="margin-top:30px">
           <tr>
             <td>Room Number</td>
             <td>Price per person per night</td>
             <td>number of people</td> 
-            <td>Selected Date</td>
+            <td>Start Date</td>
+            <td>End Date</td>
             <td>Total Price</td>
           </tr>
           <tr>
             <td name='roomNum'>--</td>
-            <td name='pricePerNight'>--</td>
-            <td name='numOfPeople'>--</td>
-            <td name='duration'>--</td>
-            <td name='total Price'>--</td>
+            <td name='pricePerNight' id='price'>--</td>
+            <td name='numOfPeople' id='peoplenum'>--</td>
+            <td name='startday'id='startdate11'>--</td>
+            <td name='endday' id='enddate11'>--</td>
+            <td name='totalPrice' id='totalprice1'>--</td>
           </tr>
         </table>
 
-        <div class="row" style="margin-bottom: 30px;" hidden=true>
+        
+        <div class="row" style="margin-bottom: 30px;" >
+
           <div class="col-sm-6"></div>
           <div class="col-sm-4"></div>
           <div class="col-sm-2"><a class="btn btn-primary newColor" href="#" role="button" name='submit'>Book and pay now</a></div>
@@ -136,6 +199,13 @@
 
       </div>
     </div>
+
+
+
+
+
+
+
 
     <div id="type2" class="container tab-pane fade"><br>
       <img name="eventPic" id="0" src="webimage/Accommodation.jpg" alt='room'>     
@@ -211,8 +281,9 @@
             <td name='roomNum'>--</td>
             <td name='pricePerNight'>--</td>
             <td name='numOfPeople'>--</td>
-            <td name='duration'>--</td>
-            <td name='total Price'>--</td>
+            <td name='startday'>--</td>
+            <td name='endday'>--</td>
+            <td name='totalPrice'>--</td>
           </tr>
         </table>
 
@@ -304,8 +375,9 @@
             <td name='roomNum'>--</td>
             <td name='pricePerNight'>--</td>
             <td name='numOfPeople'>--</td>
-            <td name='duration'>--</td>
-            <td name='total Price'>--</td>
+            <td name='startday'>--</td>
+            <td name='endday'>--</td>
+            <td name='totalPrice'>--</td>
           </tr>
         </table>
 
@@ -396,8 +468,9 @@
             <td name='roomNum'>--</td>
             <td name='pricePerNight'>--</td>
             <td name='numOfPeople'>--</td>
-            <td name='duration'>--</td>
-            <td name='total Price'>--</td>
+            <td name='startday'>--</td>
+            <td name='endday'>--</td>
+            <td name='totalPrice'>--</td>
           </tr>
         </table>
 
@@ -485,8 +558,9 @@
             <td name='roomNum'>--</td>
             <td name='pricePerNight'>--</td>
             <td name='numOfPeople'>--</td>
-            <td name='duration'>--</td>
-            <td name='total Price'>--</td>
+            <td name='startday'>--</td>
+            <td name='endday'>--</td>
+            <td name='totalPrice'>--</td>
           </tr>
         </table>
 
@@ -501,6 +575,12 @@
         </div>
 
       </div>
+
+
+
+
+
+
     </div>
 
   </div>
