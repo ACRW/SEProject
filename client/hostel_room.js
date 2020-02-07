@@ -97,6 +97,7 @@ updateHostel();
 // synchronize number of people info into the payment table
 
 
+
 submitBooking = async(index, customerid, roomid, start, end) => {
   const url ='/staffhostelbooking';
   const queryParams ='';
@@ -256,39 +257,6 @@ function preMonth(){
     showCld(year, preMonth, weekday, dayinmonth);
 }
 
-
-
-getHostel = async() => {
-  const url ='/rooms';
-  const queryParams ='?types=hostel';
-  const endpoint = `${url}${queryParams}`
-  try{
-    const response = await fetch( endpoint, {
-      method:"GET",
-      headers:{
-        "Content-Type": "application/json"
-      }
-    })
-    if(response.ok){
-        const jsonResponse = await response.json();
-        // render json response
-        if(jsonResponse.error){
-          responseField.innerHTML = "<p>Sorry, error occurs.</p><p> Try later.</p>";
-          payButtons.disable = true;
-          paymentTable.style.display = "none";
-        } else {
-          return jsonResponse["hostel"]
-        }
-      }
-    // get element do the replacement 
-    responseField.innerHTML = "<p>Sorry, No hostel room available.</p><p>Please wait for release.</p>";
-    paymentButton.disable = true;
-    paymentTable.style.display = "none";
-    throw new Error('Error getting hostel.' + response.code);
-  }catch(error){
-    alert ('Error: ' + error + ' Possible solution: check your internet connection');
-  }
-}
 
 async function roomstatus(roomid){
 
