@@ -848,7 +848,7 @@ app.post('/customersignin', async function(req, resp) {
             // if customer in database
             if (customer.length == 1) {
                 // refresh session
-                req.session.regenerate(function (error) {
+                req.session.regenerate(function(error) {
                     // if regeneration failed
                     if (error) {
                         // session error
@@ -926,8 +926,6 @@ app.post('/newcustomer', async function(req, resp) {
                 if (processQueryResult(result, resp)) {
                     // if one row inserted
                     if (result['affectedRows'] == 1) {
-                        // create session here
-
                         // get customer's name
                         const customer = await performQuery('SELECT fName, lName FROM customers WHERE id = ' + customerID);
 
@@ -936,8 +934,23 @@ app.post('/newcustomer', async function(req, resp) {
                             // customer's name
                             const customerDetails = {'fname': customer[0]['fName'], 'sname': customer[0]['lName']};
 
-                            // send customer's name
-                            resp.status(200).send(JSON.stringify(customerDetails));
+                            // refresh session
+                            req.session.regenerate(function(error) {
+                                // if regeneration failed
+                                if (error) {
+                                    // session error
+                                    resp.status(500).send('0session');
+
+                                } else {
+                                    // set session variables
+                                    req.session.active = true;
+                                    req.session.type = 'customer';
+                                    req.session.userID = customerID;
+
+                                    // send customer's name
+                                    resp.status(200).send(JSON.stringify(customerDetails));
+                                }
+                            });
                         }
 
                     // customer not in database
@@ -957,6 +970,45 @@ app.post('/newcustomer', async function(req, resp) {
     } else {
         // customer ID error
         resp.status(400).send('0customerID');
+    }
+});
+
+// sign user out
+app.post('/signout', async function(req, resp) {
+    // if user active
+    if (req.session.active) {
+        // destroy session
+        req.session.destroy(function(error) {
+            // if destruction failed
+            if (error) {
+                // session error
+                resp.status(500).send('0session');
+
+            } else {
+                // success message
+                resp.status(200).send('1success');
+            }
+        });
+
+    } else {
+        // activity error
+        resp.status(403).send('0inactive');
+    }
+});
+
+// current user
+app.get('/currentuser', async function(req, resp) {
+    // if session active
+    if (req.session.active) {
+        // session information
+        const sessionInformation = {'type': req.session.type, 'userID': req.session.userID};
+
+        // send session information
+        resp.status(200).send(JSON.stringify(sessionInformation));
+
+    } else {
+        // activity error
+        resp.status(403).send('0inactive');
     }
 });
 
