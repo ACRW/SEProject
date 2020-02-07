@@ -51,7 +51,7 @@ async function onSignIn(googleUser) {
 }
 
 window.addEventListener('DOMContentLoaded', function() {
-    document.getElementById('signOut').addEventListener('click', function() {
+    document.getElementById('signOut').addEventListener('click', async function() {
         event.preventDefault();
 
         let auth2 = gapi.auth2.getAuthInstance();
@@ -60,6 +60,18 @@ window.addEventListener('DOMContentLoaded', function() {
         document.getElementById('userMenu').setAttribute('hidden', '');
         document.getElementById('contentCard').setAttribute('hidden', '');
         document.getElementById('signOutCard').removeAttribute('hidden');
+
+        let response = await fetch('/signout',
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            }
+        });
+
+        const responseBody = await response.text();
+
+        console.log(responseBody);
 
         // need to destroy session
     });
