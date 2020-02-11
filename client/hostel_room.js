@@ -1,389 +1,466 @@
+////// Selecting page elements //////
+const responseField = document.getElementById("responseField");// error message place 
 
-// Selecting page elements
-const responseField = document.getElementsByName("responseField");//error message
-const showUser = document.getElementsByName("SubmittionResponse");//submission message
-const maxPeople = document.getElementsByName('maxPeople'); // input field 
+const maxPeople = document.getElementById("maxPeople"); // input field 
 
-const paymentTable = document.getElementsByClassName("table"); // table
-const pricePerNight = document.getElementsByName('pricePerNight'); // table content 2
-const numOfPeople = document.getElementsByName('numOfPeople'); // table content 3
+const wholeCalender = document.getElementById("cldFrame"); // whole calender
+const startDateCalender = document.getElementById("startDateCalender"); // start date of the calander
+const endDateCalender = document.getElementById("endDateCalender"); // end date of the calander
 
-var startday=document.getElementsByName('startday');
-var endday=document.getElementsByName('endday');
+//const paymentTable = document.getElementsByClassName("table"); // whole table
+const roomNumTable=document.getElementById("roomNum"); // table content 1
+const pricePerNight = document.getElementById('pricePerNight'); // table content 2
+const numOfPeople = document.getElementById('numOfPeople'); // table content 3
+const startDateTable=document.getElementById('startDayTable');// table content 4
+const endDateTable=document.getElementById('endDayTable');// table content 5
+const durationTable=document.getElementById('duration');// table content 6
+/*为什么加上这个就错了？*/
+const totalPrice = document.getElementById('totalPrice'); // table content 7
 
-const totalPrice = document.getElementsByName('totalPrice'); // table content 5
-const payButtons = document.getElementsByClassName("row"); // button display
-const bookButtons = document.getElementsByName('submit'); // button itself
-
-console.log(maxPeople)
-
-// const paymentButton = document.getElementById("fat-btn");
-
-// AJAX function
-// when open the page, fetch hostel infor from the database
-getHostel = async() => {
-  const url ='/rooms';
-  const queryParams ='?types=hostel';
-  const endpoint = `${url}${queryParams}`
-  try{
-    const response = await fetch( endpoint, {
-      method:"GET",
-      headers:{
-        "Content-Type": "application/json"
-      }
-    })
-    if(response.ok){
-        const jsonResponse = await response.json();
-        // render json response
-        if(jsonResponse.error){
-          responseField.innerHTML = "<p>Sorry, error occurs.</p><p> Try later.</p>";
-          payButtons.disable = true;
-          paymentTable.style.display = "none";
-        } else {
-          return jsonResponse["hostel"]
-        }
-      }
-    // get element do the replacement 
-    responseField.innerHTML = "<p>Sorry, No hostel room available.</p><p>Please wait for release.</p>";
-    paymentButton.disable = true;
-    paymentTable.style.display = "none";
-    throw new Error('Error getting hostel.' + response.code);
-  }catch(error){
-    alert ('Error: ' + error + ' Possible solution: check your internet connection');
-  }
-}
-
-// use hostel info fetched to update the html
-updateHostel = async() => {
-  const rooms = await getHostel();
-  if(rooms == 'Error'){
-    responseField.innerHTML = 'Error fetching hostel rooms'
-  }else{
-    // change in the summary box
-    // room type, Price per person per night
-    
-
-    // change the max in the number of people label
-    const roomNum = document.getElementsByName('roomNum');
-    console.log(roomNum)
-
-    for(i=0; i<rooms.length; i++){
-      // update limit
-      maxPeople[i].max = rooms[i]['noOfPeople']
-      // update payment table
-      roomNum[i].innerHTML = rooms[i]['roomNumber']
-      pricePerNight[i].innerHTML = rooms[i]['pricePerNight']
+const submitButton =document.getElementById("submitButton"); // the submittion button
 
 
+////// All functions //////
 
-      // find not avialable nights
-      let weekInfo = rooms[i]['nights']
-      let NotBookableDate = [];
-      for(j=0; j<weekInfo.length; j++){
-        if(weekInfo[j] === '0'){
-          NotBookableDate.push(j);
-        }
-      }
-      // update calender 
-      // Loretta PLZ HELP ME HERE!!!!! //
-    }
+/// calender functions ///
 
-    
-  }
-}
-
-updateHostel();
-
-// synchronize number of people info into the payment table
-
-
-
-submitBooking = async(index, customerid, roomid, start, end) => {
-  const url ='/staffhostelbooking';
-  const queryParams ='';
-  const endpoint = `${url}${queryParams}`
-  try{
-    const response = await fetch( endpoint, {
-      method:"POST",
-      headers:{
-        "Content-Type": "application/json",
-      },
-      body:{
-        customerid:0, // fake for now
-        roomid: roomid,
-        start: start,
-        end: end
-      }
-    })
-    if(response.ok){
-      showUser[index].innerHTML = "<p>Order submitted successfully.</p><p> Cheer</p>";
-      payButtons[index].disable = true;
-    }else{
-      showUser[index].innerHTML = "<p>Submission failed.</p><p> Please try agin.</p>";
-      throw new Error('Error booking hostel.' + response.code);
-    }
-  }catch(error){
-    alert ('Error: ' + error + ' Possible solution: check your internet connection');
-  }
-}
-
-
-
-
-//get which day is firstday in a week
+// get which weekday is the first day in a month
+// year= yyyy, month = 1-12
+// return a number 0-6 // 0 =sun,6=sat
 function getWeekday(year,month){
-    var d= new Date();
-    d.setFullYear(year);
-    d.setMonth(month-1);
-    d.setDate(1);
-    weekday=d.getDay();
-    return weekday
+  let d= new Date();
+  d.setFullYear(year);
+  d.setMonth(month-1);
+  d.setDate(1);
+  const weekday=d.getDay();
+  return weekday
 }
 
-//add zero before number
+// add zero before number
+// num is the number
+// length is how long you want the string be
+// addzero(11,4) returns 0011
+// addzero(4,11) returns 00000000004
+// addzero(123445677, 4) returns 5677
 function addzero(num, length) {    
-        return (Array(length).join("0") + num).slice(-length);
+  return (Array(length).join("0") + num).slice(-length);
+};
+
+// get week info, return Error if error
+// return the not vialable pattern of the room
+const getWeekInfo = async(roomid) =>{
+  const rooms = await getHostel();
+  if(rooms == "Error"){
+    responseField.innerHTML = "<p>Error fetching hostel rooms</P>";
+    return "Error";
+  }else{
+    let weekInfo = rooms[roomid]['nights'];
+    return weekInfo;
+  }
+
+};
+
+// year= yyyy, month* = 0-11
+// return a proper calander. the already booked date colored grey 
+async function roomstatus(year,month,roomid){
+  let i;
+  let response = await fetch('/roomavailability?type=hostel&id=' + roomid, {
+    method: "GET",
+    headers: {
+        "Content-Type": "application/json"
     }
+  });
+  let availability = await response.json();
+  /* what inside json
+  {"nights":"1111100",
+  "id":"0",
+  "busy":[{"startDate":"2020-02-23T00:00:00.000Z","endDate":"2020-03-17T00:00:00.000Z"},
+          {"startDate":"2020-02-23T00:00:00.000Z","endDate":"2020-03-17T00:00:00.000Z"},
+          {"startDate":"2020-02-23T00:00:00.000Z","endDate":"2020-03-17T00:00:00.000Z"}]}
+  */
+  const bookings = availability["busy"];// get the list
+  console.log(bookings)
+  let startlist=[];
+  let endlist=[];
+
+  for(i=0;i<bookings.length;i++){// each day from the list
+    const start=bookings[i].startDate; // "2020-02-23T00:00:00.000Z"
+    const end=bookings[i].endDate; // "2020-03-17T00:00:00.000Z"
+    startlist.push(start.substring(0,10));// 2020-02-23
+    endlist.push(end.substring(0,10));//2020-03-17
+      
+  }
+  
+
+  for(i=0;i<startlist.length;i++) { // for each pair of date
+    /*key is, we only need to calculte the not available day of the month*/
+    let id1=startlist[i];
+    let ida=id1.split('-'); // [ '2020', '02', '23' ]2020 2
+    let id2=endlist[i];
+    let idb=id2.split('-'); // [ '2020', '03', '17' ]
+
+    let year1 = Number(ida[0]);
+    let month1 = Number(ida[1])-1;
+    let day1 = Number(ida[2]);
+    let date1 = new Date(year1,month1,day1);//start date
+
+    let year2 = Number(idb[0]);
+    let month2 = Number(idb[1])-1;
+    let day2 = Number(idb[2]);
+    let date2 = new Date(year2,month2,day2);//end date
+    console.log(date2)
+
+    let dayinmonth=new Date(year,month+1,0).getDate();//days=28~31 as number of days in this month
+
+    for(let day=1;day<=dayinmonth;day++){//for each day in the calander
+      let dateNow = new Date(year,month,day);
+      if(dateNow<date1){
+        //do nothing
+      }else if(date1<=dateNow && dateNow<= date2){
+        //colored grey
+        let fixeday=addzero(day,2);
+        let fixedmonth=addzero(month+1,2);
+        let idvalue=year+'-'+fixedmonth+'-'+fixeday;
+        let cell=document.getElementById(idvalue);
+        if(cell){// find it and colored grey
+          cell.bgColor='gray';
+        }
+      }else{
+        //do nothing 
+      };
+    };
+  };
+
+};
 
 //calendar basic display
-function showCld(year, month, firstDay,days){
-    var i;
-    var tagClass = "";
-    var nowDate = new Date();
-    var today=nowDate.getDate();
+// set calander，grey pastdays，roomstates？？
+// year= yyyy, month* = 0-11
+// firstDay =0-6(which weekday is first day in this month)0 =sun,6=sat| 
+// days=28~31 as number of days in this month
+// roomid = roomid stored in the database
+function showCld(year, month, firstDay, days, roomid,weekInfo){
+  var i;
+  var tagClass = "";
+  var nowDate = new Date();
+  var today=nowDate.getDate();
+  let curMonth = nowDate.getMonth()+1;
+  let curYear = nowDate.getFullYear();
+  month = month+1
 
-    //add current year and month to the top
-    var topdateHtml = year  + '-'+month;
-    var topDate = document.getElementById('topDate');
-    topDate.innerHTML = topdateHtml;    
-    
-    //add days
-    var tbodyHtml = '<tr>';
-    
-    //blank before first day
-    for(i=0; i<firstDay; i++){
-        tbodyHtml += "<td></td>";
-    }
-   
-    var changLine = firstDay;
-
-    for(i=1; i<=days; i++){
-      // set class for current day and other days.
-        if(year == nowDate.getFullYear() && month == nowDate.getMonth()+1 && i == today) {
-            tagClass = "curDate";
-        } 
-        else{ 
-            tagClass = "isDate";
-        }  
-        //fill in the table, add class and id to each cell
-        fixedmonth=addzero(month,2)
-        fixedday=addzero(i,2)
-        idvalue=year+'-'+fixedmonth+'-'+fixedday
-        
-        tbodyHtml += "<td class=" + tagClass + " id="+idvalue +">" + i + "</td>";
-        
-        changLine = (changLine+1)%7;
-
-        //whether change the line
-        if(changLine == 0 && i != days){
-            tbodyHtml += "</tr><tr>";
-        } 
-    }
-
-    if(changLine!=0){
-        for (i=changLine; i<7; i++) {
-            tbodyHtml += "<td></td>";
-        }
-    }   
-
-    tbodyHtml +="</tr>";
-    var tbody = document.getElementById('tbody');
-    tbody.innerHTML = tbodyHtml;
-
-    //gray the past days
-    for(x=today-1;x>=1;x--){
-        fixedx=addzero(x,2)
-        idvalue1=year+'-'+fixedmonth+'-'+fixedx
-        document.getElementById(idvalue1).bgColor='gray'
-    }
-
-
-    //display bookings
-    roomstatus(0)
-    
-}
-
-
-function nextMonth(){
-    var topStr = document.getElementById("topDate").innerHTML;
-    var pattern = /\d+/g;
-    var listTemp = topStr.match(pattern);
-    var year = Number(listTemp[0]);
-    var month = Number(listTemp[1]);
-    
-    var nextMonth = month+1;
-    if(nextMonth > 12){
-        nextMonth = 1;
-        year++;
-    }
-    var weekday=getWeekday(year,nextMonth);
-    var dayinmonth=new Date(year,nextMonth,0).getDate();
-
-    document.getElementById('topDate').innerHTML = '';
-    showCld(year, nextMonth,weekday,dayinmonth);
-}
-
-function preMonth(){
-    var topStr = document.getElementById("topDate").innerHTML;
-    var pattern = /\d+/g;
-    var listTemp = topStr.match(pattern);
-    var year = Number(listTemp[0]);
-    var month = Number(listTemp[1]);
-
-    var preMonth = month-1;
-
-    if(preMonth<curMonth){
-        return
-    }else{
-        if(preMonth < 1){
-            preMonth = 12;
-            year--;
-        }
-    }
-    var weekday=getWeekday(year,preMonth);
-    var dayinmonth=new Date(year,preMonth,0).getDate();
-
-    document.getElementById('topDate').innerHTML = '';
-    showCld(year, preMonth, weekday, dayinmonth);
-}
-
-
-async function roomstatus(roomid){
-
-    let response = await fetch('/roomavailability?type=hostel&id=' + roomid, {
-        method: "GET",
-        headers: {
-            "Content-Type": "application/json"
-        }
-    });
-    let availability = await response.json();
-    bookings = availability["busy"];
-    startlist=[]
-    endlist=[]
-    for(i=0;i<bookings.length;i++){
-        start=bookings[i].startDate
-        end=bookings[i].endDate
-        startlist.push(start.substring(0,10))
-        endlist.push(end.substring(0,10))
-        
-    }        
-
-    for(i=0;i<startlist.length;i++) {
-       
-        id1=startlist[i]
-        ida=id1.split('-')
-        id2=endlist[i]
-        idb=id2.split('-')
-
-        if(ida[1]!=idb[1]){
-            
-            var day1=ida[2]
-            var day2=idb[2]
-            var totalday= new Date(ida[0], ida[1], 0).getDate();
-            
-            //i smalledr than the days in month
-            for(a=day1;a<=totalday;a++){
-                fixeda=addzero(a,2)
-                idvalue=ida[0]+'-'+ida[1]+'-'+a
-                if(cell=document.getElementById(idvalue)){
-                    cell.bgColor='gray';
-                    
-                }    
-            }
-
-            for(b=1;b<=idb[2];b++){
-                fixedb=addzero(b,2)        
-                idvalue=idb[0]+'-'+idb[1]+'-'+fixedb
-                if(cell=document.getElementById(idvalue)){
-                    cell.bgColor='gray';   
-                }       
-            }
-        }
-    }            
-}
-
-
-
-flag=0
-function infor(e){ 
-    if (flag%2==0 || flag==0){
-        color=e.target.bgColor
-        if (color=='gray'){
-            alert('This day can not be book')
-        }else{     
-            a=e.target.innerHTML       
-            date=document.getElementById("topDate").innerHTML
-            document.getElementById('startdate1').innerHTML=date+'-'+a
-            document.getElementById('startdate11').innerHTML=date+'-'+a
-            
-        }
-    }else if(flag==1 || flag%2!=0){
-        color2=e.target.bgColor
-        if(color2=='gray'){
-            alert('This day can not be book')
-        }else{
-            b=e.target.innerHTML       
-            date=document.getElementById("topDate").innerHTML
-            document.getElementById('enddate1').innerHTML=date+'-'+b
-            document.getElementById('enddate11').innerHTML=date+'-'+b
-
-        }
-    }
-    
-
-  flag++;
-}  
-
-
-
-
-
-
-var curDate = new Date();
-var curYear = curDate.getFullYear();
-var curMonth = curDate.getMonth() + 1;
-var first=getWeekday(curYear,curMonth)
-var dayinmonth= new Date(curYear, curMonth, 0).getDate();
-
-window.onload=showCld(curYear,curMonth,first,dayinmonth);
-
-document.getElementById('left').onclick=function(){
-    preMonth();
-}
-
-document.getElementById('right').onclick = function(){
-        nextMonth();
-    }
-
-
-document.getElementById('tbody').addEventListener('click', infor);
-roomstatus(0)
-
-for(i=0; i<maxPeople.length; i++){
+  //add current year and month to the top
+  var topdateHtml = year  + '-'+ addzero(month,2);
+  var topDate = document.getElementById('topDate');
+  topDate.innerHTML = topdateHtml;    
   
-  maxPeople[i].addEventListener('change', ()=>{
-    for(i=0; i<maxPeople.length; i++){
-      
-      numOfPeople[i].innerHTML=maxPeople[i].value;
+  // add days html
+  // a new row
+  var tbodyHtml = '<tr>';
+  //blank before first day
+  for(i=0; i<firstDay; i++){//fill before 1st of the month
+      tbodyHtml += "<td></td>";
+  }
+ 
+  var changLine = firstDay;
 
-      a=numOfPeople[i].innerHTML
-      b=pricePerNight[i].innerHTML
-      
-      totalPrice[i].innerHTML=a*b
+  for(i=1; i<=days; i++){
+    // set class for current day and other days.
+    if(year == nowDate.getFullYear() && month == nowDate.getMonth()+1 && i == today) {
+      tagClass = "curDate"; // current date
+    } 
+    else{ 
+      tagClass = "isDate"; // other date, set class for future reference
+    }  
+    //fill in the table, add class and id to each cell
+    const fixedmonth=addzero(month,2)
+    const fixedday=addzero(i,2)
+    const idvalue=year+'-'+fixedmonth+'-'+fixedday// yyyy-mm-dd
+    
+    tbodyHtml += "<td class=" + tagClass + " id="+idvalue +">" + i + "</td>";
+    changLine = (changLine+1)%7;
 
+    //whether change the line
+    if(changLine == 0 && i != days){
+        tbodyHtml += "</tr><tr>";
+    } 
+  }
+
+  if(changLine!=0){// after all days, fill the blank place
+      for (i=changLine; i<7; i++) {
+          tbodyHtml += "<td></td>";
+      }
+  }   
+
+  tbodyHtml +="</tr>";// end
+  var tbody = document.getElementById('tbody');
+  tbody.innerHTML = tbodyHtml;// add to the html
+
+  //gray the past days
+  if (curYear == year && curMonth==month){
+    for(let x=today-1;x>=1;x--){ // all days before today
+      const fixedmonth=addzero(month,2)
+      const fixedx=addzero(x,2)
+      const idvalue1=year+'-'+fixedmonth+'-'+fixedx
+      document.getElementById(idvalue1).bgColor='gray'
     }
-  })
+  }
+
+  // grey the fixed not avialable date
+  let NotBookableDate = [];
+  for(i=0; i<weekInfo.length; i++){// 0=monday,6=sunday
+    if(weekInfo[i] === '0'){
+      NotBookableDate.push(i);
+    }
+  }
+  // [5,6] means sat&sun
+  // in database 0=monday,6=sunday
+  // in javaScript 0=sunday,6=sat
+  for(i=0; i<NotBookableDate.length;i++){
+    NotBookableDate[i] = (NotBookableDate[i]+1)%7;
+  }
+
+  for(i=0; i<NotBookableDate.length;i++){
+    for(let j=1; j<=days;j++){
+      let today = new Date(year,month-1,j);
+      let date = today.getDay();
+      if(date==NotBookableDate[i]){
+        // colored grey
+        let fixeday=addzero(j,2);
+        let fixedmonth=addzero(month,2);
+        let idvalue=year+'-'+fixedmonth+'-'+fixeday;
+        let cell=document.getElementById(idvalue);
+        if(cell){// find it and colored grey
+          cell.bgColor='gray';
+        }
+      };
+    }
+  }
+  
+  // grey those days already be rented
+  roomstatus(year,month-1,roomid);
 }
 
+async function nextMonth(roomid){
+  var topStr = document.getElementById("topDate").innerHTML;// yyyy-dd
+  var pattern = /\d+/g;
+  var listTemp = topStr.match(pattern); //['2019', '02']
+  var year = Number(listTemp[0]);
+  var month = Number(listTemp[1]); // 02 -> 2
+  
+  var nextMonth = month+1;
+  if(nextMonth > 12){
+      nextMonth = 1;
+      year++;
+  }
+  var weekday=getWeekday(year,nextMonth); //which weekday is first day in a month
+  // Date(year,nextMonth,1) is the defualt
+  // eg Date(2020,2,1) gives 2020-03-01T00:00:00.000Z
+  // max of this month，day-1,do Date(2020,2,0) get 2020-02-29T00:00:00.000Z. here 29 is what we want
+  var dayinmonth=new Date(year,nextMonth,0).getDate();//days=28~31 as number of days in this month
+
+  document.getElementById('topDate').innerHTML = '';
+
+  let weekInfo= await getWeekInfo(roomid);
+  showCld(year, nextMonth-1,weekday,dayinmonth,roomid,weekInfo);
+}
+
+async function preMonth(roomid){
+  var topStr = document.getElementById("topDate").innerHTML;
+  var pattern = /\d+/g;
+  var listTemp = topStr.match(pattern);//['2019', '02']
+  var year = Number(listTemp[0]);
+  var month = Number(listTemp[1]);// 02 -> 2
+
+  var preMonth = month-1;//1-12
+  let today = new Date();
+  let curMonth = today.getMonth()+1;//1-12
+
+  if(preMonth<curMonth){
+      return
+  }else if(preMonth < 1){
+    preMonth = 12;
+    year--;
+  }
+  var weekday=getWeekday(year,preMonth);
+  var dayinmonth=new Date(year,preMonth,0).getDate();
+
+  document.getElementById('topDate').innerHTML = '';
+  let weekInfo= await getWeekInfo(roomid);
+  showCld(year, preMonth-1, weekday, dayinmonth,roomid,weekInfo);
+}
+
+// update the date inside the calender and the table
+function infor(e){ 
+  let color=e.target.bgColor;
+  if (color=='gray'){
+    alert('This day can not be book');
+    return;
+  }
+
+  let id = e.target.id;
+  const startDateCalender = document.getElementById('startDateCalender').innerHTML;
+
+  if(id =='tbody'){
+    // means select multipul components->ignor
+    return;
+  }else if(startDateCalender=='--'){
+    // put in startdate
+    document.getElementById('startDateCalender').innerHTML=id;
+    document.getElementById('startDayTable').innerHTML=id;
+    return;
+  }else{
+    let idNow=id.split('-'); // [ '2020', '02', '23' ]
+    let idStart=startDateCalender.split('-'); // [ '2020', '03', '17' ]
+
+    let year1 = Number(idNow[0]);
+    let month1 = Number(idNow[1])-1;
+    let day1 = Number(idNow[2]);
+    let userDate = new Date(year1,month1,day1); //user choosed date
+
+    let year2 = Number(idStart[0]);
+    let month2 = Number(idStart[1])-1;
+    let day2 = Number(idStart[2]);
+    let startDate = new Date(year2,month2,day2); //start date
+    if(userDate>startDate){
+      // put in enddate
+      document.getElementById('endDateCalender').innerHTML=id;
+      document.getElementById('endDayTable').innerHTML=id;
+    }else if(userDate.getTime() === startDate.getTime()){
+      // clear start date
+      document.getElementById('startDateCalender').innerHTML='--';
+      document.getElementById('startDayTable').innerHTML='--';
+      // clear end date
+      document.getElementById('endDateCalender').innerHTML='--';
+      document.getElementById('endDayTable').innerHTML='--';
+    }else{//userDate<startDate
+      // put in startdate
+      document.getElementById('startDateCalender').innerHTML=id;
+      document.getElementById('startDayTable').innerHTML=id;
+      // clean enddate
+      document.getElementById('endDateCalender').innerHTML='--';
+      document.getElementById('endDayTable').innerHTML='--';
+    }
+    /////////A CHECK/////////////
+    return;
+  };
+  
+}
+
+
+/// load the page functions ///
+
+// erase the whole form 
+const eraseFields = () =>{
+    // number of people: value & limit
+    maxPeople.value=0;
+    maxPeople.max=0;
+    // calander change to default
+    const defaultCalender="<div id='cldBody'><table><thead><tr><td colspan='7'><div id='top'><span id='left'>&lt;</span><span id='topDate'>waitforjs</span><span id='right'>&gt;</span></div></td></tr><tr id='week'><td>Sun</td><td>Mon</td><td>Tue</td><td>Wed</td><td>Thu</td><td>Fri</td><td>Sat</td></tr></thead><tbody id='tbody'></tbody></table></div>";
+    wholeCalender.innerHTML = defaultCalender;
+    // start date & end date fields= --
+    startDateCalender.innerHTML ="--";
+    endDateCalender.innerHTML="--";
+    // all table intems = --
+    roomNum.innerHTML="--";
+    pricePerNight.innerHTML="--";
+    numOfPeople.innerHTML="--";
+    startDateTable.innerHTML="--";
+    endDateTable.innerHTML="--";
+    durationTable.innerHTML="--";
+    totalPrice.innerHTML="--.";
+    // disable submittion button
+    submitButton.hidden=true;
+}
+
+// update the whole form
+const updateFields = async(roomNumber) =>{
+    const rooms = await getHostel();
+    console.log(rooms);
+    if(rooms == "Error"){
+      responseField.innerHTML = "<p>Error fetching hostel rooms</P>";
+    }else{
+      // erase the page
+      eraseFields();
+      
+      //1. Number of people:
+      //  change the max in the number of people label
+      maxPeople.max = rooms[roomNumber-1]['noOfPeople'];
+      //  when changed, update the table
+      maxPeople.addEventListener('change', ()=>{
+        numOfPeople.innerHTML=maxPeople.value;
+        if(maxPeople.value==0){
+          numOfPeople.innerHTML='--';
+        }
+        /////////A CHECK/////////////
+      });
+
+      //2. calander:
+      let weekInfo = rooms[roomNumber-1]['nights'];
+      let today = new Date();
+      let year = today.getFullYear();
+      let month = today.getMonth();
+      let firstDay=getWeekday(year,month+1);
+      var days= new Date(year, month+1, 0).getDate();
+      showCld(year, month, firstDay, days, roomNumber,weekInfo);
+
+      // enable the calendar left and right button function
+      document.getElementById('left').onclick=function(){
+        preMonth(roomNumber-1);
+      }
+      document.getElementById('right').onclick = function(){
+        nextMonth(roomNumber-1);
+      }
+
+      // when click, update the time
+      document.getElementById('tbody').addEventListener('click', infor);
+
+      // 3. table:
+      // update payment table:Room number & Price
+      roomNumTable.innerHTML = rooms[roomNumber-1]['roomNumber'];
+      pricePerNight.innerHTML = rooms[roomNumber-1]['pricePerNight'];
+      
+
+
+    }
+
+};
+
+// when open the page, fetch hostel infor from the database
+getHostel = async() => {
+    const url ='/rooms';
+    const queryParams ='?types=hostel';
+    const endpoint = `${url}${queryParams}`;
+    try{
+      const response = await fetch( endpoint, {
+        method:"GET",
+        headers:{
+          "Content-Type": "application/json"
+        }
+      })
+      if(response.ok){// receive and get ok
+          const jsonResponse = await response.json();
+          if(jsonResponse.error){// cannot change it to json format
+            //responseField.innerHTML = "<p>Sorry, error occurs.</p><p> Try later.</p>";
+            return "Error"
+          } else {
+            // return all the hostel
+            return jsonResponse["hostel"];
+          }
+        }
+      // receive but not ok
+      //responseField.innerHTML = "<p>Sorry, hostel room Not available. </p><p>Response code =  "+ response.code +"</p>";
+      return "Error"
+      //throw new Error('Error getting hostel.' + response.code);
+    }catch(error){// did not receive anything 
+      //alert ('Error: ' + error + ' Possible solution: check your internet connection');
+      return "Error"
+    }
+}
+
+
+////// Action /////
+// load the page
+//  update
+updateFields(1);
 
 
