@@ -1,4 +1,11 @@
+let flag = true;
 ////// Selecting page elements //////
+const room1 = document.getElementById("room1");
+const room2 = document.getElementById("room2");
+const room3 = document.getElementById("room3");
+const room4 = document.getElementById("room4");
+const room5 = document.getElementById("room5");
+
 const responseField = document.getElementById("responseField");// error message place 
 
 const maxPeople = document.getElementById("maxPeople"); // input field 
@@ -62,7 +69,7 @@ const getWeekInfo = async(roomid) =>{
 
 // year= yyyy, month* = 0-11
 // return a proper calander. the already booked date colored grey 
-async function roomstatus(year,month,roomid){
+async function roomRented(year,month,roomid){
   let i;
   let response = await fetch('/roomavailability?type=hostel&id=' + roomid, {
     method: "GET",
@@ -88,7 +95,6 @@ async function roomstatus(year,month,roomid){
     const end=bookings[i].endDate; // "2020-03-17T00:00:00.000Z"
     startlist.push(start.substring(0,10));// 2020-02-23
     endlist.push(end.substring(0,10));//2020-03-17
-      
   }
   
 
@@ -219,8 +225,8 @@ function showCld(year, month, firstDay, days, roomid,weekInfo){
     NotBookableDate[i] = (NotBookableDate[i]+1)%7;
   }
 
-  for(i=0; i<NotBookableDate.length;i++){
-    for(let j=1; j<=days;j++){
+  for(i=0; i<NotBookableDate.length;i++){// for each date in the list
+    for(let j=1; j<=days;j++){// for each day in the month
       let today = new Date(year,month-1,j);
       let date = today.getDay();
       if(date==NotBookableDate[i]){
@@ -237,7 +243,7 @@ function showCld(year, month, firstDay, days, roomid,weekInfo){
   }
   
   // grey those days already be rented
-  roomstatus(year,month-1,roomid);
+  roomRented(year,month-1,roomid);
 }
 
 async function nextMonth(roomid){
@@ -261,6 +267,10 @@ async function nextMonth(roomid){
   document.getElementById('topDate').innerHTML = '';
 
   let weekInfo= await getWeekInfo(roomid);
+  if(weekInfo=="Error"){
+    alert("Error: Cannot get the fixed not avaliable dates of this room");
+    return;
+  }
   showCld(year, nextMonth-1,weekday,dayinmonth,roomid,weekInfo);
 }
 
@@ -286,11 +296,15 @@ async function preMonth(roomid){
 
   document.getElementById('topDate').innerHTML = '';
   let weekInfo= await getWeekInfo(roomid);
+  if(weekInfo=="Error"){
+    alert("Error: Cannot get the fixed not avaliable dates of this room");
+    return;
+  }
   showCld(year, preMonth-1, weekday, dayinmonth,roomid,weekInfo);
 }
 
 // update the date inside the calender and the table
-function infor(e){ 
+async function infor(e){ 
   let color=e.target.bgColor;
   if (color=='gray'){
     alert('This day can not be book');
@@ -321,17 +335,45 @@ function infor(e){
     let month2 = Number(idStart[1])-1;
     let day2 = Number(idStart[2]);
     let startDate = new Date(year2,month2,day2); //start date
+
+    
     if(userDate>startDate){
       // put in enddate
       document.getElementById('endDateCalender').innerHTML=id;
       document.getElementById('endDayTable').innerHTML=id;
+      // calculte duration 
+      let duration = await calculateDuration(startDate,userDate);//start and end date
+      if(duration=="Error"){
+        alert("Error calculating duration");
+        return;
+      }
+      durationTable.innerHTML=duration;
     }else if(userDate.getTime() === startDate.getTime()){
-      // clear start date
-      document.getElementById('startDateCalender').innerHTML='--';
-      document.getElementById('startDayTable').innerHTML='--';
-      // clear end date
-      document.getElementById('endDateCalender').innerHTML='--';
-      document.getElementById('endDayTable').innerHTML='--';
+      if(flag){
+        // update the end date same as the start date
+        document.getElementById('endDateCalender').innerHTML=id;
+        document.getElementById('endDayTable').innerHTML=id;
+        // calculate duration
+        let duration = await calculateDuration(startDate,userDate);//start and end date
+        if(duration=="Error"){
+          alert("Error calculating duration");
+          return;
+        }
+        durationTable.innerHTML=duration;
+        // change the flag
+        flag=false;
+      }else{
+        // clear start date
+        document.getElementById('startDateCalender').innerHTML='--';
+        document.getElementById('startDayTable').innerHTML='--';
+        // clear end date
+        document.getElementById('endDateCalender').innerHTML='--';
+        document.getElementById('endDayTable').innerHTML='--';
+        durationTable.innerHTML='--';
+        // change the flag
+        flag=true;
+      }
+
     }else{//userDate<startDate
       // put in startdate
       document.getElementById('startDateCalender').innerHTML=id;
@@ -339,37 +381,152 @@ function infor(e){
       // clean enddate
       document.getElementById('endDateCalender').innerHTML='--';
       document.getElementById('endDayTable').innerHTML='--';
+      durationTable.innerHTML='--';
     }
     /////////A CHECK/////////////
+    checkPrice();
     return;
   };
   
 }
 
+//start and end date
+const calculateDuration=async(startDate,endDate)=>{
+  // number of days in middle
+  let Difference_In_Time = endDate.getTime() - startDate.getTime();   
+  // To calculate the no. of days between two dates 
+  let Difference_In_Days = parseInt(Difference_In_Time / (1000 * 3600 * 24)+0.5);// time zone changes
+  // get roomid
+  const roomid = Number(roomNumTable.innerHTML)-1;
+  // get roomavailability
+  const availability = await roomAvailability(roomid);
+  console.log(availability);
+  if(availability=="Error"){
+    return "Error";
+  }
+  // make a busy date list
+  let occupied = [];
+  let i;
+
+
+  // get ride of the fixed not bookable date //
+  const weekInfo = availability["nights"]// '1111100'
+  let NotBookableDate = [];
+  for(i=0; i<weekInfo.length; i++){// 0=monday,6=sunday
+    if(weekInfo[i] === '0'){
+      NotBookableDate.push(i);
+    }
+  }
+  // [5,6] means sat&sun
+  // in database 0=monday,6=sunday / in javaScript 0=sunday,6=sat
+
+  for(i=0; i<NotBookableDate.length;i++){
+    NotBookableDate[i] = (NotBookableDate[i]+1)%7;
+  }//convert to [0,6]
+  for(i=0; i<NotBookableDate.length;i++){// for each date in the list
+    for(let j=new Date(startDate.getTime()); j<=endDate;j.setDate(j.getDate() + 1)){// for each day between 2 dates.
+      if(j.getDay() === Number(NotBookableDate[i])){
+        occupied.push(new Date(j));// have to push a new date object, not the reference.
+      };
+      // means j++
+      //aug32 automatically becomes sep1
+    }
+  }
+  
+
+
+
+  // get ride of reserved date //
+  const bookings=availability["busy"];
+  console.log(bookings)
+  let startlist=[];
+  let endlist=[];
+
+
+  for(i=0;i<bookings.length;i++){// each day from the list
+    const start=bookings[i].startDate; // "2020-02-23T00:00:00.000Z"
+    const end=bookings[i].endDate; // "2020-03-17T00:00:00.000Z"
+    startlist.push(start.substring(0,10));// 2020-02-23
+    endlist.push(end.substring(0,10));//2020-03-17
+  }
+
+  for(i=0;i<startlist.length;i++) { // for each pair of date
+    let id1=startlist[i];
+    let ida=id1.split('-'); // [ '2020', '02', '23' ]2020 2
+    let id2=endlist[i];
+    let idb=id2.split('-'); // [ '2020', '03', '17' ]
+
+    let year1 = Number(ida[0]);
+    let month1 = Number(ida[1])-1;
+    let day1 = Number(ida[2]);
+    let date1 = new Date(year1,month1,day1);//booked start date
+
+    let year2 = Number(idb[0]);
+    let month2 = Number(idb[1])-1;
+    let day2 = Number(idb[2]);
+    let date2 = new Date(year2,month2,day2);//booked end date
+
+    if(startDate<date1 && date2<endDate){//dates are in between
+      //var copiedDate = new Date(date.getTime())
+      for(let j=new Date(date1.getTime());j<=date2;){// push each date
+        //console.log(j)
+        occupied.push(new Date(j));// have to push a new date object, not the reference.
+        // means i++
+        j.setDate(j.getDate() + 1);//aug32 automatically becomes sep1
+      }
+    }
+  }
+
+  // get ride of repetations in occupie list
+  // here could have use the Array.from(new Set(a)),but the date object must have the same reference
+  // It can't remove duplicate Date objects that share the same values but not the same references
+  let occupiedNew = occupied
+  .map(function (date) { return date.getTime() })
+  .filter(function (date, i, array) {
+      return array.indexOf(date) === i;
+   })
+  .map(function (time) { return new Date(time); });
+
+  let duration = Difference_In_Days-occupiedNew.length+1;
+  return duration
+};
+
+// check and calculate the total price
+const checkPrice =()=>{
+  if ( pricePerNight.innerHTML!='--'&&numOfPeople.innerHTML!='--'&&durationTable.innerHTML!='--'){
+    let total =  Number(pricePerNight.innerHTML)*Number(numOfPeople.innerHTML)*Number(durationTable.innerHTML);
+    totalPrice.innerHTML = total;
+    submitButton.hidden=false;
+  }else{
+    totalPrice.innerHTML = '--';
+    submitButton.hidden=true;
+  }
+};
 
 /// load the page functions ///
-
 // erase the whole form 
 const eraseFields = () =>{
-    // number of people: value & limit
-    maxPeople.value=0;
-    maxPeople.max=0;
-    // calander change to default
-    const defaultCalender="<div id='cldBody'><table><thead><tr><td colspan='7'><div id='top'><span id='left'>&lt;</span><span id='topDate'>waitforjs</span><span id='right'>&gt;</span></div></td></tr><tr id='week'><td>Sun</td><td>Mon</td><td>Tue</td><td>Wed</td><td>Thu</td><td>Fri</td><td>Sat</td></tr></thead><tbody id='tbody'></tbody></table></div>";
-    wholeCalender.innerHTML = defaultCalender;
-    // start date & end date fields= --
-    startDateCalender.innerHTML ="--";
-    endDateCalender.innerHTML="--";
-    // all table intems = --
-    roomNum.innerHTML="--";
-    pricePerNight.innerHTML="--";
-    numOfPeople.innerHTML="--";
-    startDateTable.innerHTML="--";
-    endDateTable.innerHTML="--";
-    durationTable.innerHTML="--";
-    totalPrice.innerHTML="--.";
-    // disable submittion button
-    submitButton.hidden=true;
+  // error message place clean up
+  responseField.innerHTML="";
+  // number of people: value & limit
+  maxPeople.value=0;
+  maxPeople.max=0;
+  // calander change to default
+  const defaultCalender="<div id='cldBody'><table><thead><tr><td colspan='7'><div id='top'><span id='left'>&lt;</span><span id='topDate'>waitforjs</span><span id='right'>&gt;</span></div></td></tr><tr id='week'><td>Sun</td><td>Mon</td><td>Tue</td><td>Wed</td><td>Thu</td><td>Fri</td><td>Sat</td></tr></thead><tbody id='tbody'></tbody></table></div>";
+  wholeCalender.innerHTML = defaultCalender;
+  // start date & end date fields= --
+  startDateCalender.innerHTML ="--";
+  endDateCalender.innerHTML="--";
+  // all table intems = --
+  roomNum.innerHTML="--";
+  pricePerNight.innerHTML="--";
+  numOfPeople.innerHTML="--";
+  startDateTable.innerHTML="--";
+  endDateTable.innerHTML="--";
+  durationTable.innerHTML="--";
+  totalPrice.innerHTML="--.";
+  // disable submittion button
+  submitButton.hidden=true;
 }
 
 // update the whole form
@@ -392,6 +549,7 @@ const updateFields = async(roomNumber) =>{
           numOfPeople.innerHTML='--';
         }
         /////////A CHECK/////////////
+        checkPrice();
       });
 
       //2. calander:
@@ -457,10 +615,105 @@ getHostel = async() => {
     }
 }
 
+// get room availability
+async function roomAvailability(roomid){
+  let i;
+  let response = await fetch('/roomavailability?type=hostel&id=' + roomid, {
+    method: "GET",
+    headers: {
+        "Content-Type": "application/json"
+    }
+  });
+  let availability = await response.json();
+  /* what inside json
+  {"nights":"1111100",
+  "id":"0",
+  "busy":[{"startDate":"2020-02-23T00:00:00.000Z","endDate":"2020-03-17T00:00:00.000Z"},
+          {"startDate":"2020-02-23T00:00:00.000Z","endDate":"2020-03-17T00:00:00.000Z"},
+          {"startDate":"2020-02-23T00:00:00.000Z","endDate":"2020-03-17T00:00:00.000Z"}]}
+  */
+  return availability;
+}
+
+// submittion functions
+/*/staffhostelbooking
+      body:{
+        customerid:0, // fake for now
+        roomid: roomid,//0-4
+        start: start,//格式"2020-02-23T00:00:00.000Z"
+        end: end// 格式"2020-03-17T00:00:00.000Z"
+      }*/
+submitBooking = async(customerid,roomid,start,end)=>{
+  //create new hostel booking
+  let response = await fetch('http://localhost:8090/staffhostelbooking',
+  {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded'
+    },
+    body: 'customerid=' + customerid + '&roomid=' + roomid + '&start=' + start + '&end=' + end
+  });
+  //if response isn't fine
+  if(!response.ok){
+    //error message
+    throw new Error('problem adding new event ' + response.code);
+  }else{
+    //success message
+    responseField.innerHTML='Booking successful.';
+
+    //reset forms
+    eraseFields();
+  }
+
+};
 
 ////// Action /////
 // load the page
 //  update
 updateFields(1);
 
+window.onload = function() {
+  // paging buttons
+  room1.addEventListener("click",function(){
+    updateFields(1);
+  });
+  room2.addEventListener("click",function(){
+    updateFields(2);
+  });
 
+  room3.addEventListener("click",function(){
+    updateFields(3);
+  });
+
+  room4.addEventListener("click",function(){
+    updateFields(4);
+  })
+
+  room5.addEventListener("click",function(){
+    updateFields(5);
+  })
+
+  // submitbutton event listener.
+  submitButton.addEventListener("click", function(event){
+    event.preventDefault()
+    // get all info needed
+    const customerid = 0;//fake for now
+    const roomid = Number(roomNumTable.innerHTML);
+    let start = startDateTable.innerHTML;
+    start=start.split('-');
+    let end = endDateTable.innerHTML;
+    end = end.split('-');
+
+    let year1 = Number(start[0]);
+    let month1 = Number(start[1])-1;
+    let day1 = Number(start[2]);
+    let date1 = new Date(year1,month1,day1);//start date
+
+    let year2 = Number(end[0]);
+    let month2 = Number(end[1])-1;
+    let day2 = Number(end[2]);
+    let date2 = new Date(year2,month2,day2);//end date
+    // send
+    submitBooking(customerid,roomid,date1,date2);
+  });
+};
