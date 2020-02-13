@@ -824,6 +824,59 @@ app.get('/bookingrequests', async function(req,resp){
 
 // look into HTTPS
 
+// handle staff sign in
+app.post('/staffsignin', async function(req, resp) {
+    // Google token
+    const token = req.body.token;
+    // verify token
+    const payload = await login(token);
+
+    // if verification failed
+    if (!payload) {
+        // token error
+        resp.status(403).send('0token');
+
+    } else {
+        // Google ID
+        const googleID = payload['sub'];
+
+        // look for staff member in database
+        const staff = await performQuery('SELECT * FROM staff WHERE googleId = ' + googleID);
+
+        // if no database error
+        if (processQueryResult(staff, resp)) {
+            // if staff member in database
+            if (staff.length == 1) {
+                // refresh session
+                req.session.regenerate(function(error) {
+                    // if regeneration failed
+                    if (error) {
+                        // session error
+                        resp.status(500).send('0session');
+
+                    } else {
+                        // set session variables
+                        req.session.active = true;
+                        req.session.type = 'staff';
+                        req.session.userID = staff[0]['id'];
+
+                        // name
+                        const staffMemberDetails = {'fname': staff[0]['fName'], 'sname': staff[0]['lName']};
+
+                        // send name
+                        resp.status(200).send(JSON.stringify(staffMemberDetails));
+                    }
+                });
+
+            // if access denied
+            } else {
+                // permission error
+                resp.status(403).send('0permission');
+            }
+        }
+    }
+});
+
 // handle customer sign in
 app.post('/customersignin', async function(req, resp) {
     // Google token
