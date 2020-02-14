@@ -495,6 +495,35 @@ app.post('/staffcommunitybooking', async function(req, resp) {
     }
 });
 
+// make community room booking using customer session
+app.post('/customercommunitybooking', async function(req, resp) {
+    // if active customer session
+    if (req.session.active && req.session.type == 'customer') {
+        // booking parameters
+        const roomID = req.body.roomid;
+        const start = req.body.start;
+        const end = req.body.end;
+        const price = req.body.price;
+        const paid = req.body.paid;
+
+        // if all parameters specified
+        if (roomID && start && end && price && paid) {
+            // make booking
+            if (await communityBooking(req.session.userID, roomID, start, end, price, paid, resp)) {
+                // booking successful
+                resp.status(200).send('1success');
+            }
+        } else {
+            // parameter error
+            resp.status(400).send('0parameters');
+        }
+
+    } else {
+        // activity error
+        resp.status(403).send('0inactive');
+    }
+});
+
 // hostel room booking
 async function hostelBooking(customerID, roomID, start, end, resp) {
     // should check if free at specified times
@@ -940,7 +969,6 @@ app.post('/newstaffmember', async function(req, resp) {
                 }
             }
         }
-
     } else {
         // permission error
         resp.status(403).send('0permission');
