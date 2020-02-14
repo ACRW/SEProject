@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+	<title>TCR Hub activity booking page</title>
+
+	<meta charset=utf-8>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <link rel="stylesheet" href="style.css">
+	
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+  <style type="text/css">
+      #cldFrame{
+      position: relative;
+      width: 440px;
+      
+    }
+    #cldBody{
+        
+        
+        width: 420px;
+    }
+    #top{
+        position: relative;
+        height: 60px;
+        text-align: center;
+        line-height: 60px;
+    }
+    #topDate{
+        font-size: 30px;
+    }
+    .curDate{
+        color: red;
+        font-weight: bold;
+    }
+    
+    table{
+        background-color: #C2D6B6;
+    }
+    #week td{
+        font-size: 20px;
+        font-weight: bold;
+    }
+    td{
+        height: 60px;
+        width: 60px;
+        text-align: center;
+        
+        font-size: 20px;
+    }
+    #left, #right{
+        position: absolute;
+        width: 60px;
+        height: 60px;
+    }
+    #left{left: 0px;}
+    #right{right: 0px;}
+    #left:hover, #right:hover{
+        background-color: rgba(30, 30, 30, 0.2);
+    }
+  </style>
+	
+</head>
+<body>
+
+<br>
+
+<!-- Presentation -->
+<div class="container">
+  <h2 style="color: #A5B686 ;">Book your activities here.</h2>
+
+  <!-- Nav tabs -->
+  <ul class="nav nav-tabs" role="tablist">
+    <li class="nav-item">
+      <a class="nav-link active" data-toggle="tab" href="#type1" style="color:gray;font-size: 25px;" id="act1">Archery</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" data-toggle="tab" href="#type2" style="color:gray;font-size: 25px;" id="act22">Kayaking</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" data-toggle="tab" href="#type3" style=" color:gray;font-size: 25px;" id="act3">Painting</a>
+    </li>
+    
+  </ul>
+
+  <!-- Tab panes -->
+  <div class="tab-content">
+
+    <div id="type1" class="container tab-pane active"><br>
+      
+      <div style="width: 400px;height: 380px; display: flex;align-items: center;">
+        <img name="eventPic" id="0" src="webimage/Kayaking.jpg" alt='room' style="width: auto;height: 100%">
+      </div>
+      
+
+      <div style=' margin-top: 20px; '>
+        <h3>Archery</h3>
+      
+      </div>
+
+    </div>
+
+    <div id="type2" class="container tab-pane fade"><br>
+
+      <div style="width: 400px;height: 380px; display: flex;align-items: center;">
+        <img name="eventPic" id="0" src="webimage/Kayaking.jpg" alt='room' style="width: auto;height: 100%">
+      </div>  
+      
+      <div style=' margin-top: 20px; '>
+      <h3>Kayaking</h3>
+      
+      </div>
+    </div>
+
+    <div id="type3" class="container tab-pane fade"><br>
+      <div style="width: 400px;height: 380px; display: flex;align-items: center;">
+        <img name="eventPic" id="0" src="webimage/kayaking.jpg" alt='room' style="width: auto;height: 100%">
+      </div>
+
+      <div style=' margin-top: 20px; '>
+      <h3>painting</h3>
+     
+        </div> 
+    </div>
+
+    
+  </div>
+
+<br>
+
+</div>
+
+<!-- Fill info -->
+<div style="padding-left: 170px">
+  <h3>
+    Please fill in the following information
+    <small class="text-muted">To book</small>
+  </h3>
+  <!-- response Message -->
+  <div ><h4 id="responseField"></h4>
+  </div>
+
+  <!-- number of people-->
+  <div class="form-group">
+    <label>Number of people: </label>
+    <input type="number" min='0' value='0' id='maxPeople'>
+    <br>
+  </div>
+
+  <!--calendar-->
+  <div class="calendar form-group">
+    <p>Please choose the date of your booking from the calendar:</p>
+
+    <div id="cldFrame">
+      <div id="cldBody">
+          <table >
+            <thead>
+              <tr>
+                <td colspan="7">
+                    <div id="top">
+                        <span id="left">&lt;</span>
+                        <span id="topDate">waitforjs</span>
+                        <span id="right">&gt;</span>
+                    </div>
+                </td>
+              </tr>
+              <tr id="week">
+                  <td>Sun</td>
+                  <td>Mon</td>
+                  <td>Tue</td>
+                  <td>Wed</td>
+                  <td>Thu</td>
+                  <td>Fri</td>
+                  <td>Sat</td>
+              </tr>
+              </thead>
+              <tbody id="tbody"></tbody>
+          </table>
+      </div>
+    </div>
+
+    <br>
+    
+    <p>Date:(yyyy-mm-dd)</p> <P id='date'>--</P>
+   
+  </div>
+
+  <!--table-->
+  <div class="form-group" style="padding-top: 20px; padding-right: 50px;">
+    <p>Please check your information in the table:</p>
+
+    <table class="table" style="margin-top:30px; ">
+      <tr>
+        <td>Activity</td>
+        <td>Price per person</td>
+        <td>number of people</td> 
+        <td>Date</td>
+        <td>Total Price</td>
+      </tr>
+      <tr>
+        <td id='act'>--</td>
+        <td id='pricepp'>--</td>
+        <td id='numOfPeople'>--</td>
+        <td id='date'>--</td>
+        <td id='totalPrice'>--</td>
+      </tr>
+    </table>
+
+    <!--submit buttom-->
+    <div class="row" style="margin-bottom: 30px;" >
+      <div class="col-sm-6"></div>
+      <div class="col-sm-4"></div>
+      <div class="col-sm-2"><a class="btn btn-primary newColor" href="#" role="button" id='submitButton' hidden="true">Book and pay now</a></div>
+    </div>
+
+    <!--submittion response-->
+    <div name="SubmittionResponse">
+    </div>
+
+  </div>
+
+
+</div>
+
+
+<script src="activity_room.js"></script>
+
+</body>
+</html>
