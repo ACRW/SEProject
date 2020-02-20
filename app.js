@@ -495,6 +495,35 @@ app.post('/staffcommunitybooking', async function(req, resp) {
     }
 });
 
+// make community room booking using customer session
+app.post('/customercommunitybooking', async function(req, resp) {
+    // if active customer session
+    if (req.session.active && req.session.type == 'customer') {
+        // booking parameters
+        const roomID = req.body.roomid;
+        const start = req.body.start;
+        const end = req.body.end;
+        const price = req.body.price;
+        const paid = req.body.paid;
+
+        // if all parameters specified
+        if (roomID && start && end && price && paid) {
+            // make booking
+            if (await communityBooking(req.session.userID, roomID, start, end, price, paid, resp)) {
+                // booking successful
+                resp.status(200).send('1success');
+            }
+        } else {
+            // parameter error
+            resp.status(400).send('0parameters');
+        }
+
+    } else {
+        // activity error
+        resp.status(403).send('0inactive');
+    }
+});
+
 // hostel room booking
 async function hostelBooking(customerID, roomID, start, end, resp) {
     // should check if free at specified times
@@ -877,6 +906,75 @@ app.post('/staffsignin', async function(req, resp) {
     }
 });
 
+// new staff member
+app.post('/newstaffmember', async function(req, resp) {
+    // if staff session active
+    if (req.session.active && req.session.type == 'staff') {
+        // Google token
+        const token = req.body.token;
+        // verify token
+        const payload = await login(token);
+
+        // if verification failed
+        if (!payload) {
+            // token error
+            resp.status(403).send('0token');
+
+        } else {
+            // Google ID
+            const googleID = payload['sub'];
+
+            // look for staff member in database
+            const staff = await performQuery('SELECT * FROM staff WHERE googleId = ' + googleID);
+
+            // if no database error
+            if (processQueryResult(staff, resp)) {
+                // if staff member not in database
+                if (staff.length == 0) {
+                    // get maximum staff ID
+                    const maxID = await performQuery('SELECT MAX(id) FROM staff');
+
+                    // if no database error
+                    if (processQueryResult(maxID, resp)) {
+                        // new staff ID
+                        let newID = 0;
+
+                        // if previous IDs exist
+                        if (maxID[0]['MAX(id)'] != null) {
+                            // increment staff ID
+                            newID = parseInt(maxID[0]['MAX(id)']) + 1;
+                        }
+
+                        // add staff member to database
+                        const result = await performQuery('INSERT INTO staff (id, fName, lName, googleId, email) VALUES (' + newID + ', "' + payload['given_name'] + '", "' + payload['family_name'] + '", "' + googleID + '", "' + payload['email'] + '")');
+
+                        // if no database error
+                        if (processQueryResult(result, resp)) {
+                            // if one row inserted
+                            if (result['affectedRows'] == 1) {
+                                // return new staff ID to client
+                                resp.status(200).send(JSON.stringify(newID));
+
+                            } else {
+                                // database error
+                                resp.status(500).send('0database');
+                            }
+                        }
+                    }
+
+                // staff member already registered
+                } else {
+                    // staff member error
+                    resp.status(400).send('0staff');
+                }
+            }
+        }
+    } else {
+        // permission error
+        resp.status(403).send('0permission');
+    }
+});
+
 // handle customer sign in
 app.post('/customersignin', async function(req, resp) {
     // Google token
@@ -932,7 +1030,7 @@ app.post('/customersignin', async function(req, resp) {
                     let newID = 0;
 
                     // if previous IDs exist
-                    if (maxID.length == 1) {
+                    if (maxID[0]['MAX(id)'] != null) {
                         // increment customer ID
                         newID = parseInt(maxID[0]['MAX(id)']) + 1;
                     }
