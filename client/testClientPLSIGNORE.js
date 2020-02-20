@@ -6,7 +6,7 @@ async function onSignIn(googleUser) {
 
     const token = googleUser.getAuthResponse().id_token;
 
-    let response = await fetch('/staffsignin',
+    let response = await fetch('/customersignin',
     {
         method: "POST",
         headers: {
