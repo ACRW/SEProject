@@ -81,6 +81,20 @@ function processQueryResult(result, response) {
     return true;
 }
 
+// validate session
+function validateSession(type, req, resp) {
+    // if session active & of correct type
+    if (req.session.active && req.session.type == type) {
+        // valid session
+        return true;
+    }
+
+    // activity error
+    resp.status(403).send('0inactive');
+
+    return false;
+}
+
 // add parameter to search clause
 function addToSearchClause(parameter, field, whereClause) {
     // if parameter defined
@@ -90,9 +104,11 @@ function addToSearchClause(parameter, field, whereClause) {
             // add 'AND' to clause
             whereClause += ' AND ';
         }
+
         // add parameter
         whereClause += field + ' LIKE "%' + parameter + '%"';
     }
+
     // return search clause
     return whereClause;
 }
@@ -438,101 +454,165 @@ app.get('/customerbookings', async function(req, resp) {
     }
 });
 
-// community room booking
-async function communityBooking(customerID, roomID, start, end, price, paid, resp) {
-    // check for clashing bookings
-    const clashes = await performQuery('SELECT * FROM communityBookings WHERE start < FROM_UNIXTIME(' + end + ') AND end > FROM_UNIXTIME(' + start + ')');
+// hostel room booking
+async function hostelBooking(roomID, startDate, endDate,userId, price, paid, numberOfPeople, resp) {
+    // should check if free at specified times
+    try{
+    // insert row
+    const result = await performQuery('INSERT INTO hostelBookings (roomId,startDate, endDate, userId, price, paid, noOfPeople) VALUES ('+ roomID + ', FROM_UNIXTIME(' + startDate + '), FROM_UNIXTIME(' + endDate + '),' + userId + ', ' + price + ',' + paid + ', ' + numberOfPeople + ')');
 
     // if no database error
-    if (processQueryResult(clashes, resp)) {
-        // if no clashes
-        if (clashes.length == 0) {
-            // insert row
-            const result = await performQuery('INSERT INTO communityBookings (start, end, priceOfBooking, paid, roomId, userId) VALUES (FROM_UNIXTIME(' + start + '), FROM_UNIXTIME(' + end + '), ' + price + ', ' + paid + ', ' + roomID + ', ' + customerID + ')');
-
-            // if no database error
-            if (processQueryResult(result, resp)) {
-                // if correct number of rows inserted
-                if (result['affectedRows'] == 1) {
-                    // return true
-                    return true;
-
-                } else {
-                    // database error
-                    resp.status(500).send('0database');
-                }
-            }
+    if (processQueryResult(result, resp)) {
+        // if correct number of rows inserted
+        if (result['affectedRows'] == 1) {
+            // return true
+            return true;
 
         } else {
-            // clashing bookings error
-            resp.status(400).send('0clashes');
+            // database error
+            resp.status(500).send('0database');
         }
     }
-
     // return false
     return false;
+  }catch(error) {
+    console.log ('Error: ' + error);
+  }
+}
+
+// activity room booking
+async function activityBooking(customerID, dateTime, activityId, price, paid, numberOfPeople, resp) {
+    // should check if free at specified times
+    try{
+    // insert row
+    const result = await performQuery('INSERT INTO activityBookings (dateTime, price, paid, activityId, userId, numberOfPeople) VALUES (FROM_UNIXTIME(' + start + '),' + price + ', ' + paid + ', ' + activityID + ', ' + customerID + ', ' + numberOfPeople + ')');
+
+    // if no database error
+    if (processQueryResult(result, resp)) {
+        // if correct number of rows inserted
+        if (result['affectedRows'] == 1) {
+            // return true
+            return true;
+
+        } else {
+            // database error
+            resp.status(500).send('0database');
+        }
+    }
+    // return false
+    return false;
+  }catch(error) {
+    console.log ('Error: ' + error);
+  }
 }
 
 // make community room booking on behalf of customer
 app.post('/staffcommunitybooking', async function(req, resp) {
-    // customer ID
-    const customerID = req.body.customerid;
+    // if valid staff session
+    if (validateSession('staff', req, resp)) {
+        // customer ID
+        const customerID = req.body.customerid;
 
-    // if customer ID specified
-    if (customerID) {
-        // check customer exists
-        if (checkCustomerExists(customerID, resp)) {
-            // booking parameters
-            const roomID = req.body.roomid;
-            const start = req.body.start;
-            const end = req.body.end;
-            const price = req.body.price;
-            const paid = req.body.paid;
+        // if customer ID specified
+        if (customerID) {
+            // check customer exists
+            if (checkCustomerExists(customerID, resp)) {
+                // booking parameters
+                const roomID = req.body.roomid;
+                const start = req.body.start;
+                const end = req.body.end;
+                const price = req.body.price;
+                const paid = req.body.paid;
 
-            // if all parameters specified
-            if (roomID && start && end && price && paid) {
-                // make booking
-                if (await communityBooking(customerID, roomID, start, end, price, paid, resp)) {
-                    // booking successful
-                    resp.status(200).send('1success');
+                // if all parameters specified
+                if (roomID && start && end && price && paid) {
+                    // check for clashing bookings
+                    const clashes = await performQuery('SELECT * FROM communityBookings WHERE start < FROM_UNIXTIME(' + end + ') AND end > FROM_UNIXTIME(' + start + ')');
+
+                    // if no database error
+                    if (processQueryResult(clashes, resp)) {
+                        // if no clashes
+                        if (clashes.length == 0) {
+                            // insert row
+                            const result = await performQuery('INSERT INTO communityBookings (start, end, priceOfBooking, paid, roomId, userId) VALUES (FROM_UNIXTIME(' + start + '), FROM_UNIXTIME(' + end + '), ' + price + ', ' + paid + ', ' + roomID + ', ' + customerID + ')');
+
+                            // if no database error
+                            if (processQueryResult(result, resp)) {
+                                // if correct number of rows inserted
+                                if (result['affectedRows'] == 1) {
+                                    // booking successful
+                                    resp.status(200).send('1success');
+
+                                } else {
+                                    // database error
+                                    resp.status(500).send('0database');
+                                }
+                            }
+
+                        } else {
+                            // clashing bookings error
+                            resp.status(400).send('0clashes');
+                        }
+                    }
+
+                } else {
+                    // parameter error
+                    resp.status(400).send('0parameters');
                 }
-            } else {
-                // parameter error
-                resp.status(400).send('0parameters');
             }
+
+        } else {
+            // customer ID error
+            resp.status(400).send('0customerID');
         }
-    } else {
-        // customer ID error
-        resp.status(400).send('0customerID');
     }
 });
 
 // make community room booking using customer session
 app.post('/customercommunitybooking', async function(req, resp) {
     // if active customer session
-    if (req.session.active && req.session.type == 'customer') {
+    if (validateSession('customer', req, resp)) {
         // booking parameters
         const roomID = req.body.roomid;
         const start = req.body.start;
         const end = req.body.end;
         const price = req.body.price;
-        const paid = req.body.paid;
 
         // if all parameters specified
-        if (roomID && start && end && price && paid) {
-            // make booking
-            if (await communityBooking(req.session.userID, roomID, start, end, price, paid, resp)) {
-                // booking successful
-                resp.status(200).send('1success');
+        if (roomID && start && end && price) {
+            // check for clashing bookings
+            const clashes = await performQuery('(SELECT start, end FROM communityBookings WHERE start < FROM_UNIXTIME(' + end + ') AND end > FROM_UNIXTIME(' + start + ')) UNION (SELECT start, end FROM communityRequests WHERE start < FROM_UNIXTIME(' + end + ') AND end > FROM_UNIXTIME(' + start + '))');
+
+            // if no database error
+            if (processQueryResult(clashes, resp)) {
+                // if no clashes
+                if (clashes.length == 0) {
+                    // insert row
+                    const result = await performQuery('INSERT INTO communityRequests (start, end, priceOfBooking, roomId, userId) VALUES (FROM_UNIXTIME(' + start + '), FROM_UNIXTIME(' + end + '), ' + price + ', ' + roomID + ', ' + req.session.userID + ')');
+
+                    // if no database error
+                    if (processQueryResult(result, resp)) {
+                        // if correct number of rows inserted
+                        if (result['affectedRows'] == 1) {
+                            // booking successful
+                            resp.status(200).send('1success');
+
+                        } else {
+                            // database error
+                            resp.status(500).send('0database');
+                        }
+                    }
+
+                } else {
+                    // clashing bookings error
+                    resp.status(400).send('0clashes');
+                }
             }
+
         } else {
             // parameter error
             resp.status(400).send('0parameters');
         }
-
-    } else {
-        // activity error
-        resp.status(403).send('0inactive');
     }
 });
 
@@ -640,6 +720,9 @@ app.post('/staffhostelbooking', async function(req, resp) {
         resp.status(400).send('0customerID');
     }
 });
+
+// customer hostel booking
+// remove duplicated function
 
 // cancel booking
 app.post('/cancelbooking', async function(req, resp) {
@@ -838,17 +921,17 @@ app.get('/bookingrequests', async function(req,resp){
 
   //fetch all activity requests
   const activityRequests = await performQuery('SELECT r.id, r.dateTime, a.name, a.description, a.price, a.roomNeeded, c.fName, c.lName, c.email, c.phone FROM activityRequests AS r INNER JOIN customers AS c ON r.userId = c.id INNER JOIN activities AS a ON r.activityId = a.id ')
-  console.log(activityRequests)
+
   if(processQueryResult(activityRequests, resp)){
 
     //fetch all community booking requests
-    const communityRequests = await performQuery('SELECT r.id, r.start, r.end, r.priceOfBooking, co.name, co.description, cu.fName, cu.lName, cu.email, cu.phone  FROM tcr_hub.communityRequest AS r INNER JOIN tcr_hub.customers AS cu ON r.userId = cu.id INNER JOIN tcr_hub.communityRooms AS co ON r.roomId = co.id ')
-    console.log(communityRequests)
+    const communityRequests = await performQuery('SELECT r.id, r.start, r.end, r.priceOfBooking, co.name, co.description, cu.fName, cu.lName, cu.email, cu.phone  FROM communityRequest AS r INNER JOIN customers AS cu ON r.userId = cu.id INNER JOIN communityRooms AS co ON r.roomId = co.id ')
+
     if(processQueryResult(activityRequests, resp)){
 
       //fetch all hostel room bookings
       const hostelRequests = await performQuery('SELECT r.id, r.startDate, r.endDate, r.price, r.noOfPeople, hr.roomNumber, c.fName, c.lName, c.email, c.phone  FROM hostelRequests AS r INNER JOIN customers AS c ON r.userId = c.id INNER JOIN hostelRooms AS hr ON r.roomId = hr.id ')
-      console.log(hostelRequests)
+
       if(processQueryResult(hostelRequests,resp)){
         request['activity'] = activityRequests
         request['community'] = communityRequests
@@ -858,6 +941,184 @@ app.get('/bookingrequests', async function(req,resp){
       }
     }
   }
+
+});
+
+app.post('/approvecommunityrequest', async function(req,resp){
+
+  const id = req.body.id;
+
+  // where clause
+  let where = '';
+
+  where = addToSearchClause(id, 'id', where);
+  // fetch request
+  const request = await performQuery('SELECT * FROM communityRequest WHERE '+ where);
+
+  // if no database error
+  if (processQueryResult(request, resp)) {
+
+    //add to booking table
+    if(await communityBooking(request[0].userId, request[0].roomId, request[0].start.getTime()/1000, request[0].end.getTime()/1000, request[0].priceOfBooking, 0, resp)){
+
+      //delete from request
+      const result = await performQuery('DELETE FROM communityRequest WHERE '+ where);
+
+      // if no database error
+      if (processQueryResult(result, resp)) {
+        // inform client new booking added to the database
+        resp.status(201).send('success');
+
+      } else {
+        // database error
+        resp.status(500).send('0database');
+      }
+    }else{
+  console.log('Error with adding to booking table')
+  }
+}
+
+});
+
+app.post('/approveactivityrequest', async function(req,resp){
+
+  const id = req.body.id;
+
+  // where clause
+  let where = '';
+
+  where = addToSearchClause(id, 'id', where);
+  // fetch request
+  const request = await performQuery('SELECT * FROM activityRequest WHERE '+ where);
+
+  // if no database error
+  if (processQueryResult(request, resp)) {
+    //add to booking table
+    if(await activityBooking(request[0].userId, request[0].dateTime.getTime()/1000, request[0].activityId, request[0].price, 0, request[0].numberOfPeople, resp)){
+
+      //delete from request
+      const result = await performQuery('DELETE FROM activityRequest WHERE '+ where);
+
+      // if no database error
+      if (processQueryResult(result, resp)) {
+        // inform client new booking added to the database
+        resp.status(201).send('success');
+
+      } else {
+        // database error
+        resp.status(500).send('0database');
+      }
+    }else{
+  console.log('Error with adding to booking table')
+  }
+}
+
+});
+
+app.post('/approvehostelrequest', async function(req,resp){
+
+  const id = req.body.id;
+
+  // where clause
+  let where = '';
+
+  where = addToSearchClause(id, 'id', where);
+  // fetch request
+  const request = await performQuery('SELECT * FROM hostelRequest WHERE '+ where);
+
+  // if no database error
+  if (processQueryResult(request, resp)) {
+    //add to booking table
+    if(await hostelBooking(request[0].roomId, request[0].startDate.getTime()/1000,request[0].endDate.getTime()/1000, request[0].userId, request[0].price, 0, request[0].noOfPeople, resp)){
+
+      //delete from request
+      const result = await performQuery('DELETE FROM hostelRequest WHERE '+ where);
+
+      // if no database error
+      if (processQueryResult(result, resp)) {
+        // inform client new booking added to the database
+        resp.status(201).send('success');
+
+      } else {
+        // database error
+        resp.status(500).send('0database');
+      }
+    }else{
+  console.log('Error with adding to booking table')
+  }
+}
+
+});
+
+app.post('/denycommunityrequest', async function(req,resp){
+
+  const id = req.body.id;
+
+  // where clause
+  let where = '';
+
+  where = addToSearchClause(id, 'id', where);
+  //delete from request
+  const result = await performQuery('DELETE FROM communityRequest WHERE '+ where);
+
+  // if no database error
+  if (processQueryResult(result, resp)) {
+
+    // inform client deleted successfully
+    resp.status(201).send('success');
+  } else {
+
+    // database error
+    resp.status(500).send('0database');
+      }
+
+});
+
+app.post('/denyactivityrequest', async function(req,resp){
+
+  const id = req.body.id;
+
+  // where clause
+  let where = '';
+
+  where = addToSearchClause(id, 'id', where);
+  //delete from request
+  const result = await performQuery('DELETE FROM activityRequest WHERE '+ where);
+
+  // if no database error
+  if (processQueryResult(result, resp)) {
+
+    // inform client deleted successfully
+    resp.status(201).send('success');
+  } else {
+
+    // database error
+    resp.status(500).send('0database');
+      }
+
+});
+
+app.post('/denyhostelrequest', async function(req,resp){
+
+  const id = req.body.id;
+
+  // where clause
+  let where = '';
+
+  where = addToSearchClause(id, 'id', where);
+  //delete from request
+  const result = await performQuery('DELETE FROM hostelRequest WHERE '+ where);
+
+  // if no database error
+  if (processQueryResult(result, resp)) {
+
+    // inform client deleted successfully
+    resp.status(201).send('success');
+  } else {
+
+    // database error
+    resp.status(500).send('0database');
+      }
 
 });
 
