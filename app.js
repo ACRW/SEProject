@@ -60,7 +60,7 @@ async function performQuery(query) {
         return result = await db.query(query);
     // if query fails
     } catch (err) {
-        // return errors
+        // return error
         return '0database';
     } finally {
         // disconnect databse
@@ -440,23 +440,35 @@ app.get('/customerbookings', async function(req, resp) {
 
 // community room booking
 async function communityBooking(customerID, roomID, start, end, price, paid, resp) {
-    // should check if free at specified times
-
-    // insert row
-    const result = await performQuery('INSERT INTO communityBookings (start, end, priceOfBooking, paid, roomId, userId) VALUES (FROM_UNIXTIME(' + start + '), FROM_UNIXTIME(' + end + '), ' + price + ', ' + paid + ', ' + roomID + ', ' + customerID + ')');
+    // check for clashing bookings
+    const clashes = await performQuery('SELECT * FROM communityBookings WHERE start < FROM_UNIXTIME(' + end + ') AND end > FROM_UNIXTIME(' + start + ')');
 
     // if no database error
-    if (processQueryResult(result, resp)) {
-        // if correct number of rows inserted
-        if (result['affectedRows'] == 1) {
-            // return true
-            return true;
+    if (processQueryResult(clashes, resp)) {
+        // if no clashes
+        if (clashes.length == 0) {
+            // insert row
+            const result = await performQuery('INSERT INTO communityBookings (start, end, priceOfBooking, paid, roomId, userId) VALUES (FROM_UNIXTIME(' + start + '), FROM_UNIXTIME(' + end + '), ' + price + ', ' + paid + ', ' + roomID + ', ' + customerID + ')');
+
+            // if no database error
+            if (processQueryResult(result, resp)) {
+                // if correct number of rows inserted
+                if (result['affectedRows'] == 1) {
+                    // return true
+                    return true;
+
+                } else {
+                    // database error
+                    resp.status(500).send('0database');
+                }
+            }
 
         } else {
-            // database error
-            resp.status(500).send('0database');
+            // clashing bookings error
+            resp.status(400).send('0clashes');
         }
     }
+
     // return false
     return false;
 }
