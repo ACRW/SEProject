@@ -38,7 +38,7 @@
     font-size: 115%;
     color: black;
     font-size: 115%;
-        
+
     margin-top: 5px;
     margin-bottom: 5px;
 }
@@ -83,6 +83,8 @@
 .btn {
   margin-bottom: 5px;
   margin-top: 5px;
+  margin-right: 5px;
+  margin-left: 5px;
 }
 
     /* Dropdown Button */
