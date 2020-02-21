@@ -81,6 +81,20 @@ function processQueryResult(result, response) {
     return true;
 }
 
+// validate session
+function validateSession(type, req, resp) {
+    // if session active & of correct type
+    if (req.session.active && req.session.type == type) {
+        // valid session
+        return true;
+    }
+
+    // activity error
+    resp.status(403).send('0inactive');
+
+    return false;
+}
+
 // add parameter to search clause
 function addToSearchClause(parameter, field, whereClause) {
     // if parameter defined
@@ -90,9 +104,11 @@ function addToSearchClause(parameter, field, whereClause) {
             // add 'AND' to clause
             whereClause += ' AND ';
         }
+
         // add parameter
         whereClause += field + ' LIKE "%' + parameter + '%"';
     }
+
     // return search clause
     return whereClause;
 }
@@ -490,102 +506,113 @@ async function activityBooking(customerID, dateTime, activityId, price, paid, nu
   }
 }
 
-// community room booking
-async function communityBooking(customerID, roomID, start, end, price, paid, resp) {
-    // check for clashing bookings
-    const clashes = await performQuery('SELECT * FROM communityBookings WHERE start < FROM_UNIXTIME(' + end + ') AND end > FROM_UNIXTIME(' + start + ')');
+// make community room booking on behalf of customer
+app.post('/staffcommunitybooking', async function(req, resp) {
+    // if valid staff session
+    if (validateSession('staff', req, resp)) {
+        // customer ID
+        const customerID = req.body.customerid;
 
+        // if customer ID specified
+        if (customerID) {
+            // check customer exists
+            if (checkCustomerExists(customerID, resp)) {
+                // booking parameters
+                const roomID = req.body.roomid;
+                const start = req.body.start;
+                const end = req.body.end;
+                const price = req.body.price;
+                const paid = req.body.paid;
 
-    // if no database error
-    if (processQueryResult(clashes, resp)) {
-        // if no clashes
-        if (clashes.length == 0) {
-            // insert row
-            const result = await performQuery('INSERT INTO communityBookings (start, end, priceOfBooking, paid, roomId, userId) VALUES (FROM_UNIXTIME(' + start + '), FROM_UNIXTIME(' + end + '), ' + price + ', ' + paid + ', ' + roomID + ', ' + customerID + ')');
+                // if all parameters specified
+                if (roomID && start && end && price && paid) {
+                    // check for clashing bookings
+                    const clashes = await performQuery('SELECT * FROM communityBookings WHERE start < FROM_UNIXTIME(' + end + ') AND end > FROM_UNIXTIME(' + start + ')');
 
-            // if no database error
-            if (processQueryResult(result, resp)) {
-                // if correct number of rows inserted
-                if (result['affectedRows'] == 1) {
-                    // return true
-                    return true;
+                    // if no database error
+                    if (processQueryResult(clashes, resp)) {
+                        // if no clashes
+                        if (clashes.length == 0) {
+                            // insert row
+                            const result = await performQuery('INSERT INTO communityBookings (start, end, priceOfBooking, paid, roomId, userId) VALUES (FROM_UNIXTIME(' + start + '), FROM_UNIXTIME(' + end + '), ' + price + ', ' + paid + ', ' + roomID + ', ' + customerID + ')');
+
+                            // if no database error
+                            if (processQueryResult(result, resp)) {
+                                // if correct number of rows inserted
+                                if (result['affectedRows'] == 1) {
+                                    // booking successful
+                                    resp.status(200).send('1success');
+
+                                } else {
+                                    // database error
+                                    resp.status(500).send('0database');
+                                }
+                            }
+
+                        } else {
+                            // clashing bookings error
+                            resp.status(400).send('0clashes');
+                        }
+                    }
 
                 } else {
-                    // database error
-                    resp.status(500).send('0database');
+                    // parameter error
+                    resp.status(400).send('0parameters');
                 }
             }
 
         } else {
-            // clashing bookings error
-            resp.status(400).send('0clashes');
+            // customer ID error
+            resp.status(400).send('0customerID');
         }
-    }
-
-    // return false
-    return false;
-}
-
-// make community room booking on behalf of customer
-app.post('/staffcommunitybooking', async function(req, resp) {
-    // customer ID
-    const customerID = req.body.customerid;
-
-    // if customer ID specified
-    if (customerID) {
-        // check customer exists
-        if (checkCustomerExists(customerID, resp)) {
-            // booking parameters
-            const roomID = req.body.roomid;
-            const start = req.body.start;
-            const end = req.body.end;
-            const price = req.body.price;
-            const paid = req.body.paid;
-
-            // if all parameters specified
-            if (roomID && start && end && price && paid) {
-                // make booking
-                if (await communityBooking(customerID, roomID, start, end, price, paid, resp)) {
-                    // booking successful
-                    resp.status(200).send('1success');
-                }
-            } else {
-                // parameter error
-                resp.status(400).send('0parameters');
-            }
-        }
-    } else {
-        // customer ID error
-        resp.status(400).send('0customerID');
     }
 });
 
 // make community room booking using customer session
 app.post('/customercommunitybooking', async function(req, resp) {
     // if active customer session
-    if (req.session.active && req.session.type == 'customer') {
+    if (validateSession('customer', req, resp)) {
         // booking parameters
         const roomID = req.body.roomid;
         const start = req.body.start;
         const end = req.body.end;
         const price = req.body.price;
-        const paid = req.body.paid;
 
         // if all parameters specified
-        if (roomID && start && end && price && paid) {
-            // make booking
-            if (await communityBooking(req.session.userID, roomID, start, end, price, paid, resp)) {
-                // booking successful
-                resp.status(200).send('1success');
+        if (roomID && start && end && price) {
+            // check for clashing bookings
+            const clashes = await performQuery('(SELECT start, end FROM communityBookings WHERE start < FROM_UNIXTIME(' + end + ') AND end > FROM_UNIXTIME(' + start + ')) UNION (SELECT start, end FROM communityRequests WHERE start < FROM_UNIXTIME(' + end + ') AND end > FROM_UNIXTIME(' + start + '))');
+
+            // if no database error
+            if (processQueryResult(clashes, resp)) {
+                // if no clashes
+                if (clashes.length == 0) {
+                    // insert row
+                    const result = await performQuery('INSERT INTO communityRequests (start, end, priceOfBooking, roomId, userId) VALUES (FROM_UNIXTIME(' + start + '), FROM_UNIXTIME(' + end + '), ' + price + ', ' + roomID + ', ' + req.session.userID + ')');
+
+                    // if no database error
+                    if (processQueryResult(result, resp)) {
+                        // if correct number of rows inserted
+                        if (result['affectedRows'] == 1) {
+                            // booking successful
+                            resp.status(200).send('1success');
+
+                        } else {
+                            // database error
+                            resp.status(500).send('0database');
+                        }
+                    }
+
+                } else {
+                    // clashing bookings error
+                    resp.status(400).send('0clashes');
+                }
             }
+
         } else {
             // parameter error
             resp.status(400).send('0parameters');
         }
-
-    } else {
-        // activity error
-        resp.status(403).send('0inactive');
     }
 });
 
