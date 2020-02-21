@@ -524,9 +524,6 @@ async function communityBooking(customerID, roomID, start, end, price, paid, res
 
     // return false
     return false;
-  }catch(error) {
-    console.log ('Error: ' + error);
-  }
 }
 
 // make community room booking on behalf of customer
