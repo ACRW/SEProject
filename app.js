@@ -721,6 +721,9 @@ app.post('/staffhostelbooking', async function(req, resp) {
     }
 });
 
+// customer hostel booking
+// remove duplicated function
+
 // cancel booking
 app.post('/cancelbooking', async function(req, resp) {
     // booking type
