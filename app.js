@@ -674,7 +674,7 @@ app.post('/customerhostelbooking', async function(req, resp) {
                 // if no clashes
                 if (clashes.length == 0) {
                     // insert row
-                    const result = await performQuery('INSERT INTO hostelRequests (roomId, startDate, endDate, userId, price, noOfPeople) VALUES ('+ roomID + ', FROM_UNIXTIME(' + start + '), FROM_UNIXTIME(' + end + '),' + customerID + ', ' + price + ', ' + numberOfPeople + ')');
+                    const result = await performQuery('INSERT INTO hostelRequests (roomId, startDate, endDate, userId, price, noOfPeople) VALUES ('+ roomID + ', FROM_UNIXTIME(' + start + '), FROM_UNIXTIME(' + end + '),' + req.session.userID + ', ' + price + ', ' + numberOfPeople + ')');
 
                     // if no database error
                     if (processQueryResult(result, resp)) {
