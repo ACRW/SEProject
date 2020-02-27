@@ -653,6 +653,55 @@ app.post('/staffhostelbooking', async function(req, resp) {
     }
 });
 
+// make community room booking using customer session
+app.post('/customerhostelbooking', async function(req, resp) {
+    // if valid staff session
+    if (validateSession('customer', req, resp)) {
+        // booking parameters
+        const roomID = req.body.roomid;
+        const start = req.body.start;
+        const end = req.body.end;
+        const price = req.body.price;
+        const numberOfPeople = req.body.numberofpeople;
+
+        // if all parameters specified
+        if (roomID && start && end && price && paid && numberOfPeople) {
+            // check for clashing bookings
+            const clashes = await performQuery('(SELECT startDate, endDate FROM hostelBookings WHERE startDate < FROM_UNIXTIME(' + end + ') AND endDate > FROM_UNIXTIME(' + start + ')) UNION (SELECT startDate, endDate FROM hostelRequests WHERE startDate < FROM_UNIXTIME(' + end + ') AND endDate > FROM_UNIXTIME(' + start + '))');
+
+            // if no database error
+            if (processQueryResult(clashes, resp)) {
+                // if no clashes
+                if (clashes.length == 0) {
+                    // insert row
+                    const result = await performQuery('INSERT INTO hostelRequests (roomId, startDate, endDate, userId, price, noOfPeople) VALUES ('+ roomID + ', FROM_UNIXTIME(' + start + '), FROM_UNIXTIME(' + end + '),' + customerID + ', ' + price + ', ' + numberOfPeople + ')');
+
+                    // if no database error
+                    if (processQueryResult(result, resp)) {
+                        // if correct number of rows inserted
+                        if (result['affectedRows'] == 1) {
+                            // booking successful
+                            resp.status(200).send('1success');
+
+                        } else {
+                            // database error
+                            resp.status(500).send('0database');
+                        }
+                    }
+
+                } else {
+                    // clashing bookings error
+                    resp.status(400).send('0clashes');
+                }
+            }
+
+        } else {
+            // parameter error
+            resp.status(400).send('0parameters');
+        }
+    }
+});
+
 // hostel room booking
 async function newEvent(name, description, start, capacity, tickets, resp) {
     // should check if free at specified times
