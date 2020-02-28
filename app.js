@@ -977,7 +977,30 @@ async function approveRequest(requestID, tableName, resp) {
             if (request.length == 1) {
                 // for community & hostel - check for clashes
 
+                switch (tableName) {
+                    case 'activity':
+                        const result = await performQuery('INSERT INTO activityBookings (dateTime, activityId, userId, numberOfPeople, price, paid) VALUES (FROM_UNIXTIME(' + request[0].dateTime.getTime()/1000 + '), ' + request[0].activityId + ', ' + request[0].userId + ', ' + request[0].numberOfPeople + ', ' + request[0].price + ', 0)');
 
+                        break;
+                }
+
+                if (processQueryResult(result, resp)) {
+                    if (result['affectedRows'] == 1) {
+                        const result = await performQuery('DELETE FROM ' + tableName + 'Requests WHERE id = ' + requestID);
+
+                        if (processQueryResult(result, resp)) {
+                            if (result['affectedRows'] == 1) {
+                                resp.status(201).send('1success');
+
+                            } else {
+
+                            }
+                        }
+
+                    } else {
+
+                    }
+                }
 
             // request does not exist
             } else {
@@ -1097,6 +1120,8 @@ app.post('/approvehostelrequest', async function(req,resp){
 }
 
 });
+
+// check session!!
 
 // deny booking request
 async function denyRequest(requestID, tableName, resp) {
