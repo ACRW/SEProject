@@ -289,6 +289,11 @@ document.addEventListener("DOMContentLoaded", function () {
   document.getElementById('customerId').addEventListener('change',function(){
     getUserBookings()
   })
+
+  //when notifications selected
+  document.getElementById('notificationButton').addEventListener('click',function(){
+    getNotifications()
+  })
 });
 
 //runs get request to search for user in database and displays results
@@ -1450,5 +1455,235 @@ async function createNewEvent(){
 }catch(error){
   alert('Error' + error)
 }
+}
 
+//get one of each type of booking still awaiting approval
+async function getNotifications(){
+
+  //get all requests
+  try{
+    let response = await fetch('http://localhost:8090/bookingrequests',
+    {
+      method: 'GET',
+      headers: {
+          "Content-Type": "application/json"
+        }
+    });
+
+    //if response is ok
+    if(response.ok){
+      var body = await response.text();
+      var requests = JSON.parse(body)
+
+      //display information
+      document.getElementById('notificationBody').innerHTML = '<p> One booking of each type is displayed please act on a request to view the next one </p>'
+      document.getElementById('notificationBody').innerHTML += '<p> Before you deny a request please inform the client by phone or email the reason for your decision </p>';
+
+
+      //if community request exists
+      if(requests['community'].length>=1){
+        console.log(requests['community'])
+        document.getElementById('notificationBody').innerHTML += '<p> Community Booking Requests </p>';
+        //display info about request
+        statement = 'Booking Request for ' + requests['community'][0].name + ' from ' + requests['community'][0].start + ' - ' + requests['community'][0].end + ' by ' + requests['community'][0].fName + ' ' + requests['community'][0].lName;
+        customerInfo = ' Customer email: ' + requests['community'][0].email + ' Customer phone: ' + requests['community'][0].phone + ' Booking Price: £' + requests['community'][0].priceOfBooking;
+        document.getElementById('notificationBody').innerHTML += '<p id="request' + requests['community'][0].id + '"> '+statement + customerInfo +' </p>';
+        document.getElementById('notificationBody').innerHTML += '<button type="button" class="btn btn-primary newColor" id="approveC'+ requests['community'][0].id+'"> Approve </button>';
+        document.getElementById('notificationBody').innerHTML += '<button type="button" class="btn btn-primary newColor" id="denyC'+requests['community'][0].id+'"> Deny </button>';
+
+        //add listeners to buttons
+        document.getElementById('approveC'+requests['community'][0].id).addEventListener("click", function(){
+          approveCRequest(requests['community'][0].id);
+        });
+        document.getElementById('denyC'+requests['community'][0].id).addEventListener("click", function(){
+          denyCRequest(requests['community'][0].id);
+        });
+
+      }
+
+      //if activity request exists
+      if(requests['activity'].length>=1){
+        document.getElementById('notificationBody').innerHTML += '<p> Activity Booking Requests </p>';
+        //display info about request
+        statement = 'Booking Request for ' + requests['activity'][0].name + ' from ' + requests['activity'][0].dateTime + ' by ' + requests['activity'][0].fName + ' ' + requests['activity'][0].lName;
+        customerInfo = ' Customer email: ' + requests['activity'][0].email + ' Customer phone: ' + requests['activity'][0].phone + ' Booking Price: £' + requests['activity'][0].priceOfBooking;
+        document.getElementById('notificationBody').innerHTML += '<p id="request' + requests['activity'][0].id + '"> '+statement + customerInfo +' </p>';
+
+        document.getElementById('notificationBody').innerHTML += '<button type="button" class="btn btn-primary newColor" id="approveA'+ requests['activity'][0].id+'"> Approve </button>';
+        document.getElementById('notificationBody').innerHTML += '<button type="button" class="btn btn-primary newColor" id="denyA'+requests['activity'][0].id+'"> Deny </button>';
+
+        //add listeners to buttons
+        document.getElementById('approveA'+requests['activity'][0].id).addEventListener("click", function(){
+          approveCRequest(requests['activity'][0].id);
+        });
+        document.getElementById('denyA'+requests['activity'][0].id).addEventListener("click", function(){
+          denyCRequest(requests['activity'][0].id);
+        });
+
+      }
+
+      //if hostel request exists
+      if(requests['hostel'].length>=1){
+        document.getElementById('notificationBody').innerHTML += '<p> Hostel Booking Requests </p>';
+        //display info about request
+        statement = 'Booking Request for ' + requests['hostel'][0].roomNumber + ' from ' + requests['hostel'][0].start + ' by ' + requests['hostel'][0].fName + ' ' + requests['hostel'][0].lName;
+        customerInfo = ' Customer email: ' + requests['hostel'][0].email + ' Customer phone: ' + requests['hostel'][0].phone + ' Booking Price: £' + requests['hostel'][0].priceOfBooking;
+        document.getElementById('notificationBody').innerHTML += '<p id="request' + requests['hostel'][0].id + '"> '+statement + customerInfo +' </p>';
+
+        document.getElementById('notificationBody').innerHTML += '<button type="button" class="btn btn-primary newColor" id="approveH'+ requests['hostel'][0].id+'"> Approve </button>';
+        document.getElementById('notificationBody').innerHTML += '<button type="button" class="btn btn-primary newColor" id="denyH'+requests['hostel'][0].id+'"> Deny </button>';
+
+        //add listeners to buttons
+        document.getElementById('approveH'+requests['hostel'][0].id).addEventListener("click", function(){
+          approveCRequest(requests['hostel'][0].id);
+        });
+        document.getElementById('denyH'+requests['hostel'][0].id).addEventListener("click", function(){
+          denyCRequest(requests['hostel'][0].id);
+        });
+
+      }
+    }else{
+      throw new Error('Error  ' + response.code);
+    }
+  }catch(error){
+    alert('Error' + error)
+  }
+}
+
+async function approveCRequest(id){
+  //add new community booking and delete from request
+  try{
+    let response = await fetch('http://localhost:8090/approvecommunityrequest',
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: 'id=' + id
+    });
+
+  //if response isn't fine
+  if(!response.ok){
+    throw new Error('problem aproving event ' + response.code);
+  }else{
+    getNotifications()
+  }
+}catch(error){
+  alert('Error' + error)
+}
+}
+
+async function approveARequest(id){
+  //add new activity booking and delete from request
+  try{
+    let response = await fetch('http://localhost:8090/approveactivityrequest',
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: 'id=' + id
+    });
+
+  //if response isn't fine
+  if(!response.ok){
+    throw new Error('problem aproving event ' + response.code);
+  }else{
+    getNotifications()
+  }
+}catch(error){
+  alert('Error' + error)
+}
+}
+
+async function approveHRequest(id){
+  //add new hostel booking and delete from request
+  try{
+    let response = await fetch('http://localhost:8090/approvehostelrequest',
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: 'id=' + id
+    });
+
+  //if response isn't fine
+  if(!response.ok){
+    throw new Error('problem aproving event ' + response.code);
+  }else{
+    getNotifications()
+  }
+}catch(error){
+  alert('Error' + error)
+}
+}
+
+async function denyCRequest(id){
+  //delete from request
+  try{
+    let response = await fetch('http://localhost:8090/denycommunityrequest',
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: 'id=' + id
+    });
+
+  //if response isn't fine
+  if(!response.ok){
+    throw new Error('problem aproving event ' + response.code);
+  }else{
+    getNotifications()
+  }
+}catch(error){
+  alert('Error' + error)
+}
+}
+
+async function denyARequest(id){
+  //delete from request
+  try{
+    let response = await fetch('http://localhost:8090/denyactivityrequest',
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: 'id=' + id
+    });
+
+  //if response isn't fine
+  if(!response.ok){
+    throw new Error('problem aproving event ' + response.code);
+  }else{
+    getNotifications()
+  }
+}catch(error){
+  alert('Error' + error)
+}
+}
+
+async function denyHRequest(id){
+  //delete from request
+  try{
+    let response = await fetch('http://localhost:8090/denyhostelrequest',
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: 'id=' + id
+    });
+
+  //if response isn't fine
+  if(!response.ok){
+    throw new Error('problem aproving event ' + response.code);
+  }else{
+    getNotifications()
+  }
+}catch(error){
+  alert('Error' + error)
+}
 }

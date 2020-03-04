@@ -60,7 +60,7 @@ async function performQuery(query) {
         return result = await db.query(query);
     // if query fails
     } catch (err) {
-        // return errors
+        // return error
         return '0database';
     } finally {
         // disconnect databse
@@ -81,6 +81,20 @@ function processQueryResult(result, response) {
     return true;
 }
 
+// validate session
+function validateSession(type, req, resp) {
+    // if session active & of correct type
+    if (req.session.active && req.session.type == type) {
+        // valid session
+        return true;
+    }
+
+    // activity error
+    resp.status(403).send('0inactive');
+
+    return false;
+}
+
 // add parameter to search clause
 function addToSearchClause(parameter, field, whereClause) {
     // if parameter defined
@@ -90,9 +104,11 @@ function addToSearchClause(parameter, field, whereClause) {
             // add 'AND' to clause
             whereClause += ' AND ';
         }
+
         // add parameter
         whereClause += field + ' LIKE "%' + parameter + '%"';
     }
+
     // return search clause
     return whereClause;
 }
@@ -438,12 +454,12 @@ app.get('/customerbookings', async function(req, resp) {
     }
 });
 
-// community room booking
-async function communityBooking(customerID, roomID, start, end, price, paid, resp) {
+// activity room booking
+async function activityBooking(customerID, dateTime, activityId, price, paid, numberOfPeople, resp) {
     // should check if free at specified times
-
+    try{
     // insert row
-    const result = await performQuery('INSERT INTO communityBookings (start, end, priceOfBooking, paid, roomId, userId) VALUES (FROM_UNIXTIME(' + start + '), FROM_UNIXTIME(' + end + '), ' + price + ', ' + paid + ', ' + roomID + ', ' + customerID + ')');
+    const result = await performQuery('INSERT INTO activityBookings (dateTime, price, paid, activityId, userId, numberOfPeople) VALUES (FROM_UNIXTIME(' + start + '),' + price + ', ' + paid + ', ' + activityID + ', ' + customerID + ', ' + numberOfPeople + ')');
 
     // if no database error
     if (processQueryResult(result, resp)) {
@@ -459,68 +475,232 @@ async function communityBooking(customerID, roomID, start, end, price, paid, res
     }
     // return false
     return false;
+  }catch(error) {
+    console.log ('Error: ' + error);
+  }
 }
 
 // make community room booking on behalf of customer
 app.post('/staffcommunitybooking', async function(req, resp) {
-    // customer ID
-    const customerID = req.body.customerid;
+    // if valid staff session
+    if (validateSession('staff', req, resp)) {
+        // customer ID
+        const customerID = req.body.customerid;
 
-    // if customer ID specified
-    if (customerID) {
-        // check customer exists
-        if (checkCustomerExists(customerID, resp)) {
-            // booking parameters
-            const roomID = req.body.roomid;
-            const start = req.body.start;
-            const end = req.body.end;
-            const price = req.body.price;
-            const paid = req.body.paid;
+        // if customer ID specified
+        if (customerID) {
+            // check customer exists
+            if (checkCustomerExists(customerID, resp)) {
+                // booking parameters
+                const roomID = req.body.roomid;
+                const start = req.body.start;
+                const end = req.body.end;
+                const price = req.body.price;
+                const paid = req.body.paid;
 
-            // if all parameters specified
-            if (roomID && start && end && price && paid) {
-                // make booking
-                if (await communityBooking(customerID, roomID, start, end, price, paid, resp)) {
-                    // booking successful
-                    resp.status(200).send('1success');
+                // if all parameters specified
+                if (roomID && start && end && price && paid) {
+                    // check for clashing bookings
+                    const clashes = await performQuery('SELECT * FROM communityBookings WHERE start < FROM_UNIXTIME(' + end + ') AND end > FROM_UNIXTIME(' + start + ')');
+
+                    // if no database error
+                    if (processQueryResult(clashes, resp)) {
+                        // if no clashes
+                        if (clashes.length == 0) {
+                            // insert row
+                            const result = await performQuery('INSERT INTO communityBookings (start, end, priceOfBooking, paid, roomId, userId) VALUES (FROM_UNIXTIME(' + start + '), FROM_UNIXTIME(' + end + '), ' + price + ', ' + paid + ', ' + roomID + ', ' + customerID + ')');
+
+                            // if no database error
+                            if (processQueryResult(result, resp)) {
+                                // if correct number of rows inserted
+                                if (result['affectedRows'] == 1) {
+                                    // booking successful
+                                    resp.status(200).send('1success');
+
+                                } else {
+                                    // database error
+                                    resp.status(500).send('0database');
+                                }
+                            }
+
+                        } else {
+                            // clashing bookings error
+                            resp.status(400).send('0clashes');
+                        }
+                    }
+
+                } else {
+                    // parameter error
+                    resp.status(400).send('0parameters');
                 }
-            } else {
-                // parameter error
-                resp.status(400).send('0parameters');
             }
+
+        } else {
+            // customer ID error
+            resp.status(400).send('0customerID');
         }
-    } else {
-        // customer ID error
-        resp.status(400).send('0customerID');
     }
 });
 
-// hostel room booking
-async function hostelBooking(customerID, roomID, start, end, resp) {
-    // should check if free at specified times
-    try{
-      // insert row
-      const result = await performQuery('INSERT INTO hostelBookings (roomID, startDate, endDate, userId) VALUES (' + roomID + ', FROM_UNIXTIME(' + start + '), FROM_UNIXTIME(' + end + '), ' + customerID + ')');
+// make community room booking using customer session
+app.post('/customercommunitybooking', async function(req, resp) {
+    // if active customer session
+    if (validateSession('customer', req, resp)) {
+        // booking parameters
+        const roomID = req.body.roomid;
+        const start = req.body.start;
+        const end = req.body.end;
+        const price = req.body.price;
 
-      // if no database error
-      if (processQueryResult(result, resp)) {
-          // if correct number of rows inserted
-          if (result['affectedRows'] == 1) {
-              // return true
-              return true;
+        // if all parameters specified
+        if (roomID && start && end && price) {
+            // check for clashing bookings
+            const clashes = await performQuery('(SELECT start, end FROM communityBookings WHERE start < FROM_UNIXTIME(' + end + ') AND end > FROM_UNIXTIME(' + start + ')) UNION (SELECT start, end FROM communityRequests WHERE start < FROM_UNIXTIME(' + end + ') AND end > FROM_UNIXTIME(' + start + '))');
 
-            } else {
-              // database error
-              resp.status(500).send('0database');
+            // if no database error
+            if (processQueryResult(clashes, resp)) {
+                // if no clashes
+                if (clashes.length == 0) {
+                    // insert row
+                    const result = await performQuery('INSERT INTO communityRequests (start, end, priceOfBooking, roomId, userId) VALUES (FROM_UNIXTIME(' + start + '), FROM_UNIXTIME(' + end + '), ' + price + ', ' + roomID + ', ' + req.session.userID + ')');
+
+                    // if no database error
+                    if (processQueryResult(result, resp)) {
+                        // if correct number of rows inserted
+                        if (result['affectedRows'] == 1) {
+                            // booking successful
+                            resp.status(200).send('1success');
+
+                        } else {
+                            // database error
+                            resp.status(500).send('0database');
+                        }
+                    }
+
+                } else {
+                    // clashing bookings error
+                    resp.status(400).send('0clashes');
+                }
             }
-        }
 
-        // return false
-        return false;
-      }catch (error) {
-        console.log ('Error: ' + error);
-      }
-}
+        } else {
+            // parameter error
+            resp.status(400).send('0parameters');
+        }
+    }
+});
+
+// make hostel room booking on behalf of customer
+app.post('/staffhostelbooking', async function(req, resp) {
+    // if valid staff session
+    if (validateSession('staff', req, resp)) {
+        // customer ID
+        const customerID = req.body.customerid;
+
+        // if customer ID specified
+        if (customerID) {
+            // check customer exists
+            if (checkCustomerExists(customerID, resp)) {
+                // booking parameters
+                const roomID = req.body.roomid;
+                const start = req.body.start;
+                const end = req.body.end;
+                const price = req.body.price;
+                const paid = req.body.paid;
+                const numberOfPeople = req.body.numberofpeople;
+
+                // if all parameters specified
+                if (roomID && start && end && price && paid && numberOfPeople) {
+                    // check for clashing bookings
+                    const clashes = await performQuery('SELECT * FROM hostelBookings WHERE startDate < FROM_UNIXTIME(' + end + ') AND endDate > FROM_UNIXTIME(' + start + ')');
+
+                    // if no database error
+                    if (processQueryResult(clashes, resp)) {
+                        // if no clashes
+                        if (clashes.length == 0) {
+                            // insert row
+                            const result = await performQuery('INSERT INTO hostelBookings (roomId, startDate, endDate, userId, price, paid, noOfPeople) VALUES ('+ roomID + ', FROM_UNIXTIME(' + start + '), FROM_UNIXTIME(' + end + '),' + customerID + ', ' + price + ',' + paid + ', ' + numberOfPeople + ')');
+
+                            // if no database error
+                            if (processQueryResult(result, resp)) {
+                                // if correct number of rows inserted
+                                if (result['affectedRows'] == 1) {
+                                    // booking successful
+                                    resp.status(200).send('1success');
+
+                                } else {
+                                    // database error
+                                    resp.status(500).send('0database');
+                                }
+                            }
+
+                        } else {
+                            // clashing bookings error
+                            resp.status(400).send('0clashes');
+                        }
+                    }
+
+                } else {
+                    // parameter error
+                    resp.status(400).send('0parameters');
+                }
+            }
+
+        } else {
+            // customer ID error
+            resp.status(400).send('0customerID');
+        }
+    }
+});
+
+// make community room booking using customer session
+app.post('/customerhostelbooking', async function(req, resp) {
+    // if valid staff session
+    if (validateSession('customer', req, resp)) {
+        // booking parameters
+        const roomID = req.body.roomid;
+        const start = req.body.start;
+        const end = req.body.end;
+        const price = req.body.price;
+        const numberOfPeople = req.body.numberofpeople;
+
+        // if all parameters specified
+        if (roomID && start && end && price && paid && numberOfPeople) {
+            // check for clashing bookings
+            const clashes = await performQuery('(SELECT startDate, endDate FROM hostelBookings WHERE startDate < FROM_UNIXTIME(' + end + ') AND endDate > FROM_UNIXTIME(' + start + ')) UNION (SELECT startDate, endDate FROM hostelRequests WHERE startDate < FROM_UNIXTIME(' + end + ') AND endDate > FROM_UNIXTIME(' + start + '))');
+
+            // if no database error
+            if (processQueryResult(clashes, resp)) {
+                // if no clashes
+                if (clashes.length == 0) {
+                    // insert row
+                    const result = await performQuery('INSERT INTO hostelRequests (roomId, startDate, endDate, userId, price, noOfPeople) VALUES ('+ roomID + ', FROM_UNIXTIME(' + start + '), FROM_UNIXTIME(' + end + '),' + req.session.userID + ', ' + price + ', ' + numberOfPeople + ')');
+
+                    // if no database error
+                    if (processQueryResult(result, resp)) {
+                        // if correct number of rows inserted
+                        if (result['affectedRows'] == 1) {
+                            // booking successful
+                            resp.status(200).send('1success');
+
+                        } else {
+                            // database error
+                            resp.status(500).send('0database');
+                        }
+                    }
+
+                } else {
+                    // clashing bookings error
+                    resp.status(400).send('0clashes');
+                }
+            }
+
+        } else {
+            // parameter error
+            resp.status(400).send('0parameters');
+        }
+    }
+});
 
 // hostel room booking
 async function newEvent(name, description, start, capacity, tickets, resp) {
@@ -563,42 +743,10 @@ async function newEvent(name, description, start, capacity, tickets, resp) {
   }
 }
 
-// make hostel room booking on behalf of customer
-app.post('/staffhostelbooking', async function(req, resp) {
-    // customer ID
-    const customerID = req.body.customerid;
 
-    // if customer ID specified
-    if (customerID) {
-        // check customer exists
-        if (checkCustomerExists(customerID, resp)) {
-            // booking parameters
-            const roomID = req.body.roomid;
-            const start = req.body.start;
-            const end = req.body.end;
 
-            // if all parameters specified
-            if (roomID && start && end) {
-                // make booking
-                try{
-                if (await hostelBooking(customerID, roomID, start, end, resp)) {
-                    // booking successful
-                    resp.status(200).send('1success');
-                }
-              }catch(error){
-                console.log ('Error: ' + error);
-              }
-
-            } else {
-                // parameter error
-                resp.status(400).send('0parameters');
-            }
-        }
-    } else {
-        // customer ID error
-        resp.status(400).send('0customerID');
-    }
-});
+// customer hostel booking
+// remove duplicated function
 
 // cancel booking
 app.post('/cancelbooking', async function(req, resp) {
@@ -788,9 +936,363 @@ app.get('/communityroomprice', async function(req,resp) {
     }
 });
 
+// booking requests
+
+// get all booking requests
+app.get('/bookingrequests', async function(req, resp) {
+    // requests object
+    let requests = {}
+
+    // activity requests
+    const activityRequests = await performQuery('SELECT r.id, r.dateTime, a.name, a.description, a.price, a.roomNeeded, c.fName, c.lName, c.email, c.phone FROM activityRequests AS r INNER JOIN customers AS c ON r.userId = c.id INNER JOIN activities AS a ON r.activityId = a.id');
+
+    // community requests
+    const communityRequests = await performQuery('SELECT r.id, r.start, r.end, r.priceOfBooking, co.name, co.description, cu.fName, cu.lName, cu.email, cu.phone  FROM communityRequests AS r INNER JOIN customers AS cu ON r.userId = cu.id INNER JOIN communityRooms AS co ON r.roomId = co.id');
+
+    // hostel requests
+    const hostelRequests = await performQuery('SELECT r.id, r.startDate, r.endDate, r.price, r.noOfPeople, hr.roomNumber, c.fName, c.lName, c.email, c.phone  FROM hostelRequests AS r INNER JOIN customers AS c ON r.userId = c.id INNER JOIN hostelRooms AS hr ON r.roomId = hr.id');
+
+    // if no database errors
+    if (processQueryResult(activityRequests, resp) && processQueryResult(communityRequests, resp) && processQueryResult(hostelRequests, resp)) {
+        // add each type to requests object
+        requests['activity'] = activityRequests;
+        requests['community'] = communityRequests;
+        requests['hostel'] = hostelRequests;
+
+        // send requests
+        resp.status(200).send(JSON.stringify(requests));
+    }
+});
+
+// approve booking request
+async function approveRequest(requestID, tableName, resp) {
+    // if request ID specified
+    if (requestID) {
+        // fetch request
+        const request = await performQuery('SELECT * FROM ' + tableName + 'Requests WHERE id = ' + requestID);
+
+        // if no database error
+        if (processQueryResult(request, resp)) {
+            // if one row returned
+            if (request.length == 1) {
+                // for community & hostel - check for clashes
+
+                switch (tableName) {
+                    case 'activity':
+                        const result = await performQuery('INSERT INTO activityBookings (dateTime, activityId, userId, numberOfPeople, price, paid) VALUES (FROM_UNIXTIME(' + request[0].dateTime.getTime()/1000 + '), ' + request[0].activityId + ', ' + request[0].userId + ', ' + request[0].numberOfPeople + ', ' + request[0].price + ', 0)');
+
+                        break;
+                }
+
+                if (processQueryResult(result, resp)) {
+                    if (result['affectedRows'] == 1) {
+                        const result = await performQuery('DELETE FROM ' + tableName + 'Requests WHERE id = ' + requestID);
+
+                        if (processQueryResult(result, resp)) {
+                            if (result['affectedRows'] == 1) {
+                                resp.status(201).send('1success');
+
+                            } else {
+
+                            }
+                        }
+
+                    } else {
+
+                    }
+                }
+
+            // request does not exist
+            } else {
+                // request error
+                resp.status(400).send('0request');
+            }
+        }
+
+    } else {
+        // request ID error
+        resp.status(400).send('0id');
+    }
+}
+
+app.post('/approvecommunityrequest', async function(req,resp){
+
+  const id = req.body.id;
+
+  // where clause
+  let where = '';
+
+  where = addToSearchClause(id, 'id', where);
+  // fetch request
+  const request = await performQuery('SELECT * FROM communityRequest WHERE '+ where);
+
+  // if no database error
+  if (processQueryResult(request, resp)) {
+
+    //add to booking table
+    if(await communityBooking(request[0].userId, request[0].roomId, request[0].start.getTime()/1000, request[0].end.getTime()/1000, request[0].priceOfBooking, 0, resp)){
+
+      //delete from request
+      const result = await performQuery('DELETE FROM communityRequest WHERE '+ where);
+
+      // if no database error
+      if (processQueryResult(result, resp)) {
+        // inform client new booking added to the database
+        resp.status(201).send('success');
+
+      } else {
+        // database error
+        resp.status(500).send('0database');
+      }
+    }else{
+  console.log('Error with adding to booking table')
+  }
+}
+
+});
+
+app.post('/approveactivityrequest', async function(req,resp){
+
+  const id = req.body.id;
+
+  // where clause
+  let where = '';
+
+  where = addToSearchClause(id, 'id', where);
+  // fetch request
+  const request = await performQuery('SELECT * FROM activityRequest WHERE '+ where);
+
+  // if no database error
+  if (processQueryResult(request, resp)) {
+    //add to booking table
+    if(await activityBooking(request[0].userId, request[0].dateTime.getTime()/1000, request[0].activityId, request[0].price, 0, request[0].numberOfPeople, resp)){
+
+      //delete from request
+      const result = await performQuery('DELETE FROM activityRequest WHERE '+ where);
+
+      // if no database error
+      if (processQueryResult(result, resp)) {
+        // inform client new booking added to the database
+        resp.status(201).send('success');
+
+      } else {
+        // database error
+        resp.status(500).send('0database');
+      }
+    }else{
+  console.log('Error with adding to booking table')
+  }
+}
+
+});
+
+app.post('/approvehostelrequest', async function(req,resp){
+
+  const id = req.body.id;
+
+  // where clause
+  let where = '';
+
+  where = addToSearchClause(id, 'id', where);
+  // fetch request
+  const request = await performQuery('SELECT * FROM hostelRequest WHERE '+ where);
+
+  // if no database error
+  if (processQueryResult(request, resp)) {
+    //add to booking table
+    if(await hostelBooking(request[0].roomId, request[0].startDate.getTime()/1000,request[0].endDate.getTime()/1000, request[0].userId, request[0].price, 0, request[0].noOfPeople, resp)){
+
+      //delete from request
+      const result = await performQuery('DELETE FROM hostelRequest WHERE '+ where);
+
+      // if no database error
+      if (processQueryResult(result, resp)) {
+        // inform client new booking added to the database
+        resp.status(201).send('success');
+
+      } else {
+        // database error
+        resp.status(500).send('0database');
+      }
+    }else{
+  console.log('Error with adding to booking table')
+  }
+}
+
+});
+
+// check session!!
+
+// deny booking request
+async function denyRequest(requestID, tableName, resp) {
+    // if request ID specified
+    if (requestID) {
+        // delete row from appropriate table
+        const result = await performQuery('DELETE FROM ' + tableName + 'Requests WHERE id = ' + requestID);
+
+        // if no database error
+        if (processQueryResult(result, resp)) {
+            // if one row deleted
+            if (result['affectedRows'] == 1) {
+                // inform client request deleted
+                resp.status(200).send('1success');
+
+            // request does not exist
+            } else {
+                // request error
+                resp.status(400).send('0request');
+            }
+        }
+
+    } else {
+        // request ID error
+        resp.status(400).send('0id');
+    }
+}
+
+// deny community booking request
+app.post('/denycommunityrequest', async function(req, resp) {
+    // make call to deny request function
+    await denyRequest(req.body.id, 'community', resp);
+});
+
+// deny hostel booking request
+app.post('/denyhostelrequest', async function(req,resp){
+    // make call to deny request function
+    await denyRequest(req.body.id, 'hostel', resp);
+});
+
+// deny activity booking request
+app.post('/denyactivityrequest', async function(req,resp){
+    // make call to deny request function
+    await denyRequest(req.body.id, 'activity', resp);
+});
+
 // user accounts
 
 // look into HTTPS
+
+// handle staff sign in
+app.post('/staffsignin', async function(req, resp) {
+    // Google token
+    const token = req.body.token;
+    // verify token
+    const payload = await login(token);
+
+    // if verification failed
+    if (!payload) {
+        // token error
+        resp.status(403).send('0token');
+
+    } else {
+        // Google ID
+        const googleID = payload['sub'];
+
+        // look for staff member in database
+        const staff = await performQuery('SELECT * FROM staff WHERE googleId = ' + googleID);
+
+        // if no database error
+        if (processQueryResult(staff, resp)) {
+            // if staff member in database
+            if (staff.length == 1) {
+                // refresh session
+                req.session.regenerate(function(error) {
+                    // if regeneration failed
+                    if (error) {
+                        // session error
+                        resp.status(500).send('0session');
+
+                    } else {
+                        // set session variables
+                        req.session.active = true;
+                        req.session.type = 'staff';
+                        req.session.userID = staff[0]['id'];
+
+                        // name
+                        const staffMemberDetails = {'fname': staff[0]['fName'], 'sname': staff[0]['lName']};
+
+                        // send name
+                        resp.status(200).send(JSON.stringify(staffMemberDetails));
+                    }
+                });
+
+            // if access denied
+            } else {
+                // permission error
+                resp.status(403).send('0permission');
+            }
+        }
+    }
+});
+
+// new staff member
+app.post('/newstaffmember', async function(req, resp) {
+    // if staff session active
+    if (req.session.active && req.session.type == 'staff') {
+        // Google token
+        const token = req.body.token;
+        // verify token
+        const payload = await login(token);
+
+        // if verification failed
+        if (!payload) {
+            // token error
+            resp.status(403).send('0token');
+
+        } else {
+            // Google ID
+            const googleID = payload['sub'];
+
+            // look for staff member in database
+            const staff = await performQuery('SELECT * FROM staff WHERE googleId = ' + googleID);
+
+            // if no database error
+            if (processQueryResult(staff, resp)) {
+                // if staff member not in database
+                if (staff.length == 0) {
+                    // get maximum staff ID
+                    const maxID = await performQuery('SELECT MAX(id) FROM staff');
+
+                    // if no database error
+                    if (processQueryResult(maxID, resp)) {
+                        // new staff ID
+                        let newID = 0;
+
+                        // if previous IDs exist
+                        if (maxID[0]['MAX(id)'] != null) {
+                            // increment staff ID
+                            newID = parseInt(maxID[0]['MAX(id)']) + 1;
+                        }
+
+                        // add staff member to database
+                        const result = await performQuery('INSERT INTO staff (id, fName, lName, googleId, email) VALUES (' + newID + ', "' + payload['given_name'] + '", "' + payload['family_name'] + '", "' + googleID + '", "' + payload['email'] + '")');
+
+                        // if no database error
+                        if (processQueryResult(result, resp)) {
+                            // if one row inserted
+                            if (result['affectedRows'] == 1) {
+                                // return new staff ID to client
+                                resp.status(200).send(JSON.stringify(newID));
+
+                            } else {
+                                // database error
+                                resp.status(500).send('0database');
+                            }
+                        }
+                    }
+
+                // staff member already registered
+                } else {
+                    // staff member error
+                    resp.status(400).send('0staff');
+                }
+            }
+        }
+    } else {
+        // permission error
+        resp.status(403).send('0permission');
+    }
+});
 
 // handle customer sign in
 app.post('/customersignin', async function(req, resp) {
@@ -816,7 +1318,7 @@ app.post('/customersignin', async function(req, resp) {
             // if customer in database
             if (customer.length == 1) {
                 // refresh session
-                req.session.regenerate(function (error) {
+                req.session.regenerate(function(error) {
                     // if regeneration failed
                     if (error) {
                         // session error
@@ -847,7 +1349,7 @@ app.post('/customersignin', async function(req, resp) {
                     let newID = 0;
 
                     // if previous IDs exist
-                    if (maxID.length == 1) {
+                    if (maxID[0]['MAX(id)'] != null) {
                         // increment customer ID
                         newID = parseInt(maxID[0]['MAX(id)']) + 1;
                     }
@@ -894,8 +1396,6 @@ app.post('/newcustomer', async function(req, resp) {
                 if (processQueryResult(result, resp)) {
                     // if one row inserted
                     if (result['affectedRows'] == 1) {
-                        // create session here
-
                         // get customer's name
                         const customer = await performQuery('SELECT fName, lName FROM customers WHERE id = ' + customerID);
 
@@ -904,8 +1404,23 @@ app.post('/newcustomer', async function(req, resp) {
                             // customer's name
                             const customerDetails = {'fname': customer[0]['fName'], 'sname': customer[0]['lName']};
 
-                            // send customer's name
-                            resp.status(200).send(JSON.stringify(customerDetails));
+                            // refresh session
+                            req.session.regenerate(function(error) {
+                                // if regeneration failed
+                                if (error) {
+                                    // session error
+                                    resp.status(500).send('0session');
+
+                                } else {
+                                    // set session variables
+                                    req.session.active = true;
+                                    req.session.type = 'customer';
+                                    req.session.userID = customerID;
+
+                                    // send customer's name
+                                    resp.status(200).send(JSON.stringify(customerDetails));
+                                }
+                            });
                         }
 
                     // customer not in database
@@ -925,6 +1440,45 @@ app.post('/newcustomer', async function(req, resp) {
     } else {
         // customer ID error
         resp.status(400).send('0customerID');
+    }
+});
+
+// sign user out
+app.post('/signout', async function(req, resp) {
+    // if user active
+    if (req.session.active) {
+        // destroy session
+        req.session.destroy(function(error) {
+            // if destruction failed
+            if (error) {
+                // session error
+                resp.status(500).send('0session');
+
+            } else {
+                // success message
+                resp.status(200).send('1success');
+            }
+        });
+
+    } else {
+        // activity error
+        resp.status(403).send('0inactive');
+    }
+});
+
+// current user
+app.get('/currentuser', async function(req, resp) {
+    // if session active
+    if (req.session.active) {
+        // session information
+        const sessionInformation = {'type': req.session.type, 'userID': req.session.userID};
+
+        // send session information
+        resp.status(200).send(JSON.stringify(sessionInformation));
+
+    } else {
+        // activity error
+        resp.status(403).send('0inactive');
     }
 });
 
