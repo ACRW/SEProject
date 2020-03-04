@@ -38,6 +38,7 @@
             let option = document.createElement("option");
             option.text = rooms[i]["name"];
             option.value = rooms[i]["id"];
+            console.log(rooms[i]["id"]);
             roomDrop.add(option);
         }
     }
@@ -50,8 +51,8 @@
         let table = document.getElementById("calTable");
         let eTable = document.getElementById("eventTable");
         let cellHeight = 50; // Height of calender rows
-        let bookings = [];
-        
+        let bookings = []; // Keeps a list of all bookings
+        let curRoom = -1; // The id of the room that is currently selected, for conveniance.
         let userBooking = {
             "element": document.createElement("div"),
             "date": -1,
@@ -60,6 +61,7 @@
         let peekElement = document.createElement("div");
         let tableDims = table.getBoundingClientRect();
         let colWidth = tableDims.width * 0.13; // Width of the columns
+        let paymentTable = document.getElementById("paymentTable");
         
         peekElement.className = "peekGraphic newColor";
         peekElement.style.width = String(tableDims.width * 0.11) + "px"
@@ -124,17 +126,15 @@
             }
         }
         
-        this.changeRoom = async function () {
+        this.changeRoom = async function () { // Called when the room is changed
             tableDims = table.getBoundingClientRect();
-            let roomID = document.getElementById("roomDrop").value; // The list is in order of room id but offset by one due to the default option
-            await getBookings(roomID);
+            curRoom = document.getElementById("roomDrop").value; // The list is in order of room id but offset by one due to the default option
+            await getBookings(curRoom);
             displayBookings();
-            console.log(roomID + 1)
-            document.getElementById("roomDesc").innerHTML = rooms[parseInt(roomID) + 1]["description"];
+            document.getElementById("roomDesc").innerHTML = rooms[parseInt(curRoom) + 1]["description"];
         }
 
         let getBookings = async function(roomID) { // Gets the bookings and formats them nicely
-            console.log(roomID);
             if (roomID == -1) {
                 return;
             }
@@ -206,6 +206,15 @@
                 userBooking["date"] = new Date();
                 eTable.rows[0].cells[curColumn + 1].appendChild(userBooking["element"]);
             }
+            
+            // update payment table:
+            if (curRoom != "-1") {
+                console.log(curRoom);
+                paymentTable.rows[1].cells[0].innerHTML = rooms[curRoom]["name"];
+                paymentTable.rows[1].cells[1].innerHTML = rooms[curRoom]["pricePerHour"];
+                paymentTable.rows[1].cells[2].innerHTML = rooms[curRoom]["pricePerHour"] * userBooking["bookingLength"];
+            }
+            
         }
         
         this.setBookingLength = async function(e) { // Sets what the booking length should be
@@ -422,7 +431,7 @@
           </tr>
         </tbody>
     </table>
-    <table class="table" style="margin-top:30px">
+    <table class="table" style="margin-top:30px" id="paymentTable">
         <tr>
             <td>Room</td>
             <td>Price/Hour</td>
