@@ -940,27 +940,30 @@ app.get('/communityroomprice', async function(req,resp) {
 
 // get all booking requests
 app.get('/bookingrequests', async function(req, resp) {
-    // requests object
-    let requests = {}
+    // if valid staff session
+    if (validateSession('staff', req, resp)) {
+        // requests object
+        let requests = {}
 
-    // activity requests
-    const activityRequests = await performQuery('SELECT r.id, r.dateTime, a.name, a.description, a.price, a.roomNeeded, c.fName, c.lName, c.email, c.phone FROM activityRequests AS r INNER JOIN customers AS c ON r.userId = c.id INNER JOIN activities AS a ON r.activityId = a.id');
+        // activity requests
+        const activityRequests = await performQuery('SELECT r.id, r.dateTime, a.name, a.description, a.price, a.roomNeeded, c.fName, c.lName, c.email, c.phone FROM activityRequests AS r INNER JOIN customers AS c ON r.userId = c.id INNER JOIN activities AS a ON r.activityId = a.id');
 
-    // community requests
-    const communityRequests = await performQuery('SELECT r.id, r.start, r.end, r.priceOfBooking, co.name, co.description, cu.fName, cu.lName, cu.email, cu.phone  FROM communityRequests AS r INNER JOIN customers AS cu ON r.userId = cu.id INNER JOIN communityRooms AS co ON r.roomId = co.id');
+        // community requests
+        const communityRequests = await performQuery('SELECT r.id, r.start, r.end, r.priceOfBooking, co.name, co.description, cu.fName, cu.lName, cu.email, cu.phone  FROM communityRequests AS r INNER JOIN customers AS cu ON r.userId = cu.id INNER JOIN communityRooms AS co ON r.roomId = co.id');
 
-    // hostel requests
-    const hostelRequests = await performQuery('SELECT r.id, r.startDate, r.endDate, r.price, r.noOfPeople, hr.roomNumber, c.fName, c.lName, c.email, c.phone  FROM hostelRequests AS r INNER JOIN customers AS c ON r.userId = c.id INNER JOIN hostelRooms AS hr ON r.roomId = hr.id');
+        // hostel requests
+        const hostelRequests = await performQuery('SELECT r.id, r.startDate, r.endDate, r.price, r.noOfPeople, hr.roomNumber, c.fName, c.lName, c.email, c.phone  FROM hostelRequests AS r INNER JOIN customers AS c ON r.userId = c.id INNER JOIN hostelRooms AS hr ON r.roomId = hr.id');
 
-    // if no database errors
-    if (processQueryResult(activityRequests, resp) && processQueryResult(communityRequests, resp) && processQueryResult(hostelRequests, resp)) {
-        // add each type to requests object
-        requests['activity'] = activityRequests;
-        requests['community'] = communityRequests;
-        requests['hostel'] = hostelRequests;
+        // if no database errors
+        if (processQueryResult(activityRequests, resp) && processQueryResult(communityRequests, resp) && processQueryResult(hostelRequests, resp)) {
+            // add each type to requests object
+            requests['activity'] = activityRequests;
+            requests['community'] = communityRequests;
+            requests['hostel'] = hostelRequests;
 
-        // send requests
-        resp.status(200).send(JSON.stringify(requests));
+            // send requests
+            resp.status(200).send(JSON.stringify(requests));
+        }
     }
 });
 
@@ -977,28 +980,38 @@ async function approveRequest(requestID, tableName, resp) {
             if (request.length == 1) {
                 // for community & hostel - check for clashes
 
+                // switch request type
                 switch (tableName) {
+                    // activity request
                     case 'activity':
+                        // create activity booking
                         const result = await performQuery('INSERT INTO activityBookings (dateTime, activityId, userId, numberOfPeople, price, paid) VALUES (FROM_UNIXTIME(' + request[0].dateTime.getTime()/1000 + '), ' + request[0].activityId + ', ' + request[0].userId + ', ' + request[0].numberOfPeople + ', ' + request[0].price + ', 0)');
-
                         break;
                 }
 
+                // if no database error
                 if (processQueryResult(result, resp)) {
+                    // if one row inserted
                     if (result['affectedRows'] == 1) {
+                        // delete request from appropriate requests table
                         const result = await performQuery('DELETE FROM ' + tableName + 'Requests WHERE id = ' + requestID);
 
+                        // if no database error
                         if (processQueryResult(result, resp)) {
+                            // if one row deleted
                             if (result['affectedRows'] == 1) {
+                                // inform client request successfully approved
                                 resp.status(201).send('1success');
 
                             } else {
-
+                                // database error
+                                resp.status(500).send('0database');
                             }
                         }
 
                     } else {
-
+                        // database error
+                        resp.status(500).send('0database');
                     }
                 }
 
@@ -1014,6 +1027,16 @@ async function approveRequest(requestID, tableName, resp) {
         resp.status(400).send('0id');
     }
 }
+
+// approve activity booking request
+app.post('/approveactivityrequest', async function(req, resp) {
+    // if valid staff session
+    if (validateSession('staff', req, resp)) {
+        // make call to approve request function
+        await approveRequest(req.body.id, 'activity', resp);
+    }
+});
+
 
 app.post('/approvecommunityrequest', async function(req,resp){
 
@@ -1034,41 +1057,6 @@ app.post('/approvecommunityrequest', async function(req,resp){
 
       //delete from request
       const result = await performQuery('DELETE FROM communityRequest WHERE '+ where);
-
-      // if no database error
-      if (processQueryResult(result, resp)) {
-        // inform client new booking added to the database
-        resp.status(201).send('success');
-
-      } else {
-        // database error
-        resp.status(500).send('0database');
-      }
-    }else{
-  console.log('Error with adding to booking table')
-  }
-}
-
-});
-
-app.post('/approveactivityrequest', async function(req,resp){
-
-  const id = req.body.id;
-
-  // where clause
-  let where = '';
-
-  where = addToSearchClause(id, 'id', where);
-  // fetch request
-  const request = await performQuery('SELECT * FROM activityRequest WHERE '+ where);
-
-  // if no database error
-  if (processQueryResult(request, resp)) {
-    //add to booking table
-    if(await activityBooking(request[0].userId, request[0].dateTime.getTime()/1000, request[0].activityId, request[0].price, 0, request[0].numberOfPeople, resp)){
-
-      //delete from request
-      const result = await performQuery('DELETE FROM activityRequest WHERE '+ where);
 
       // if no database error
       if (processQueryResult(result, resp)) {
@@ -1121,8 +1109,6 @@ app.post('/approvehostelrequest', async function(req,resp){
 
 });
 
-// check session!!
-
 // deny booking request
 async function denyRequest(requestID, tableName, resp) {
     // if request ID specified
@@ -1152,20 +1138,29 @@ async function denyRequest(requestID, tableName, resp) {
 
 // deny community booking request
 app.post('/denycommunityrequest', async function(req, resp) {
-    // make call to deny request function
-    await denyRequest(req.body.id, 'community', resp);
+    // if valid staff session
+    if (validateSession('staff', req, resp)) {
+        // make call to deny request function
+        await denyRequest(req.body.id, 'community', resp);
+    }
 });
 
 // deny hostel booking request
-app.post('/denyhostelrequest', async function(req,resp){
-    // make call to deny request function
-    await denyRequest(req.body.id, 'hostel', resp);
+app.post('/denyhostelrequest', async function(req, resp) {
+    // if valid staff session
+    if (validateSession('staff', req, resp)) {
+        // make call to deny request function
+        await denyRequest(req.body.id, 'hostel', resp);
+    }
 });
 
 // deny activity booking request
-app.post('/denyactivityrequest', async function(req,resp){
-    // make call to deny request function
-    await denyRequest(req.body.id, 'activity', resp);
+app.post('/denyactivityrequest', async function(req, resp) {
+    // if valid staff session
+    if (validateSession('staff', req, resp)) {
+        // make call to deny request function
+        await denyRequest(req.body.id, 'activity', resp);
+    }
 });
 
 // user accounts
