@@ -1291,6 +1291,8 @@ app.post('/customersignin', async function(req, resp) {
                     }
                 });
 
+            // check phone number in database !!!
+
             // if new customer
             } else {
                 // get maximum customer ID
