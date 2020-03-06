@@ -987,6 +987,18 @@ async function approveRequest(requestID, tableName, resp) {
                         // create activity booking
                         const result = await performQuery('INSERT INTO activityBookings (dateTime, activityId, userId, numberOfPeople, price, paid) VALUES (FROM_UNIXTIME(' + request[0].dateTime.getTime()/1000 + '), ' + request[0].activityId + ', ' + request[0].userId + ', ' + request[0].numberOfPeople + ', ' + request[0].price + ', 0)');
                         break;
+
+                    // community request
+                    case 'community':
+                        // create community booking
+                        const result = await performQuery('INSERT INTO communityBookings (start, end, priceOfBooking, paid, roomId, userId) VALUES (FROM_UNIXTIME(' + request[0].start.getTime()/1000 + '), FROM_UNIXTIME(' + request[0].end.getTime()/1000 + '), ' + request[0].priceOfBooking + ', 0, ' + request[0].roomId + ', ' + request[0].userId + ')');
+                        break;
+
+                    // hostel request
+                    case 'hostel':
+                        // create hostel booking
+                        const result = await performQuery('INSERT INTO hostelBookings (roomId, startDate, endDate, userId, price, paid, noOfPeople) VALUES ('+ request[0].roomId + ', FROM_UNIXTIME(' + request[0].startDate.getTime()/1000 + '), FROM_UNIXTIME(' + request[0].endDate.getTime()/1000 + '),' + request[0].userId + ', ' + request[0].price + ', 0, ' + request[0].noOfPeople + ')');
+                        break;
                 }
 
                 // if no database error
@@ -1037,76 +1049,22 @@ app.post('/approveactivityrequest', async function(req, resp) {
     }
 });
 
-
-app.post('/approvecommunityrequest', async function(req,resp){
-
-  const id = req.body.id;
-
-  // where clause
-  let where = '';
-
-  where = addToSearchClause(id, 'id', where);
-  // fetch request
-  const request = await performQuery('SELECT * FROM communityRequest WHERE '+ where);
-
-  // if no database error
-  if (processQueryResult(request, resp)) {
-
-    //add to booking table
-    if(await communityBooking(request[0].userId, request[0].roomId, request[0].start.getTime()/1000, request[0].end.getTime()/1000, request[0].priceOfBooking, 0, resp)){
-
-      //delete from request
-      const result = await performQuery('DELETE FROM communityRequest WHERE '+ where);
-
-      // if no database error
-      if (processQueryResult(result, resp)) {
-        // inform client new booking added to the database
-        resp.status(201).send('success');
-
-      } else {
-        // database error
-        resp.status(500).send('0database');
-      }
-    }else{
-  console.log('Error with adding to booking table')
-  }
-}
-
+// approve community booking request
+app.post('/approvecommunityrequest', async function(req, resp) {
+    // if valid staff session
+    if (validateSession('staff', req, resp)) {
+        // make call to approve request function
+        await approveRequest(req.body.id, 'community', resp);
+    }
 });
 
-app.post('/approvehostelrequest', async function(req,resp){
-
-  const id = req.body.id;
-
-  // where clause
-  let where = '';
-
-  where = addToSearchClause(id, 'id', where);
-  // fetch request
-  const request = await performQuery('SELECT * FROM hostelRequest WHERE '+ where);
-
-  // if no database error
-  if (processQueryResult(request, resp)) {
-    //add to booking table
-    if(await hostelBooking(request[0].roomId, request[0].startDate.getTime()/1000,request[0].endDate.getTime()/1000, request[0].userId, request[0].price, 0, request[0].noOfPeople, resp)){
-
-      //delete from request
-      const result = await performQuery('DELETE FROM hostelRequest WHERE '+ where);
-
-      // if no database error
-      if (processQueryResult(result, resp)) {
-        // inform client new booking added to the database
-        resp.status(201).send('success');
-
-      } else {
-        // database error
-        resp.status(500).send('0database');
-      }
-    }else{
-  console.log('Error with adding to booking table')
-  }
-}
-
+// approve hostel booking request
+app.post('/approvehostelrequest', async function(req, resp) {
+    // if valid staff session
+    if (validateSession('staff', req, resp)) {
+        // make call to approve request function
+        await approveRequest(req.body.id, 'hostel', resp);
+    }
 });
 
 // deny booking request
