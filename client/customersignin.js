@@ -41,6 +41,88 @@ async function signOut() {
     }
 }
 
+// validate number phone
+function validatePhoneInput() {
+    // phone number field
+    const input = document.getElementById('phoneInput');
+    // continue button
+    const continueButton = document.getElementById('phoneContinue');
+
+    // if phone number valid
+    if (input.validity.valid && input.value != '') {
+        // enabled continue button
+        continueButton.removeAttribute('disabled');
+
+    } else {
+        // disable continue button
+        continueButton.setAttribute('disabled', '');
+    }
+}
+
+// submit phone number
+async function phoneInput() {
+    // stop listening for phone number input
+    document.getElementById('phoneInput').removeEventListener('input', validatePhoneInput);
+    // stop listening for form submission
+    document.getElementById('phoneContinue').removeEventListener('click', phoneInput);
+
+    // hide continue button
+    document.getElementById('phoneContinue').setAttribute('hidden', '');
+    // show spinner
+    document.getElementById('phoneSpinner').removeAttribute('hidden');
+
+    // request body
+    let body = 'customerid=' + customerID + '&phone=' + document.getElementById('phoneInput').value.replace(' ', '%20');
+
+    // make call to API
+    let response = await fetch('/newcustomer',
+    {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: body
+    });
+
+    // hide new customer card
+    document.getElementById('newCustomerCard').setAttribute('hidden', '');
+
+    // reset new customer card
+    document.getElementById('phoneInput').value = '';
+    document.getElementById('phoneContinue').setAttribute('disabled', '');
+    document.getElementById('phoneContinue').removeAttribute('hidden');
+    document.getElementById('phoneSpinner').setAttribute('hidden', '');
+
+    // if unable to store phone number
+    if (!response.ok) {
+        // sign out of Google account
+        let auth2 = gapi.auth2.getAuthInstance();
+        auth2.signOut();
+
+        // show sign in card
+        document.getElementById('signInCard').removeAttribute('hidden');
+
+        // inform user of error
+        alert('Something went wrong! We were unable to store your phone number. Please try again.');
+
+    // if successfully stored phone number
+    } else {
+        // get customer's name
+        const responseBody = JSON.parse(await response.text());
+
+        // set customer's name on page
+        document.getElementById('userName').innerHTML = responseBody['fname'] + ' ' + responseBody['sname'];
+
+        // listen for sign out
+        document.getElementById('signOut').addEventListener('click', signOut);
+
+        // show user dropdown menu
+        document.getElementById('userMenu').removeAttribute('hidden');
+        // show placeholder content
+        document.getElementById('contentCard').removeAttribute('hidden');
+    }
+}
+
 // on Google sign in
 async function onSignIn(googleUser) {
     // hide Google button
@@ -103,8 +185,28 @@ async function onSignIn(googleUser) {
             // set customer ID
             customerID = parseInt(JSON.parse(await response.text()));
 
+            // listen for phone number input
+            document.getElementById('phoneInput').addEventListener('input', validatePhoneInput);
+            // listen for form submission
+            document.getElementById('phoneContinue').addEventListener('click', phoneInput);
+
             // show new customer card
             document.getElementById('newCustomerCard').removeAttribute('hidden');
         }
     }
 }
+
+// when page content loaded
+window.addEventListener('DOMContentLoaded', function() {
+    // when phone number invalid
+    document.getElementById('phoneInput').oninvalid = function() {
+        // prevent warning message
+        event.preventDefault();
+    }
+
+    // when enter key pressed
+    document.getElementById('phoneNumberForm').addEventListener('submit', function() {
+        // prevent form submission
+        event.preventDefault();
+    });
+});

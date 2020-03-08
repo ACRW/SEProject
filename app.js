@@ -1270,28 +1270,34 @@ app.post('/customersignin', async function(req, resp) {
         if (processQueryResult(customer, resp)) {
             // if customer in database
             if (customer.length == 1) {
-                // refresh session
-                req.session.regenerate(function(error) {
-                    // if regeneration failed
-                    if (error) {
-                        // session error
-                        resp.status(500).send('0session');
+                // if customer has provided extra information
+                if (customer[0].phone) {
+                    // refresh session
+                    req.session.regenerate(function(error) {
+                        // if regeneration failed
+                        if (error) {
+                            // session error
+                            resp.status(500).send('0session');
 
-                    } else {
-                        // set session variables
-                        req.session.active = true;
-                        req.session.type = 'customer';
-                        req.session.userID = customer[0]['id'];
+                        } else {
+                            // set session variables
+                            req.session.active = true;
+                            req.session.type = 'customer';
+                            req.session.userID = customer[0]['id'];
 
-                        // customer's name
-                        const customerDetails = {'fname': customer[0]['fName'], 'sname': customer[0]['lName']};
+                            // customer's name
+                            const customerDetails = {'fname': customer[0]['fName'], 'sname': customer[0]['lName']};
 
-                        // send customer's name
-                        resp.status(200).send(JSON.stringify(customerDetails));
-                    }
-                });
+                            // send customer's name
+                            resp.status(200).send(JSON.stringify(customerDetails));
+                        }
+                    });
 
-            // check phone number in database !!!
+                // customer previously bypassed request for futher information
+                } else {
+                    // treat as new customer
+                    resp.status(201).send(JSON.stringify(customer[0].id));
+                }
 
             // if new customer
             } else {
@@ -1342,8 +1348,11 @@ app.post('/newcustomer', async function(req, resp) {
 
         // if phone number specified
         if (phone) {
-            // check phone is a number
-            if (!isNaN(phone)) {
+            // regular expression for phone number
+            const phoneRegex = RegExp(/^[0-9]{3,6} {0,1}[0-9]{4,8}$/);
+
+            // if phone number matches regular expression
+            if (phoneRegex.test(phone)) {
                 // update database
                 const result = await performQuery('UPDATE customers SET phone = "' + phone + '" WHERE id = ' + customerID);
 
