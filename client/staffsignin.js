@@ -38,6 +38,19 @@ async function signOut() {
     }
 }
 
+// when new staff link clicked
+async function newStaff() {
+    // prevent default event
+    event.preventDefault();
+
+    // sign out of Google account
+    let auth2 = gapi.auth2.getAuthInstance();
+    auth2.signOut();
+
+    // go to new staff page
+    window.location = 'newstaff.html';
+}
+
 // on Google sign in
 async function onSignIn(googleUser) {
     // hide Google button
@@ -78,6 +91,9 @@ async function onSignIn(googleUser) {
 
         // listen for sign out
         document.getElementById('signOut').addEventListener('click', signOut);
+
+        // listen for new staff link
+        document.getElementById('newStaffLink').addEventListener('click', newStaff);
 
         // show user dropdown menu
         document.getElementById('userMenu').removeAttribute('hidden');

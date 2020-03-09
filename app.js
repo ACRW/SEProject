@@ -1224,8 +1224,11 @@ app.post('/newstaffmember', async function(req, resp) {
                         if (processQueryResult(result, resp)) {
                             // if one row inserted
                             if (result['affectedRows'] == 1) {
-                                // return new staff ID to client
-                                resp.status(200).send(JSON.stringify(newID));
+                                // name of new staff member
+                                const staffMemberDetails = {'fname': payload['given_name'], 'sname': payload['family_name']};
+
+                                // return name to client
+                                resp.status(200).send(JSON.stringify(staffMemberDetails));
 
                             } else {
                                 // database error
