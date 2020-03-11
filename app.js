@@ -454,31 +454,89 @@ app.get('/customerbookings', async function(req, resp) {
     }
 });
 
-// activity room booking
-async function activityBooking(customerID, dateTime, activityId, price, paid, numberOfPeople, resp) {
-    // should check if free at specified times
-    try{
-    // insert row
-    const result = await performQuery('INSERT INTO activityBookings (dateTime, price, paid, activityId, userId, numberOfPeople) VALUES (FROM_UNIXTIME(' + start + '),' + price + ', ' + paid + ', ' + activityID + ', ' + customerID + ', ' + numberOfPeople + ')');
+// make activity booking on behalf of customer
+app.post('/staffactivitybooking', async function(req, resp) {
+    // if valid staff session
+    if (validateSession('staff', req, resp)) {
+        // customer ID
+        const customerID = req.body.customerid;
 
-    // if no database error
-    if (processQueryResult(result, resp)) {
-        // if correct number of rows inserted
-        if (result['affectedRows'] == 1) {
-            // return true
-            return true;
+        // if customer ID specified
+        if (customerID) {
+            // check customer exists
+            if (checkCustomerExists(customerID, resp)) {
+                // booking parameters
+                const activityID = req.body.activityid;
+                const dateTime = req.body.datetime;
+                const numberOfPeople = req.body.numberofpeople;
+                const price = req.body.price;
+                const paid = req.body.paid;
+
+                // if all parameters specified
+                if (activityID && dateTime && numberOfPeople && price && paid) {
+                    // insert row
+                    const result = await performQuery('INSERT INTO activityBookings (dateTime, activityId, userId, numberOfPeople, price, paid) VALUES (FROM_UNIXTIME(' + dateTime + '), ' + activityID + ', ' + customerID + ', ' + numberOfPeople + ', ' + price + ', ' + paid + ')');
+
+                    // if no database error
+                    if (processQueryResult(result, resp)) {
+                        // if correct number of rows inserted
+                        if (result['affectedRows'] == 1) {
+                            // booking successful
+                            resp.status(200).send('1success');
+
+                        } else {
+                            // database error
+                            resp.status(500).send('0database');
+                        }
+                    }
+
+                } else {
+                    // parameter error
+                    resp.status(400).send('0parameters');
+                }
+            }
 
         } else {
-            // database error
-            resp.status(500).send('0database');
+            // customer ID error
+            resp.status(400).send('0customerID');
         }
     }
-    // return false
-    return false;
-  }catch(error) {
-    console.log ('Error: ' + error);
-  }
-}
+});
+
+// make activity booking using customer session
+app.post('/customeractivitybooking', async function(req, resp) {
+    // if valid customer session
+    if (validateSession('customer', req, resp)) {
+        // booking parameters
+        const activityID = req.body.activityid;
+        const dateTime = req.body.datetime;
+        const numberOfPeople = req.body.numberofpeople;
+        const price = req.body.price;
+
+        // if all parameters specified
+        if (activityID && dateTime && numberOfPeople && price) {
+            // insert row
+            const result = await performQuery('INSERT INTO activityRequests (dateTime, activityId, userId, numberOfPeople, price) VALUES (FROM_UNIXTIME(' + dateTime + '), ' + activityID + ', ' + req.session.userID + ', ' + numberOfPeople + ', ' + price + ')');
+
+            // if no database error
+            if (processQueryResult(result, resp)) {
+                // if correct number of rows inserted
+                if (result['affectedRows'] == 1) {
+                    // booking successful
+                    resp.status(200).send('1success');
+
+                } else {
+                    // database error
+                    resp.status(500).send('0database');
+                }
+            }
+
+        } else {
+            // parameter error
+            resp.status(400).send('0parameters');
+        }
+    }
+});
 
 // make community room booking on behalf of customer
 app.post('/staffcommunitybooking', async function(req, resp) {
