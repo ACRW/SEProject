@@ -309,74 +309,26 @@ app.get('/roomslargeenough', async function(req, resp) {
 
 // check customer in database
 async function checkCustomerExists(customerID, resp) {
-    // try to get customer's details
-    try{
-      const customer = await performQuery('SELECT id, fName, lName, email, phone FROM customers WHERE id = ' + customerID);
+    // get customer's details
+    const customer = await performQuery('SELECT id, fName, lName, email, phone FROM customers WHERE id = ' + customerID);
 
-      // if no database error
-      if (processQueryResult(customer, resp)) {
-          // if customer in database
-          if (customer.length == 1) {
-              // return true
-              return true
-            }
-            return false
-          }else{
-            //no matches
-            return false
-          }
-        }catch (error) {
-          console.log ('Error: ' + error);
+    // if no database error
+    if (processQueryResult(customer, resp)) {
+        // if customer in database
+        if (customer.length == 1) {
+            return true;
         }
+
+        return false;
+    }
 }
 
 // get all customers
 app.get('/customers', async function(req,resp) {
-    // fetch customers
-    const customers = await performQuery('SELECT id, fName, lName, email, phone FROM customers');
-
-    // if no database error
-    if (processQueryResult(customers, resp)) {
-        // if matching customers found
-        if (customers.length > 0) {
-            // send list of customers
-            resp.status(200).send(JSON.stringify(customers));
-
-        } else {
-            // no matches
-            resp.status(200).send('0matches');
-        }
-    }
-});
-
-// customer search
-app.get('/customersearch', async function(req, resp) {
-
-    // search parameters
-    const id = req.query.id;
-    const fname = req.query.fname;
-    const sname = req.query.sname;
-    const email = req.query.email;
-    const phone = req.query.phone;
-
-    // where clause
-    let where = '';
-
-    // build search clause
-    where = addToSearchClause(id, 'id', where);
-    where = addToSearchClause(fname, 'fName', where);
-    where = addToSearchClause(sname, 'lName', where);
-    where = addToSearchClause(email, 'email', where);
-    where = addToSearchClause(phone, 'phone', where);
-
-    // if no parameters specified
-    if (where.length == 0) {
-        // parameter error
-        resp.status(400).send('0parameters');
-
-    } else {
-        // get matching customers
-        const customers = await performQuery('SELECT id, fName, lName, email, phone FROM customers WHERE ' + where + ' ORDER BY lName, fName');
+    // if valid staff session
+    if (validateSession('staff', req, resp)) {
+        // fetch customers
+        const customers = await performQuery('SELECT id, fName, lName, email, phone FROM customers');
 
         // if no database error
         if (processQueryResult(customers, resp)) {
@@ -393,29 +345,78 @@ app.get('/customersearch', async function(req, resp) {
     }
 });
 
-// checks customer exists
-app.get('/customerexists', async function(req,resp) {
-    // fetch id
-    const id = req.query.id;
+// customer search
+app.get('/customersearch', async function(req, resp) {
+    // if valid staff session
+    if (validateSession('staff', req, resp)) {
+        // search parameters
+        const id = req.query.id;
+        const fname = req.query.fname;
+        const sname = req.query.sname;
+        const email = req.query.email;
+        const phone = req.query.phone;
 
-    // where clause
-    let where = '';
+        // where clause
+        let where = '';
 
-    // build search clause
-    where = addToSearchClause(id, 'id', where);
+        // build search clause
+        where = addToSearchClause(id, 'id', where);
+        where = addToSearchClause(fname, 'fName', where);
+        where = addToSearchClause(sname, 'lName', where);
+        where = addToSearchClause(email, 'email', where);
+        where = addToSearchClause(phone, 'phone', where);
 
-    const customers = await performQuery('SELECT id, fName, lName, email, phone FROM customers WHERE ' + where );
-
-    // if no database error
-    if (processQueryResult(customers, resp)) {
-        // if matching customers found
-        if (customers.length > 0) {
-            // send list of customers
-            resp.status(200).send(JSON.stringify(customers));
+        // if no parameters specified
+        if (where.length == 0) {
+            // parameter error
+            resp.status(400).send('0parameters');
 
         } else {
-            // no matches
-            resp.status(200).send('0matches');
+            // get matching customers
+            const customers = await performQuery('SELECT id, fName, lName, email, phone FROM customers WHERE ' + where + ' ORDER BY lName, fName');
+
+            // if no database error
+            if (processQueryResult(customers, resp)) {
+                // if matching customers found
+                if (customers.length > 0) {
+                    // send list of customers
+                    resp.status(200).send(JSON.stringify(customers));
+
+                } else {
+                    // no matches
+                    resp.status(200).send('0matches');
+                }
+            }
+        }
+    }
+});
+
+// checks customer exists
+app.get('/customerexists', async function(req, resp) {
+    // if valid staff session
+    if (validateSession('staff', req, resp)) {
+        // fetch ID
+        const id = req.query.id;
+
+        // where clause
+        let where = '';
+
+        // build search clause
+        where = addToSearchClause(id, 'id', where);
+
+        const customers = await performQuery('SELECT id, fName, lName, email, phone FROM customers WHERE ' + where );
+
+        // if no database error
+        if (processQueryResult(customers, resp)) {
+            // if matching customers found
+            if (customers.length > 0) {
+                // send list of customers
+                resp.status(200).send(JSON.stringify(customers));
+
+            } else {
+                // no matches
+                resp.status(200).send('0matches');
+            }
         }
     }
 });
@@ -427,15 +428,21 @@ async function bookings(customerID, resp) {
     // dictionary of bookings where key is booking type
     let bookings = {};
 
-    // need to add activity bookings
-
+    // activity bookings
+    const activity = await performQuery('SELECT b.id AS bookingID, b.dateTime, b.numberOfPeople, b.price, b.paid, a.id AS activityID, a.name, a.description FROM activityBookings b INNER JOIN activities a ON b.activityId = a.id WHERE b.userId = ' + customerID + ' ORDER BY b.dateTime');
     // community room bookings
     const community = await performQuery('SELECT b.id AS bookingID, b.start, b.end, b.priceOfBooking, b.paid, r.id AS roomID, r.name, r.description FROM communityBookings b INNER JOIN communityRooms r ON b.roomId = r.id WHERE b.userId = ' + customerID + ' ORDER BY b.start');
     // hostel room bookings
     const hostel = await performQuery('SELECT b.id AS bookingID, b.startDate, b.endDate, r.id AS roomID, r.noOfPeople, r.pricePerNight FROM hostelBookings b INNER JOIN hostelRooms r ON b.roomId = r.id WHERE b.userId = ' + customerID + ' ORDER BY b.startDate');
 
     // if no database errors
-    if (processQueryResult(community, resp) && processQueryResult(hostel, resp)) {
+    if (processQueryResult(activity, resp) && processQueryResult(community, resp) && processQueryResult(hostel, resp)) {
+        // if activity bookings exist
+        if (activity.length > 0) {
+            // add to dictionary
+            bookings['activity'] = activity;
+        }
+
         // if community room bookings exist
         if (community.length > 0) {
             // add to dictionary
@@ -459,24 +466,96 @@ async function bookings(customerID, resp) {
     }
 }
 
-// get bookings for specified customer
-app.get('/customerbookings', async function(req, resp) {
-    // customer ID
-    const customerID = req.query.id;
-    // if ID specified
-    if (customerID) {
-        // check customer exists
-        if (await checkCustomerExists(customerID, resp)) {
+// get customer booking requests
+async function bookingRequests(customerID, resp) {
+    // dictionary of booking requests where key is booking type
+    let bookings = {};
 
-            // get dictionary of bookings
-            const bookingsToReturn = await bookings(customerID, resp);
-            // send bookings
-            resp.status(200).send(bookingsToReturn);
+    // activity booking requests
+    const activity = await performQuery('SELECT b.id AS requestID, b.dateTime, b.numberOfPeople, b.price, a.id AS activityID, a.name, a.description FROM activityRequests b INNER JOIN activities a ON b.activityId = a.id WHERE b.userId = ' + customerID + ' ORDER BY b.dateTime');
+    // community room booking requests
+    const community = await performQuery('SELECT b.id AS requestID, b.start, b.end, b.priceOfBooking, r.id AS roomID, r.name, r.description FROM communityRequests b INNER JOIN communityRooms r ON b.roomId = r.id WHERE b.userId = ' + customerID + ' ORDER BY b.start');
+    // hostel room booking requests
+    const hostel = await performQuery('SELECT b.id AS requestID, b.startDate, b.endDate, r.id AS roomID, r.noOfPeople, r.pricePerNight FROM hostelRequests b INNER JOIN hostelRooms r ON b.roomId = r.id WHERE b.userId = ' + customerID + ' ORDER BY b.startDate');
+
+    // if no database errors
+    if (processQueryResult(activity, resp) && processQueryResult(community, resp) && processQueryResult(hostel, resp)) {
+        // if activity booking requests exist
+        if (activity.length > 0) {
+            // add to dictionary
+            bookings['activity'] = activity;
         }
 
-    } else {
-        // ID error
-        resp.status(400).send('0customerID');
+        // if community room booking requests exist
+        if (community.length > 0) {
+            // add to dictionary
+            bookings['community'] = community;
+        }
+
+        // if hostel room booking requests exist
+        if (hostel.length > 0) {
+            // add to dictionary
+            bookings['hostel'] = hostel;
+        }
+
+        // if customer has made no booking requests
+        if (Object.entries(bookings).length === 0) {
+            // bookings error
+            return '0bookings';
+        }
+
+        // return booking requests
+        return JSON.stringify(bookings);
+    }
+}
+
+// get bookings for specified customer
+app.get('/customerbookings', async function(req, resp) {
+    // if valid staff session
+    if (validateSession('staff', req, resp)) {
+        // customer ID
+        const customerID = req.query.id;
+
+        // if ID specified
+        if (customerID) {
+            // check customer exists
+            if (await checkCustomerExists(customerID, resp)) {
+                // get dictionary of bookings
+                const bookingsToReturn = await bookings(customerID, resp);
+                // send bookings
+                resp.status(200).send(bookingsToReturn);
+
+            } else {
+                // ID error
+                resp.status(400).send('0customerID');
+            }
+
+        } else {
+            // ID error
+            resp.status(400).send('0customerID');
+        }
+    }
+});
+
+// get bookings using customer session
+app.get('/mybookings', async function(req, resp) {
+    // if valid customer session
+    if (validateSession('customer', req, resp)) {
+        // get dictionary of bookings
+        const bookingsToReturn = await bookings(req.session.userID, resp);
+        // send bookings
+        resp.status(200).send(bookingsToReturn);
+    }
+});
+
+// get booking requests using customer session
+app.get('/mybookingrequests', async function(req, resp) {
+    // if valid customer session
+    if (validateSession('customer', req, resp)) {
+        // get dictionary of booking requests
+        const bookingsToReturn = await bookingRequests(req.session.userID, resp);
+        // send booking requests
+        resp.status(200).send(bookingsToReturn);
     }
 });
 
