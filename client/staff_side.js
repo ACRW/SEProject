@@ -1,7 +1,23 @@
 var submitAction = 0;
-
+var week = 1;
+//holds the current date
+var n =  new Date();
+var y = n.getYear();
+var m = n.getMonth() + 1;
+var d = n.getDate();
+var day = n.getDay();
 //on loading of content
 document.addEventListener("DOMContentLoaded", function () {
+
+
+
+  for(var i = 1; i <8 ; i++){
+        var x = day-i;
+        document.getElementById('day' + i).innerHTML = (d-x).toString().padStart(2,'0') + '/' + m.toString().padStart(2,'0');
+        if(isValidDate(d-x,m,y) == false){
+            document.getElementById('day' + i).innerHTML = (d-x  + daysInMonth(y,m) ).toString().padStart(2,'0')+ '/' + (m -1).toString().padStart(2,'0');
+        }
+    }
 
   //hide submit button
   document.getElementById("searchModalFooter").hidden = true;
@@ -294,7 +310,67 @@ document.addEventListener("DOMContentLoaded", function () {
   document.getElementById('notificationButton').addEventListener('click',function(){
     getNotifications()
   })
+
+  document.getElementById('nextWeek').addEventListener('click', function(){
+    forwardWeek()
+  })
+
+  document.getElementById('prevWeek').addEventListener('click', function(){
+    backWeek()
+  })
+
+  fillCalender()
 });
+
+function isValidDate(d, m, y) {
+    m = parseInt(m, 10) - 1;
+    return m >= 0 && m < 12 && d > 0 && d <= daysInMonth(y, m);
+}
+
+
+//changing the calender to the next week
+function forwardWeek(){
+  for(var i = 1; i <8 ; i++){
+      var x = parseInt(document.getElementById('day' + i).innerHTML) + 7;
+      document.getElementById('day' + i).innerHTML = x + '/' + m;
+      if(isValidDate(x,m,y) == false){
+        console.log(x)
+        console.log(daysInMonth(y,m))
+          if(daysInMonth(y,m)-x == 0){
+            m = m+ 1;
+            document.getElementById('day' + i).innerHTML = (x+1)% daysInMonth(y,m-1) + '/' + (m);
+          }else if (daysInMonth(y,m)-x < 0){
+            document.getElementById('day' + i).innerHTML = (x+1)% daysInMonth(y,m-1) + '/' + (m);
+
+          }else{
+              document.getElementById('day' + i).innerHTML = x% daysInMonth(y,m-2) + '/' + (m);
+          }
+      }
+  }
+    fillCalender()
+}
+
+//changing the calender to the previous week
+function backWeek(){
+    var monthSub = false;
+    for(var i = 7; i > 0 ; i--){
+        var x = parseInt(document.getElementById('day' + i).innerHTML) - 7;
+        document.getElementById('day' + i).innerHTML = x.toString().padStart(2,'0') + '/' + m.toString().padStart(2,'0');
+        if(isValidDate(x,m,y) == false){
+            if(x == 0){
+                m = m-1;
+                monthSub = true;
+                document.getElementById('day' + i).innerHTML = (x + daysInMonth(y,m-1)).toString().padStart(2,'0') + '/' + (m).toString().padStart(2,'0');
+            }else{
+                document.getElementById('day' + i).innerHTML =  (daysInMonth(y,m-1) + x).toString().padStart(2,'0') + '/' + (m).toString().padStart(2,'0');
+            }
+        }
+    }
+  //  if(monthSub == true){
+  //      m = m-1;
+  //  }
+  fillCalender()
+}
 
 //runs get request to search for user in database and displays results
 async function searchForUser(){
@@ -1024,6 +1100,7 @@ async function newHostelBooking(id){
   startDay = document.getElementById('chosenHostelDate').innerHTML.substring(4)
   startMonth =  document.getElementById('chosenHostelDate').value
   numberOfNights = document.getElementById('numberOfNights').value
+  endDay = (parseInt(startDay) + parseInt(numberOfNights)) % daysInMonth(2020,month)
 
   //if booking spans over the end of a month
   if(endDay<startDay){
@@ -1118,7 +1195,7 @@ async function newHostelBooking(id){
         //print error message
         document.getElementById('newHostelBookingError').innerHTML= 'Room is not avaliable at this time'
       }else{
-
+        price = document.getElementById('totalHostelBookingPrice').innerText
         //create new hostel booking
         let response = await fetch('http://localhost:8090/staffhostelbooking',
         {
@@ -1126,7 +1203,7 @@ async function newHostelBooking(id){
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
           },
-          body: 'customerid=' + id + '&roomid=' + roomId + '&start=' + startTime + '&end=' + endTime
+          body: 'customerid=' + id + '&roomid=' + roomId + '&start=' + startTime + '&end=' + endTime + '&numberOfPeople=' + numberOfGuests + '&price=' + price
         });
 
         //if response isn't fine
@@ -1686,4 +1763,82 @@ async function denyHRequest(id){
 }catch(error){
   alert('Error' + error)
 }
+}
+
+async function fillCalender(){
+  try{
+    let response = await fetch('http://localhost:8090/events',
+      {
+        method: 'GET',
+        headers: {
+            "Content-Type": "application/json"
+          }
+      });
+    if(response.ok){
+      var body = await response.text();
+      var events = JSON.parse(body)
+      eventFound = false;
+      for(var i = 0; i<events.length; i++){
+            for(var j = 1; j< 8; j++){
+                if((events[i].datetime.substring(8,10)+'/'+events[i].datetime.substring(5,7)).toString()==document.getElementById('day' + j).textContent.toString()){
+
+                    document.getElementById('day' + j + 'E').innerHTML += 'Name: ' + events[i].name + '\n'
+                    document.getElementById('day' + j + 'E').innerHTML += '  Start Time: ' + events[i].datetime.substring(11,16)
+
+                }
+            }
+        }
+    }
+  }catch(error){
+    alert('Error' + error)
+  }
+  try{
+    let response = await fetch('http://localhost:8090/bookings',
+      {
+        method: 'GET',
+        headers: {
+            "Content-Type": "application/json"
+          }
+      });
+    if(response.ok){
+      var body = await response.text();
+      var bookings = JSON.parse(body)
+      eventFound = false;
+      console.log(bookings)
+      for(var i = 0; i<bookings['activity'].length; i++){
+            for(var j = 1; j< 8; j++){
+               if((bookings['activity'][i].dateTime.substring(8,10)+'/'+bookings['activity'][i].dateTime.substring(5,7)).toString()==document.getElementById('day' + j).textContent.toString()){
+                    document.getElementById('day' + j + 'A').innerHTML += 'Start Time: ' + bookings['activity'][i].datetime.substring(11,16) + '\n'
+                    document.getElementById('day' + j + 'A').innerHTML += '  Number of People: ' + bookings['activity'].numberOfPeople
+
+                }
+            }
+      }
+      for(var i = 0; i<bookings['hostel'].length; i++){
+            for(var j = 1; j< 8; j++){
+               if((bookings['hostel'][i].startDate.substring(8,10)+'/'+bookings['hostel'][i].startDate.substring(5,7)).toString()==document.getElementById('day' + j).textContent.toString()){
+                    document.getElementById('day' + j + 'H').innerHTML += ' Start of Booking for ' + bookings['activity'].noOfPeople + ' people'
+
+              }
+              if((bookings['hostel'][i].endDate.substring(8,10)+'/'+bookings['hostel'][i].endDate.substring(5,7)).toString()==document.getElementById('day' + j).textContent.toString()){
+                   document.getElementById('day' + j + 'H').innerHTML += ' End of Booking for ' + bookings['hostel'].noOfPeople + ' people'
+
+               }
+
+            }
+      }
+      for(var i = 0; i<bookings['community'].length; i++){
+            for(var j = 1; j< 8; j++){
+               if((bookings['community'][i].start.substring(8,10)+'/'+bookings['community'][i].start.substring(5,7)).toString()==document.getElementById('day' + j).textContent.toString()){
+                    document.getElementById('day' + j + 'C').innerHTML += 'Start Time: ' + bookings['community'][i].start.substring(11,16) + '\n'
+                    document.getElementById('day' + j + 'C').innerHTML += '  End Time: ' + bookings['community'].end.substring(11,16)
+
+                }
+            }
+      }
+
+    }
+  }catch(error){
+    alert('Error' + error)
+  }
 }

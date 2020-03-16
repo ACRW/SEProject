@@ -423,6 +423,24 @@ app.get('/customerexists', async function(req, resp) {
 
 // bookings
 
+app.get('/bookings', async function(req,resp) {
+    let bookings = {}
+    // fetch customers
+    const activity = await performQuery('SELECT * FROM activityBookings');
+    const hostel = await performQuery('SELECT * FROM hostelBookings');
+    const community = await performQuery('SELECT * FROM communityBookings');
+
+    // if no database error
+    if (processQueryResult(community, resp)) {
+        // if matching customers found
+        bookings['activity'] = activity
+        bookings['hostel'] = hostel
+        bookings['community'] = community
+        resp.status(200).send(JSON.stringify(bookings));
+
+    }
+});
+
 // get customer bookings
 async function bookings(customerID, resp) {
     // dictionary of bookings where key is booking type
@@ -606,7 +624,6 @@ app.post('/staffactivitybooking', async function(req, resp) {
             resp.status(400).send('0customerID');
         }
     }
-});
 
 // make activity booking using customer session
 app.post('/customeractivitybooking', async function(req, resp) {
@@ -777,6 +794,7 @@ app.post('/staffhostelbooking', async function(req, resp) {
                     // check for clashing bookings
                     const clashes = await performQuery('SELECT * FROM hostelBookings WHERE startDate < FROM_UNIXTIME(' + end + ') AND endDate > FROM_UNIXTIME(' + start + ')');
 
+
                     // if no database error
                     if (processQueryResult(clashes, resp)) {
                         // if no clashes
@@ -907,6 +925,8 @@ async function newEvent(name, description, start, capacity, tickets, resp) {
 }
 
 
+
+    
 
 // customer hostel booking
 // remove duplicated function
