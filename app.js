@@ -380,6 +380,24 @@ app.get('/customerexists', async function(req,resp) {
 
 // bookings
 
+app.get('/bookings', async function(req,resp) {
+    let bookings = {}
+    // fetch customers
+    const activity = await performQuery('SELECT * FROM activityBookings');
+    const hostel = await performQuery('SELECT * FROM hostelBookings');
+    const community = await performQuery('SELECT * FROM communityBookings');
+
+    // if no database error
+    if (processQueryResult(community, resp)) {
+        // if matching customers found
+        bookings['activity'] = activity
+        bookings['hostel'] = hostel
+        bookings['community'] = community
+        resp.status(200).send(JSON.stringify(bookings));
+
+    }
+});
+
 // get customer bookings
 async function bookings(customerID, resp) {
     // dictionary of bookings where key is booking type
@@ -492,7 +510,7 @@ async function activityBooking(customerID, dateTime, activityId, price, paid, nu
 
 // community room booking
 async function communityBooking(customerID, roomID, start, end, price, paid, resp) {
-    // check for clashing bookings
+    try{// check for clashing bookings
     const clashes = await performQuery('SELECT * FROM communityBookings WHERE start < FROM_UNIXTIME(' + end + ') AND end > FROM_UNIXTIME(' + start + ')');
 
 
@@ -593,11 +611,11 @@ app.post('/customercommunitybooking', async function(req, resp) {
 });
 
 // hostel room booking
-async function hostelBooking(customerID, roomID, start, end, resp) {
+async function hostelBooking(customerID, roomID, start, end, price, numberOfPeople, resp) {
     // should check if free at specified times
     try{
       // insert row
-      const result = await performQuery('INSERT INTO hostelBookings (roomID, startDate, endDate, userId) VALUES (' + roomID + ', FROM_UNIXTIME(' + start + '), FROM_UNIXTIME(' + end + '), ' + customerID + ')');
+      const result = await performQuery('INSERT INTO hostelBookings (roomID, startDate, endDate, userId, price, noOfPeople) VALUES (' + roomID + ', FROM_UNIXTIME(' + start + '), FROM_UNIXTIME(' + end + '), ' + customerID + ',' + price + ',' + numberOfPeople +')');
 
       // if no database error
       if (processQueryResult(result, resp)) {
@@ -673,12 +691,14 @@ app.post('/staffhostelbooking', async function(req, resp) {
             const roomID = req.body.roomid;
             const start = req.body.start;
             const end = req.body.end;
+            const price = req.body.price;
+            const numberOfPeople = req.body.numberOfPeople
 
             // if all parameters specified
             if (roomID && start && end) {
                 // make booking
                 try{
-                if (await hostelBooking(customerID, roomID, start, end, resp)) {
+                if (await hostelBooking(customerID, roomID, start, end, price, numberOfPeople, resp)) {
                     // booking successful
                     resp.status(200).send('1success');
                 }
