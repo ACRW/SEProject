@@ -1,7 +1,15 @@
+// on Google sign in
 async function onSignIn(googleUser) {
+    // show spinner
+    document.getElementById('spinner').removeAttribute('hidden');
+    // hide Google button
+    document.getElementById('googleButton').setAttribute('hidden', '');
+
+    // get ID token
     const token = googleUser.getAuthResponse().id_token;
 
-    let response = await fetch('/newstaffmember',
+    // make call to API
+    let newStaffResponse = await fetch('/newstaffmember',
     {
         method: "POST",
         headers: {
@@ -10,15 +18,35 @@ async function onSignIn(googleUser) {
         body: 'token=' + token
     });
 
-    if (!response.ok) {
-        let auth2 = gapi.auth2.getAuthInstance();
-        auth2.signOut();
+    // make call to API
+    let signOutResponse = await fetch('/signout',
+    {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        }
+    });
 
-        alert('Something went wrong! Please try again.');
+    // hide new staff card
+    document.getElementById('newStaffCard').setAttribute('hidden', '');
+
+    // sign out of Google account
+    let auth2 = gapi.auth2.getAuthInstance();
+    auth2.signOut();
+
+    // if something went wrong
+    if (!newStaffResponse.ok || !signOutResponse.ok) {
+        // show failure card
+        document.getElementById('failureCard').removeAttribute('hidden');
 
     } else {
-        const body = JSON.parse(await response.text());
+        // get new staff member's name
+        const body = JSON.parse(await newStaffResponse.text());
 
-        alert(body);
+        // set name on page
+        document.getElementById('newName').innerHTML = body['fname'] + ' ' + body['sname'] + ' has been registered as a staff member, and is now able to sign in.';
+
+        // show success card
+        document.getElementById('successCard').removeAttribute('hidden');
     }
 }

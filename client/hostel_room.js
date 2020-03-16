@@ -21,7 +21,6 @@ const numOfPeople = document.getElementById('numOfPeople'); // table content 3
 const startDateTable=document.getElementById('startDayTable');// table content 4
 const endDateTable=document.getElementById('endDayTable');// table content 5
 const durationTable=document.getElementById('duration');// table content 6
-/*为什么加上这个就错了？*/
 const totalPrice = document.getElementById('totalPrice'); // table content 7
 
 const submitButton =document.getElementById("submitButton"); // the submittion button
@@ -577,8 +576,6 @@ const updateFields = async(roomNumber) =>{
       roomNumTable.innerHTML = rooms[roomNumber-1]['roomNumber'];
       pricePerNight.innerHTML = rooms[roomNumber-1]['pricePerNight'];
       
-
-
     }
 
 };
@@ -640,8 +637,8 @@ async function roomAvailability(roomid){
       body:{
         customerid:0, // fake for now
         roomid: roomid,//0-4
-        start: start,//格式"2020-02-23T00:00:00.000Z"
-        end: end// 格式"2020-03-17T00:00:00.000Z"
+        start: start,//format:"2020-02-23T00:00:00.000Z"
+        end: end// format:"2020-03-17T00:00:00.000Z"
       }*/
 submitBooking = async(customerid,roomid,start,end)=>{
   //create new hostel booking

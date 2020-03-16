@@ -1,3 +1,4 @@
+<html>
 <head>
     <meta name = 'google-signin-client_id' content = '250191709665-ms18vru39atn7pkfb64g9eqg1iliv2ni.apps.googleusercontent.com'>
 
@@ -41,11 +42,11 @@
 
     <link rel = 'stylesheet' href = 'https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css' integrity = 'sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T' crossorigin = 'anonymous'>
 
-    <title>TCR Hub | New Staff Member</title>
+    <title>TCR Hub | Customer Sign In</title>
 </head>
 <body>
     <nav class = 'navbar navbar-expand-md navbar-light bg-light'>
-        <a class = 'navbar-brand'>TCR Hub | Staff</a>
+        <a class = 'navbar-brand'>TCR Hub | Customer</a>
 
         <div class = 'navbar-nav ml-auto' id = 'userMenu' hidden>
             <div class = 'nav-item dropdown'>
@@ -59,31 +60,44 @@
         </div>
     </nav>
 
-    <div id = 'newStaffCard' class = 'card signInCard'>
-        <h1 class = 'display-4 card-header bg-light'>New Staff Member</h1>
+    <div id = 'signInCard' class = 'card signInCard'>
+        <h1 class = 'display-4 card-header bg-light'>Sign In</h1>
         <div class = 'card-body'>
-    		<h5 class = 'card-title'>Click the button below to register a new staff member.</h5>
-            <p class = 'card-text'>If they don't already have a Google account, they'll first be prompted to create one. Please be aware that you'll be signed out once registration has been completed.</p>
+    		<h5 class = 'card-title'>Click the button below to sign in.</h5>
+            <p class = 'card-text'>If you do not have a Google account, you will first be prompted to create one.</p>
             <div class = 'g-signin2 pr-3' data-onsuccess = 'onSignIn' id = 'googleButton'></div>
             <div class = 'spinner-border spinner-border-sm text-muted' id = 'spinner' hidden></div>
         </div>
     </div>
 
-    <div id = 'successCard' class = 'card signInCard' hidden>
-        <h1 class = 'display-4 card-header bg-light'>Congratulations!</h1>
+    <div id = 'newCustomerCard' class = 'card signInCard' hidden>
+        <h1 class = 'display-4 card-header bg-light'>Welcome!</h1>
         <div class = 'card-body'>
-    		<h5 class = 'card-title'>Registration was successful.</h5>
-            <p id = 'newName' class = 'card-text'></p>
-            <p class = 'card-text'>Click <a href = 'staffsignin.html'>here</a> to return to the sign in page.</p>
+    		<h5 class = 'card-title'>It looks like you're new here.</h5>
+            <p class = 'card-text'>We just need a little more information before you can begin using our system. Please enter your preferred telephone number in the box below, then select continue.</p>
+            <form id = 'phoneNumberForm' class = 'mb-0'>
+                <input id = 'phoneInput' type = 'tel' pattern = '[0-9]{3,6} {0,1}[0-9]{4,8}' class = 'form-control' placeholder = 'Telephone Number'>
+                <div class = 'form-group row justify-content-end mb-0 mt-3'>
+                    <button id = 'phoneContinue' class = 'btn btn-secondary signInButton' disabled>Continue</button>
+                    <div class = 'spinner-border spinner-border-sm text-muted mr-3' id = 'phoneSpinner' hidden></div>
+                </div>
+            </form>
         </div>
     </div>
 
-    <div id = 'failureCard' class = 'card signInCard' hidden>
-        <h1 class = 'display-4 card-header bg-light'>Something went wrong!</h1>
+    <div id = 'signOutCard' class = 'card signInCard' hidden>
+        <h1 class = 'display-4 card-header bg-light'>Goodbye</h1>
         <div class = 'card-body'>
-    		<h5 class = 'card-title'>We were unable to register the new staff member.</h5>
-            <p class = 'card-text'>This might be because the staff member has already been registered, but do feel free to sign in and try again.</p>
-            <p class = 'card-text'>Click <a href = 'staffsignin.html'>here</a> to return to the sign in page.</p>
+    		<h5 class = 'card-title'>You've successfully signed out.</h5>
+            <p class = 'card-text'>To sign in again, please refresh the page.</p>
+        </div>
+    </div>
+
+    <div id = 'contentCard' class = 'card signInCard' hidden>
+        <h1 class = 'display-4 card-header bg-light'>Well hello there!</h1>
+        <div class = 'card-body'>
+    		<h5 class = 'card-title'>You've successfully signed in.</h5>
+            <p class = 'card-text'>Go on, have an explore. Now we know who you are, feel free to make as many bookings as you like.</p>
         </div>
     </div>
 
@@ -91,5 +105,6 @@
     <script src = 'https://code.jquery.com/jquery-3.4.1.slim.min.js' integrity = 'sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n' crossorigin = 'anonymous'></script>
     <script src = 'https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js' integrity = 'sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo' crossorigin = 'anonymous'></script>
     <script src = 'https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js' integrity = 'sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6' crossorigin = 'anonymous'></script>
-    <script src = 'newstaff.js'></script>
+    <script src = 'customersignin.js'></script>
 </body>
+</html>
