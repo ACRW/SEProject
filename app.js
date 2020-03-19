@@ -1164,24 +1164,26 @@ async function approveRequest(requestID, tableName, resp) {
             if (request.length == 1) {
                 // for community & hostel - check for clashes
 
+                const result;
+
                 // switch request type
                 switch (tableName) {
                     // activity request
                     case 'activity':
                         // create activity booking
-                        const result = await performQuery('INSERT INTO activityBookings (dateTime, activityId, userId, numberOfPeople, price, paid) VALUES (FROM_UNIXTIME(' + request[0].dateTime.getTime()/1000 + '), ' + request[0].activityId + ', ' + request[0].userId + ', ' + request[0].numberOfPeople + ', ' + request[0].price + ', 0)');
+                        result = await performQuery('INSERT INTO activityBookings (dateTime, activityId, userId, numberOfPeople, price, paid) VALUES (FROM_UNIXTIME(' + request[0].dateTime.getTime()/1000 + '), ' + request[0].activityId + ', ' + request[0].userId + ', ' + request[0].numberOfPeople + ', ' + request[0].price + ', 0)');
                         break;
 
                     // community request
                     case 'community':
                         // create community booking
-                        const result = await performQuery('INSERT INTO communityBookings (start, end, priceOfBooking, paid, roomId, userId) VALUES (FROM_UNIXTIME(' + request[0].start.getTime()/1000 + '), FROM_UNIXTIME(' + request[0].end.getTime()/1000 + '), ' + request[0].priceOfBooking + ', 0, ' + request[0].roomId + ', ' + request[0].userId + ')');
+                        result = await performQuery('INSERT INTO communityBookings (start, end, priceOfBooking, paid, roomId, userId) VALUES (FROM_UNIXTIME(' + request[0].start.getTime()/1000 + '), FROM_UNIXTIME(' + request[0].end.getTime()/1000 + '), ' + request[0].priceOfBooking + ', 0, ' + request[0].roomId + ', ' + request[0].userId + ')');
                         break;
 
                     // hostel request
                     case 'hostel':
                         // create hostel booking
-                        const result = await performQuery('INSERT INTO hostelBookings (roomId, startDate, endDate, userId, price, paid, noOfPeople) VALUES ('+ request[0].roomId + ', FROM_UNIXTIME(' + request[0].startDate.getTime()/1000 + '), FROM_UNIXTIME(' + request[0].endDate.getTime()/1000 + '),' + request[0].userId + ', ' + request[0].price + ', 0, ' + request[0].noOfPeople + ')');
+                        result = await performQuery('INSERT INTO hostelBookings (roomId, startDate, endDate, userId, price, paid, noOfPeople) VALUES ('+ request[0].roomId + ', FROM_UNIXTIME(' + request[0].startDate.getTime()/1000 + '), FROM_UNIXTIME(' + request[0].endDate.getTime()/1000 + '),' + request[0].userId + ', ' + request[0].price + ', 0, ' + request[0].noOfPeople + ')');
                         break;
                 }
 
