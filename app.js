@@ -423,6 +423,24 @@ app.get('/customerexists', async function(req, resp) {
 
 // bookings
 
+app.get('/bookings', async function(req,resp) {
+    let bookings = {}
+    // fetch customers
+    const activity = await performQuery('SELECT * FROM activityBookings');
+    const hostel = await performQuery('SELECT * FROM hostelBookings');
+    const community = await performQuery('SELECT * FROM communityBookings');
+
+    // if no database error
+    if (processQueryResult(community, resp)) {
+        // if matching customers found
+        bookings['activity'] = activity
+        bookings['hostel'] = hostel
+        bookings['community'] = community
+        resp.status(200).send(JSON.stringify(bookings));
+
+    }
+});
+
 // get customer bookings
 async function bookings(customerID, resp) {
     // dictionary of bookings where key is booking type
