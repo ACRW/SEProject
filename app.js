@@ -624,6 +624,7 @@ app.post('/staffactivitybooking', async function(req, resp) {
             resp.status(400).send('0customerID');
         }
     }
+});
 
 // make activity booking using customer session
 app.post('/customeractivitybooking', async function(req, resp) {
@@ -926,7 +927,7 @@ async function newEvent(name, description, start, capacity, tickets, resp) {
 
 
 
-    
+
 
 // customer hostel booking
 // remove duplicated function
