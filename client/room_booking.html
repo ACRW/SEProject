@@ -19,7 +19,7 @@
     function mod(n, m) { // Because javascript mod % is broken
         return ((n % m) + m) % m;
     }
-    
+
     async function getRooms(startDate, endDate) { // Need to add error handling at some point.
         let response = await fetch('http://' + hostAddr + ":" + hostPort + '/rooms?types=community', {
             method: "GET",
@@ -62,7 +62,7 @@
         let tableDims = table.getBoundingClientRect();
         let colWidth = tableDims.width * 0.13; // Width of the columns
         let paymentTable = document.getElementById("paymentTable");
-        
+
         peekElement.className = "peekGraphic newColor";
         peekElement.style.width = String(tableDims.width * 0.11) + "px"
         peekElement.style.height = String((userBooking["bookingLength"]/60) * 50) + "px";
@@ -99,7 +99,7 @@
                     target.removeChild(target.firstChild);
                 }
             }
-            
+
             eTable.rows[0].cells[1].appendChild(peekElement); // Redisplay booking peek
         }
 
@@ -116,16 +116,16 @@
                     bookingGraphic.style.top = String(((bookings[i]["startTime"].getHours() - 9) * 50) + 50) + "px";
                     bookingGraphic.style.height = String(bookings[i]["bookingLength"] * cellHeight) + "px";
                     bookings[i]["element"] = bookingGraphic;
-                    bookings[i]["element"].innerHTML = "<p>Booked <br>" + 
-                        String(bookings[i]["startTime"].getHours()).padStart(2, '0') + ":" + 
-                        String(bookings[i]["startTime"].getMinutes()).padStart(2, '0') + " - " + 
-                        String(bookings[i]["endTime"].getHours()).padStart(2, '0') + ":" + 
+                    bookings[i]["element"].innerHTML = "<p>Booked <br>" +
+                        String(bookings[i]["startTime"].getHours()).padStart(2, '0') + ":" +
+                        String(bookings[i]["startTime"].getMinutes()).padStart(2, '0') + " - " +
+                        String(bookings[i]["endTime"].getHours()).padStart(2, '0') + ":" +
                         String(bookings[i]["endTime"].getMinutes()).padStart(2, '0') + "</p>";
                 }
                 startCell.appendChild(bookings[i]["element"]);
             }
         }
-        
+
         this.changeRoom = async function () { // Called when the room is changed
             tableDims = table.getBoundingClientRect();
             curRoom = document.getElementById("roomDrop").value; // The list is in order of room id but offset by one due to the default option
@@ -162,18 +162,18 @@
             }
             return;
         }
-        
+
         this.leaveMouse = function () {
             //peekElement.style.visibility = "hidden";
         }
-        
+
         this.mouseEnter = function () {
             peekElement.style.visibility = "visible";
         }
 
         this.bookingPeek = async function (e) { // Displays a potential booking over where the mouse hovers.
             tableDims = table.getBoundingClientRect();
-            colWidth = tableDims.width * 0.13; 
+            colWidth = tableDims.width * 0.13;
             let calX = tableDims.left;
             let calY = tableDims.top;
             let leftCol = eTable.rows[0].cells[0].offsetWidth + calX; // pos of left column
@@ -186,17 +186,17 @@
                 peekElement.style.left = String((curColumn * colWidth)) + "px";
             }
         }
-        
+
         this.placeBooking = async function (e) {
             if (userBooking["element"].parentNode) {
                 userBooking["element"].parentNode.removeChild(userBooking["element"])
             }
-            
+
             let calX = tableDims.left;
             let calY = tableDims.top;
             let leftCol = eTable.rows[0].cells[0].offsetWidth + calX; // pos of left column
-            let topRow = table.rows[0].offsetHeight + calY; // pos of top 
-            
+            let topRow = table.rows[0].offsetHeight + calY; // pos of top
+
             if (e.clientX > leftCol && e.clientY > topRow) {
                 let curColumn = Math.floor((e.clientX - leftCol) / colWidth);
                 let curRow = Math.floor((e.clientY - topRow) / cellHeight) + 1;
@@ -206,7 +206,7 @@
                 userBooking["date"] = new Date();
                 eTable.rows[0].cells[curColumn + 1].appendChild(userBooking["element"]);
             }
-            
+
             // update payment table:
             if (curRoom != "-1") {
                 console.log(curRoom);
@@ -214,16 +214,16 @@
                 paymentTable.rows[1].cells[1].innerHTML = rooms[curRoom]["pricePerHour"];
                 paymentTable.rows[1].cells[2].innerHTML = rooms[curRoom]["pricePerHour"] * userBooking["bookingLength"];
             }
-            
+
         }
-        
+
         this.setBookingLength = async function(e) { // Sets what the booking length should be
             let lengthDrop = document.getElementById("lengthDrop");
             userBooking["bookingLength"] = lengthDrop.value;
             userBooking["element"].style.height = String((userBooking["bookingLength"]/60) * 50) + "px";
             peekElement.style.height = String((userBooking["bookingLength"]/60) * 50) + "px";
         }
-        
+
         displayDates();
 
         this.nextWeek = function() {
@@ -251,7 +251,7 @@
             <select class="browser-default custom-select newDropdown" id="roomDrop" onchange="calender.changeRoom()">
                 <option selected="selected" value="-1">Select Room... </option> # Will fetch these from a database
                 <!--<option value="1">Music Room 1 (max 6 persons) £12/hour</option>-->
-            </select>            
+            </select>
         </div>
         <div class="col-sm-4">
             <select class="browser-default custom-select newDropdown" id="lengthDrop" onchange="calender.setBookingLength(event)">

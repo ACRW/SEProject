@@ -421,6 +421,20 @@ app.get('/customerexists', async function(req, resp) {
     }
 });
 
+//activities
+app.get('/activities', async function(req,resp) {
+    // fetch customers
+    const activity = await performQuery('SELECT * FROM activities');
+
+    // if no database error
+    if (processQueryResult(activity, resp)) {
+        // if matching customers found
+        resp.status(200).send(JSON.stringify(activity));
+
+    }
+});
+
+
 // bookings
 
 app.get('/bookings', async function(req,resp) {
@@ -594,7 +608,6 @@ app.post('/staffactivitybooking', async function(req, resp) {
                 const numberOfPeople = req.body.numberofpeople;
                 const price = req.body.price;
                 const paid = req.body.paid;
-
                 // if all parameters specified
                 if (activityID && dateTime && numberOfPeople && price && paid) {
                     // insert row
@@ -1119,6 +1132,148 @@ app.get('/communityroomprice', async function(req,resp) {
         }
     }
 });
+
+//gets bookings for user that still require payment
+app.get('/paymentneeded', async function(req,resp) {
+
+    let bookings = {}
+    const id = req.query.id;
+    // where clause
+    let where = '';
+
+    where = addToSearchClause(id, 'userId', where);
+    priceNotEq = ' AND price <> paid'
+
+    // fetch events
+    const activity = await performQuery('SELECT * FROM activityBookings WHERE '+ where + priceNotEq);
+
+    // if no database error
+    if (processQueryResult(activity, resp)) {
+        // if matching events found
+        bookings['activity'] = activity
+    }
+    priceNotEq = ' AND priceOfBooking <> paid'
+    // fetch events
+    const community = await performQuery('SELECT * FROM communityBookings WHERE '+ where + priceNotEq);
+
+    // if no database error
+    if (processQueryResult(community, resp)) {
+        // if matching events found
+        bookings['community'] = community
+    }
+
+    priceNotEq = ' AND price <> paid'
+
+    // fetch events
+    const hostel = await performQuery('SELECT * FROM hostelBookings WHERE '+ where + priceNotEq);
+
+    // if no database error
+    if (processQueryResult(hostel, resp)) {
+        // if matching events found
+        bookings['hostel'] = hostel
+        resp.status(200).send(JSON.stringify(bookings));
+    }
+});
+
+app.post('/makepayment', async function(req, resp) {
+    // if valid staff session
+    tableName = ''
+    type = req.body.type
+    id = req.body.id
+
+    if (validateSession('staff', req, resp)) {
+        // make call to approve request function
+        await payForBooking(id, type, resp);
+    }
+});
+
+// approve booking request
+async function payForBooking(requestID, tableName, resp) {
+    // if request ID specified
+    let where = '';
+    where = addToSearchClause(requestID, 'id', where);
+    try{
+    if (requestID) {
+        // fetch request
+        // for community & hostel - check for clashes
+
+                // switch request type
+        switch (tableName) {
+            // activity request
+            case 'activity':
+                // create activity booking
+                const activityResult = await performQuery('UPDATE activityBookings SET paid = price WHERE ' + where);
+                if (processQueryResult(activityResult, resp)) {
+                    // if one row inserted
+
+                    if (result['affectedRows'] == 1) {
+
+                      resp.status(201).send('1success');
+
+                    } else {
+                                // database error
+                        resp.status(500).send('0database');
+                    }
+
+                } else {
+                    // database error
+                    resp.status(500).send('0database');
+                }
+                break;
+
+            // community request
+            case 'community':
+                // create community booking
+                const communityResult = await performQuery('UPDATE communityBookings SET paid = priceOfBooking WHERE ' + where);
+                if (processQueryResult(communityResult, resp)) {
+                    // if one row inserted
+                    if (result['affectedRows'] == 1) {
+
+                      resp.status(201).send('1success');
+
+                    } else {
+                                // database error
+                        resp.status(500).send('0database');
+                    }
+
+                } else {
+                    // database error
+                    resp.status(500).send('0database');
+                }
+                break;
+
+            // hostel request
+            case 'hostel':
+                // create hostel booking
+                const hostelResult = await performQuery('UPDATE hostelBookings SET paid = price WHERE ' + where);
+                if (processQueryResult(hostelResult, resp)) {
+                    // if one row inserted
+                    if (result['affectedRows'] == 1) {
+
+                      resp.status(201).send('1success');
+
+                    } else {
+                                // database error
+                        resp.status(500).send('0database');
+                    }
+
+                } else {
+                    // database error
+                    resp.status(500).send('0database');
+                }
+                break;
+            }
+
+
+
+    } else {
+        // request ID error
+        resp.status(400).send('0id');
+    }
+  }catch(error){
+    resp.status(500).send('0database');
+  }
+}
 
 // booking requests
 

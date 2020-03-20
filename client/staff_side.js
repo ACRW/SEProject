@@ -105,6 +105,23 @@ document.addEventListener("DOMContentLoaded", function () {
     fillDayDrop(year,month,"EventNew")
   });
 
+  //on choosing year reveal months
+  document.getElementById("yearActivityNew").addEventListener("change", function(){
+    document.getElementById("monthActivityNewLabel").hidden = false;
+    document.getElementById("monthActivityNew").hidden = false;
+  });
+
+  //on choosing month reveal days and fill day drop down
+  document.getElementById("monthActivityNew").addEventListener("change", function(){
+    document.getElementById("dayActivityNewLabel").hidden = false;
+    document.getElementById("dayActivityNew").hidden = false;
+
+    //fill day drop with correct amount of days
+    year = document.getElementById("yearActivityNew").value;
+    month = document.getElementById("monthActivityNew").value;
+    fillDayDrop(year,month,"ActivityNew")
+  });
+
   //when new booking button clicked reset form, hide parts and reveal others
   document.getElementById("newBookingButton").addEventListener('click',function(){
     document.getElementById("findBy").hidden = false;
@@ -135,6 +152,10 @@ document.addEventListener("DOMContentLoaded", function () {
     //fill avaliabilty of room
     fillHostelBookingTable()
   });
+
+  document.getElementById('numOfPeopleActivity').addEventListener('change',function(){
+    fillActivityPrice()
+  })
 
   //once booking duration is selected
   document.getElementById('bookingDurationTime').addEventListener('change',function(){
@@ -171,6 +192,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
   //fill search dropdowns
   fillFindBy();
+
+  fillActivities();
 
   //on click of day header set chosen date
   document.getElementById('day1').addEventListener('click',function(){
@@ -319,6 +342,10 @@ document.addEventListener("DOMContentLoaded", function () {
     backWeek()
   })
 
+  document.getElementById('makePaymentButton').addEventListener('click', function(){
+    makePayment()
+  })
+
   fillCalender()
 });
 
@@ -334,8 +361,6 @@ function forwardWeek(){
       var x = parseInt(document.getElementById('day' + i).innerHTML) + 7;
       document.getElementById('day' + i).innerHTML = x + '/' + m;
       if(isValidDate(x,m,y) == false){
-        console.log(x)
-        console.log(daysInMonth(y,m))
           if(daysInMonth(y,m)-x == 0){
             m = m+ 1;
             document.getElementById('day' + i).innerHTML = (x+1)% daysInMonth(y,m-1) + '/' + (m);
@@ -851,6 +876,12 @@ async function fillFindBy(){
         document.getElementById('findByNameDropdown1').innerHTML += '<a onclick="hostelBookingView('+customers[i].id+')">' + customers[i].fName + ' ' + customers[i].lName + '</a>';
         document.getElementById('findByPhoneNumberDropdown1').innerHTML += '<a onclick="hostelBookingView('+customers[i].id+')">' + customers[i].phone + '</a>';
         document.getElementById('findByEmailDropdown1').innerHTML += '<a onclick="hostelBookingView('+customers[i].id+')">' + customers[i].email +  '</a>'
+        document.getElementById('findByNameDropdown2').innerHTML += '<a onclick="activityBookingView('+customers[i].id+')">' + customers[i].fName + ' ' + customers[i].lName + '</a>';
+        document.getElementById('findByPhoneNumberDropdown2').innerHTML += '<a onclick="activityBookingView('+customers[i].id+')">' + customers[i].phone + '</a>';
+        document.getElementById('findByEmailDropdown2').innerHTML += '<a onclick="activityBookingView('+customers[i].id+')">' + customers[i].email +  '</a>'
+        document.getElementById('findByNameDropdown3').innerHTML += '<a onclick="paymentView('+customers[i].id+')">' + customers[i].fName + ' ' + customers[i].lName + '</a>';
+        document.getElementById('findByPhoneNumberDropdown3').innerHTML += '<a onclick="paymentView('+customers[i].id+')">' + customers[i].phone + '</a>';
+        document.getElementById('findByEmailDropdown3').innerHTML += '<a onclick="paymentView('+customers[i].id+')">' + customers[i].email +  '</a>'
       }
     }else{
       throw new Error('Error getting customers' + response.code);
@@ -963,6 +994,103 @@ async function hostelBookingView(id){
       document.getElementById('customerInfo1').innerHTML= 'Customer Name:' + customers[0].fName + ' ' + customers[0].lName;
       document.getElementById('hostelBookingButtonDiv').innerHTML = '<div class="col-sm-3"><a class="btn btn-primary newColor" href="#" role="button" onclick="newHostelBooking('+customers[0].id+')">Book & Pay at desk</a></div>'
 
+    }else{
+      throw new Error('Error getting customers' + response.code);
+    }
+    } catch (error) {
+      alert ('Error: ' + error);
+    }
+  }
+}
+
+//view hostel booking page
+async function activityBookingView(id){
+
+  //show form
+  document.getElementById('makeActivityBooking').hidden = false;
+  document.getElementById('findBy2').hidden = true;
+
+  //if no id supplied
+  if(id == null){
+
+    //print error
+    document.getElementById('errorMessage').innerHTML = 'No id supplied when searching for customer'
+  }else{
+
+  //search for customer
+  try{
+    let response = await fetch('http://localhost:8090/customersearch?id='+id,
+      {
+        method: 'GET',
+        headers: {
+            "Content-Type": "application/json"
+          }
+      });
+
+    //if response is fine
+    if(response.ok){
+      var body = await response.text();
+      var customers = JSON.parse(body);
+
+      //display customer name
+      document.getElementById('customerInfo2').innerHTML= 'Customer Name:' + customers[0].fName + ' ' + customers[0].lName;
+      document.getElementById('activityBookingButtonDiv').innerHTML = '<div class="col-sm-3"><a class="btn btn-primary newColor" href="#" role="button" onclick="newActivityBooking('+customers[0].id+')">Book & Pay at desk</a></div>'
+
+    }else{
+      throw new Error('Error getting customers' + response.code);
+    }
+    } catch (error) {
+      alert ('Error: ' + error);
+    }
+  }
+}
+
+//view payment page
+async function paymentView(id){
+  paymentDropdown = document.getElementById('usersBookingForPayment')
+  //show form
+  document.getElementById('makePayment').hidden = false;
+  document.getElementById('findBy3').hidden = true;
+
+  //if no id supplied
+  if(id == null){
+
+    //print error
+    document.getElementById('errorMessage').innerHTML = 'No id supplied when searching for customer'
+  }else{
+
+  //search for customer
+  try{
+    let response = await fetch('http://localhost:8090/paymentneeded?id='+id,
+      {
+        method: 'GET',
+        headers: {
+            "Content-Type": "application/json"
+          }
+      });
+
+    //if response is fine
+    if(response.ok){
+      var body = await response.text();
+      var bookings = JSON.parse(body);
+      for(var i=0; i< bookings['activity'].length; i++){
+        let option = document.createElement("option")
+        option.text = 'A ' + bookings['activity'][i].dateTime +  ' ' + ' £' + bookings['activity'][i].price
+        option.value = bookings['activity'][i].id
+        paymentDropdown.add(option);
+      }
+      for(var i=0; i< bookings['community'].length; i++){
+        let option = document.createElement("option")
+        option.text = 'C ' + bookings['community'][i].start +  ' ' + ' £' + bookings['community'][i].priceOfBooking
+        option.value = bookings['community'][i].id
+        paymentDropdown.add(option);
+      }
+      for(var i=0; i< bookings['hostel'].length; i++){
+        let option = document.createElement("option")
+        option.text = 'H ' + bookings['hostel'][i].startDate +  ' ' + ' £' + bookings['hostel'][i].price
+        option.value = bookings['hostel'][i].id
+        paymentDropdown.add(option);
+      }
     }else{
       throw new Error('Error getting customers' + response.code);
     }
@@ -1222,6 +1350,68 @@ async function newHostelBooking(id){
       }
 }
 
+//create new hostel booking
+async function newActivityBooking(id){
+
+  //get parameters
+  year = document.getElementById('yearActivityNew').value
+  month = document.getElementById('monthActivityNew').value
+  day = document.getElementById('monthActivityNew').value
+  time = document.getElementById('monthActivityNew').value + 8
+
+  //get number of guests
+  numberOfGuests = document.getElementById('numOfPeopleActivity').value
+
+  //check that number of guests is an integer
+  if(Number.isInteger(parseInt(numberOfGuests)) == false){
+
+    //print error message
+    document.getElementById('newActivityBookingError').innerHTML= 'Please enter an integer for number of people'
+
+    //check all parameters defined
+  }else if(day == '' || numberOfGuests == '' || time == ''){
+
+    //print error message
+    document.getElementById('newActivityBookingError').innerHTML= 'Please fill in all fields to complete booking'
+  }
+
+
+  //calculate epoch value for start and end date
+  startTime = new Date(year, month, day, time, 0, 0, 0).getTime()/1000;
+  activityId = document.getElementById('activityDropdown').value;
+  price = document.getElementById('totalActivityBookingPrice').innerText
+  numOfPeople = document.getElementById('numOfPeopleActivity').value
+
+  try{
+        //create new hostel booking
+        let response = await fetch('http://localhost:8090/staffactivitybooking',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          body: 'customerid=' + id + '&activityid=' + activityId + '&datetime=' + startTime + '&numberofpeople=' + numOfPeople + '&paid=0&price=' + price
+        });
+
+        //if response isn't fine
+        if(!response.ok){
+
+          //error message
+          throw new Error('problem adding new event ' + response.code);
+        }else{
+
+          //success message
+          document.getElementById('newActivityBookingError').innerHTML='Booking successful'
+
+          //reset forms
+          resetActivityBooking()
+        }
+
+    } catch (error) {
+      alert ('Error: ' + error);
+    }
+}
+
 //get price of community room
 async function fillPrice(){
 
@@ -1280,6 +1470,20 @@ function fillHostelPrice(){
 
     //calculate total by people * price
     document.getElementById('totalHostelBookingPrice').innerHTML = parseInt(document.getElementById('numPeople').innerHTML) * parseInt(document.getElementById('hostelRoomPricePerHour').innerHTML)
+
+}
+
+//get price of activity room
+function fillActivityPrice(){
+
+    //get number of people
+    document.getElementById('activityNumPeople').innerHTML= document.getElementById('numOfPeopleActivity').value;
+
+    //get price per hour from drop down
+    document.getElementById('activityPricePerHour').innerHTML = document.getElementById('activityDropdown').options[document.getElementById('activityDropdown').selectedIndex].text.split('£')[1];
+
+    //calculate total by people * price
+    document.getElementById('totalActivityBookingPrice').innerHTML = parseInt(document.getElementById('activityNumPeople').innerHTML) * parseInt(document.getElementById('activityPricePerHour').innerHTML)
 
 }
 
@@ -1474,6 +1678,19 @@ function resetHostelBooking(){
   document.getElementById('numberOfGuests').value = '';
 }
 
+//reset forms and hide calender
+function resetActivityBooking(){
+  document.getElementById('numOfPeopleActivity').value = '';
+}
+
+//reset forms and hide calender
+function resetPayment(){
+  document.getElementById('makePayment').hidden = true;
+  document.getElementById('findBy3').hidden = false;
+  document.getElementById('newPaymentError').innerHTML = '';
+}
+
+
 //add new ticket type to event
 function addTicketType(){
 
@@ -1559,7 +1776,6 @@ async function getNotifications(){
 
       //if community request exists
       if(requests['community'].length>=1){
-        console.log(requests['community'])
         document.getElementById('notificationBody').innerHTML += '<p> Community Booking Requests </p>';
         //display info about request
         statement = 'Booking Request for ' + requests['community'][0].name + ' from ' + requests['community'][0].start + ' - ' + requests['community'][0].end + ' by ' + requests['community'][0].fName + ' ' + requests['community'][0].lName;
@@ -1804,7 +2020,6 @@ async function fillCalender(){
       var body = await response.text();
       var bookings = JSON.parse(body)
       eventFound = false;
-      console.log(bookings)
       for(var i = 0; i<bookings['activity'].length; i++){
             for(var j = 1; j< 8; j++){
                if((bookings['activity'][i].dateTime.substring(8,10)+'/'+bookings['activity'][i].dateTime.substring(5,7)).toString()==document.getElementById('day' + j).textContent.toString()){
@@ -1841,4 +2056,72 @@ async function fillCalender(){
   }catch(error){
     alert('Error' + error)
   }
+}
+
+async function fillActivities(){
+  activityDropdown = document.getElementById('activityDropdown')
+  try{
+    let response = await fetch('http://localhost:8090/activities',
+    {
+      method: 'GET',
+      headers: {
+          "Content-Type": "application/json"
+        }
+    });
+  //if response isn't fine
+  if(!response.ok){
+    throw new Error('Problem ' + response.code);
+  }else{
+    var body = await response.text();
+    var activities = JSON.parse(body)
+    for(var i=0; i<activities.length;i++){
+      //add as an option to dropdown
+      let option = document.createElement("option")
+      option.text = activities[i].name + ' £' + activities[i].price
+      option.value = activities[i].id
+      activityDropdown.add(option);
+    }
+  }
+}catch(error){
+  alert('Error' + error)
+}
+}
+
+async function makePayment(){
+  //delete from request
+  id = document.getElementById('usersBookingForPayment').value
+
+  type = document.getElementById('usersBookingForPayment').options[document.getElementById('usersBookingForPayment').selectedIndex].text.substring(0,1);
+
+  switch(type){
+    case "A":
+      tableName = 'activity'
+      break;
+    case "C":
+      tableName = 'community'
+      break;
+    case "H":
+      tableName = 'hostel'
+      break
+  }
+  try{
+    let response = await fetch('http://localhost:8090/makepayment',
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: 'id=' + id + '&type=' + tableName
+    });
+
+  //if response isn't fine
+  if(!response.ok){
+    throw new Error('problem aproving event ' + response.code);
+  }else{
+    document.getElementById('newPaymentError').innerHTML = 'Database changed correctly'
+    resetPayment()
+  }
+}catch(error){
+  alert('Error' + error)
+}
 }
