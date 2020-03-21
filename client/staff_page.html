@@ -203,7 +203,9 @@
     <button type="button" class="btn btn-primary newColor mainButton" onclick="clearSearch()" data-toggle="modal" data-target="#searchModal">Search</button>
     <button type="button" class="btn btn-primary newColor mainButton" onclick="" data-toggle="modal" data-target="#newBookingModal" id='newBookingButton'>New Room Booking</button>
     <button type="button" class="btn btn-primary newColor mainButton" onclick="" data-toggle="modal" data-target="#newHostelBookingModal" id='newHostelBookingButton'>New Hostel Booking</button>
+    <button type="button" class="btn btn-primary newColor mainButton" onclick="" data-toggle="modal" data-target="#newActivityBookingModal">New Activity Booking</button>
     <button type="button" class="btn btn-primary newColor mainButton" onclick="" data-toggle="modal" data-target="#createNewEventModal" id='createNewEventModalButton'>Create New Event</button>
+    <button type="button" class="btn btn-primary newColor mainButton" onclick="" data-toggle="modal" data-target="#paymentModal" id='paymentModalButton'>Pay for Booking</button>
     <button type="button" class="btn btn-primary newColor mainButton" onclick="" data-toggle="modal" data-target="#notificationModal" id='notificationButton'>Notifications</button>
     <button type="button" class="btn btn-primary newColor mainButton" onclick="" data-toggle="modal" data-target="#statisticsModal">Statistics</button>
   </div>
@@ -218,14 +220,14 @@
     <table class="table">
   <thead>
     <tr>
-      <th scope="col" id='day0'>#</th>
-      <th scope="col" id='day1'>Mon</th>
-      <th scope="col" id='day2'>Tue</th>
-      <th scope="col" id='day3'>Wed</th>
-      <th scope="col" id='day4'>Thur</th>
-      <th scope="col" id='day5'>Fri</th>
-      <th scope="col" id='day6'>Sat</th>
-      <th scope="col" id='day7'>Sun</th>
+      <th scope="col" id='cday0'>#</th>
+      <th scope="col" id='cday1'>Mon</th>
+      <th scope="col" id='cday2'>Tue</th>
+      <th scope="col" id='cday3'>Wed</th>
+      <th scope="col" id='cday4'>Thur</th>
+      <th scope="col" id='cday5'>Fri</th>
+      <th scope="col" id='cday6'>Sat</th>
+      <th scope="col" id='cday7'>Sun</th>
     </tr>
   </thead>
   <tbody>
@@ -620,6 +622,55 @@
     </div>
   </div>
 
+  <div class="modal" id='paymentModal' tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Pay for Booking</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body" id='paymentBody'>
+          <div id="findBy3">
+          <h5>Find user to book for by name, email or phone number</h5>
+          <div class="dropdown">
+            <button onclick="hideShow('findByNameDropdown3')" class="dropbtn">Find By Name</button>
+            <div id='findByNameDropdown3' class="dropdown-content">
+              <input type="text" placeholder="Search.." id="findByNameSearch3" onkeyup="filterNameFunction(3)">
+
+            </div>
+          </div>
+          <div class="dropdown">
+            <button onclick="hideShow('findByPhoneNumberDropdown3')" class="dropbtn newColor">Find By Phone Number</button>
+            <div id='findByPhoneNumberDropdown3' class="dropdown-content">
+              <input type="text" placeholder="Search.." id="findByPhoneNumberSearch3" onkeyup="filterPhoneNumberFunction(3)">
+
+            </div>
+          </div>
+          <div class="dropdown">
+            <button onclick="hideShow('findByEmailDropdown3')" class="dropbtn newColor">Find By Email</button>
+            <div id='findByEmailDropdown3' class="dropdown-content">
+              <input type="text" placeholder="Search.." id="findByEmailSearch3" onkeyup="filterEmailFunction(3)">
+
+            </div>
+          </div>
+        </div>
+        <div id='makePayment' hidden='true'>
+          <select class="browser-default custom-select newDropdown" id="usersBookingForPayment" >
+              <option selected>Select Booking... </option>
+          </select>
+
+        <p id='newPaymentError'></p>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" id='makePaymentButton'>Make Payment</button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+      </div>
+    </div>
+  </div>
 
   <div class="modal" id='notificationModal' tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
@@ -834,6 +885,132 @@
   </div>
 </div>
 
+<div class="modal" id="newActivityBookingModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">New Activity Booking</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div id="findBy2">
+        <h5>Find user to book for by name, email or phone number</h5>
+        <div class="dropdown">
+          <button onclick="hideShow('findByNameDropdown2')" class="dropbtn">Find By Name</button>
+          <div id='findByNameDropdown2' class="dropdown-content">
+            <input type="text" placeholder="Search.." id="findByNameSearch2" onkeyup="filterNameFunction(2)">
+
+          </div>
+        </div>
+        <div class="dropdown">
+          <button onclick="hideShow('findByPhoneNumberDropdown2')" class="dropbtn newColor">Find By Phone Number</button>
+          <div id='findByPhoneNumberDropdown2' class="dropdown-content">
+            <input type="text" placeholder="Search.." id="findByPhoneNumberSearch2" onkeyup="filterPhoneNumberFunction(2)">
+
+          </div>
+        </div>
+        <div class="dropdown">
+          <button onclick="hideShow('findByEmailDropdown2')" class="dropbtn newColor">Find By Email</button>
+          <div id='findByEmailDropdown2' class="dropdown-content">
+            <input type="text" placeholder="Search.." id="findByEmailSearch2" onkeyup="filterEmailFunction(2)">
+
+          </div>
+        </div>
+      </div>
+        <div class="container" id='makeActivityBooking' style="font-size: 100%" hidden='true'>
+            <h2 id='customerInfo2'></h2>
+            <h1> Activity Room Booking </h1>
+            <p class="mt-2 "> Book a room by first selecting entering how many people you are booking for selecting a room, then choosing the date, time and number of nights. </p>
+
+            <div class="form-group">
+              <label>Choose Activity</label>
+              <select class="browser-default custom-select newDropdown" id="activityDropdown" >
+                  <option selected>Select Activity... </option>
+              </select>
+              <label>Enter how many people</label>
+              <input class="form-control" id="numOfPeopleActivity" placeholder="Enter number of People">
+
+            <label>Year</label>
+            <select class="browser-default custom-select newDropdown" id="yearActivityNew">
+                <option selected>Select Year... </option> <!--check valid -->
+                <option value="2020">2020</option>
+                <option value="2021">2021</option>
+                <option value="2022">2022</option>
+                <option value="2023">2023</option>
+            </select>
+            <label id="monthActivityNewLabel" hidden="true">Month</label>
+            <select class="browser-default custom-select newDropdown" id="monthActivityNew" hidden="true">
+                <option selected>Select Month... </option>
+                <option value="01">January</option>
+                <option value="02">February</option>
+                <option value="03">March</option>
+                <option value="04">April</option>
+                <option value="05">May</option>
+                <option value="06">June</option>
+                <option value="07">July</option>
+                <option value="08">August</option>
+                <option value="09">September</option>
+                <option value="10">October</option>
+                <option value="11">November</option>
+                <option value="12">December</option>
+            </select>
+            <label id="dayActivityNewLabel" hidden="true">Day</label>
+            <select class="browser-default custom-select newDropdown" id="dayActivityNew" hidden="true">
+                <option selected>Select Day... </option>
+            </select>
+            <select class="browser-default custom-select newDropdown" id = 'newActivityStartTime'>
+                <option disabled selected>Select Start Time... </option>
+                <option value="1">9am</option>
+                <option value="2">10am</option>
+                <option value="3">11am</option>
+                <option value="4">12pm</option>
+                <option value="5">1pm</option>
+                <option value="6">2pm</option>
+                <option value="7">3pm</option>
+                <option value="8">4pm</option>
+                <option value="9">5pm</option>
+                <option value="10">6pm</option>
+                <option value="11">7pm</option>
+                <option value="12">8pm</option>
+                <option value="13">9pm</option>
+            </select>
+            </div>
+
+            <table class="table" style="margin-top:30px">
+                <tr>
+                    <td>Number of People</td>
+                    <td>Price per Person</td>
+                    <td>Total Price</td>
+                </tr>
+                <tr>
+                    <td id='activityNumPeople'>--</td>
+                    <td id='activityPricePerHour'>--</td>
+                    <td id= 'totalActivityBookingPrice'>--</td>
+                </tr>
+            </table>
+            <div class="row" style="margin-bottom: 30px;">
+                <div class="col-sm-6"></div>
+                <div id='activityBookingButtonDiv'>
+                </div>
+            </div>
+
+        </div>
+        <p id='newActivityBookingError'></p>
+      </div>
+        <script>
+            calender = new Calender();
+        </script>
+      </div>
+      <div class="modal-footer">
+        <div id='hostelBookingButDiv'>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 <div class="modal" id='createNewEventModal' tabindex="-1" role="dialog">
   <div class="modal-dialog" role="document">
@@ -923,6 +1100,8 @@
     </div>
   </div>
 </div>
+
+
 
 
 

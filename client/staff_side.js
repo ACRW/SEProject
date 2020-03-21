@@ -1,21 +1,23 @@
 var submitAction = 0;
 var week = 1;
-//holds the current date
+//holds the current date for calender use
 var n =  new Date();
 var y = n.getYear();
 var m = n.getMonth() + 1;
 var d = n.getDate();
 var day = n.getDay();
+
 //on loading of content
 document.addEventListener("DOMContentLoaded", function () {
 
-
-
+  //sets up the calender dates to the current week
   for(var i = 1; i <8 ; i++){
         var x = day-i;
-        document.getElementById('day' + i).innerHTML = (d-x).toString().padStart(2,'0') + '/' + m.toString().padStart(2,'0');
+        document.getElementById('cday' + i).innerHTML = (d-x).toString().padStart(2,'0') + '/' + m.toString().padStart(2,'0');
+
+        //dealing with weeks that wrap over months
         if(isValidDate(d-x,m,y) == false){
-            document.getElementById('day' + i).innerHTML = (d-x  + daysInMonth(y,m) ).toString().padStart(2,'0')+ '/' + (m -1).toString().padStart(2,'0');
+            document.getElementById('cday' + i).innerHTML = (d-x  + daysInMonth(y,m) ).toString().padStart(2,'0')+ '/' + (m -1).toString().padStart(2,'0');
         }
     }
 
@@ -105,6 +107,23 @@ document.addEventListener("DOMContentLoaded", function () {
     fillDayDrop(year,month,"EventNew")
   });
 
+  //on choosing year reveal months
+  document.getElementById("yearActivityNew").addEventListener("change", function(){
+    document.getElementById("monthActivityNewLabel").hidden = false;
+    document.getElementById("monthActivityNew").hidden = false;
+  });
+
+  //on choosing month reveal days and fill day drop down
+  document.getElementById("monthActivityNew").addEventListener("change", function(){
+    document.getElementById("dayActivityNewLabel").hidden = false;
+    document.getElementById("dayActivityNew").hidden = false;
+
+    //fill day drop with correct amount of days
+    year = document.getElementById("yearActivityNew").value;
+    month = document.getElementById("monthActivityNew").value;
+    fillDayDrop(year,month,"ActivityNew")
+  });
+
   //when new booking button clicked reset form, hide parts and reveal others
   document.getElementById("newBookingButton").addEventListener('click',function(){
     document.getElementById("findBy").hidden = false;
@@ -135,6 +154,10 @@ document.addEventListener("DOMContentLoaded", function () {
     //fill avaliabilty of room
     fillHostelBookingTable()
   });
+
+  document.getElementById('numOfPeopleActivity').addEventListener('change',function(){
+    fillActivityPrice()
+  })
 
   //once booking duration is selected
   document.getElementById('bookingDurationTime').addEventListener('change',function(){
@@ -171,6 +194,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
   //fill search dropdowns
   fillFindBy();
+
+  fillActivities();
 
   //on click of day header set chosen date
   document.getElementById('day1').addEventListener('click',function(){
@@ -311,17 +336,26 @@ document.addEventListener("DOMContentLoaded", function () {
     getNotifications()
   })
 
+  //moves the calender forward a week
   document.getElementById('nextWeek').addEventListener('click', function(){
     forwardWeek()
   })
 
+  //moves the calender back a week
   document.getElementById('prevWeek').addEventListener('click', function(){
     backWeek()
   })
 
+  //on click trys to mkae payment in database
+  document.getElementById('makePaymentButton').addEventListener('click', function(){
+    makePayment()
+  })
+
+  //fills the calender with bookings for that week
   fillCalender()
 });
 
+//checks if date is valid ie 30th Feb not valid
 function isValidDate(d, m, y) {
     m = parseInt(m, 10) - 1;
     return m >= 0 && m < 12 && d > 0 && d <= daysInMonth(y, m);
@@ -331,49 +365,49 @@ function isValidDate(d, m, y) {
 //changing the calender to the next week
 function forwardWeek(){
   for(var i = 1; i <8 ; i++){
-      var x = parseInt(document.getElementById('day' + i).innerHTML) + 7;
-      document.getElementById('day' + i).innerHTML = x + '/' + m;
+      var x = parseInt(document.getElementById('cday' + i).innerHTML) + 7;
+      document.getElementById('cday' + i).innerHTML = x + '/' + m;
       if(isValidDate(x,m,y) == false){
-        console.log(x)
-        console.log(daysInMonth(y,m))
           if(daysInMonth(y,m)-x == 0){
             m = m+ 1;
-            document.getElementById('day' + i).innerHTML = (x+1)% daysInMonth(y,m-1) + '/' + (m);
+            document.getElementById('cday' + i).innerHTML = (x+1)% daysInMonth(y,m-1) + '/' + (m);
           }else if (daysInMonth(y,m)-x < 0){
-            document.getElementById('day' + i).innerHTML = (x+1)% daysInMonth(y,m-1) + '/' + (m);
+            document.getElementById('cday' + i).innerHTML = (x+1)% daysInMonth(y,m-1) + '/' + (m);
 
           }else{
-              document.getElementById('day' + i).innerHTML = x% daysInMonth(y,m-2) + '/' + (m);
+              document.getElementById('cday' + i).innerHTML = x% daysInMonth(y,m-2) + '/' + (m);
           }
       }
   }
-    fillCalender()
+
+  //updates calender
+  fillCalender()
 }
 
 //changing the calender to the previous week
 function backWeek(){
     var monthSub = false;
     for(var i = 7; i > 0 ; i--){
-        var x = parseInt(document.getElementById('day' + i).innerHTML) - 7;
-        document.getElementById('day' + i).innerHTML = x.toString().padStart(2,'0') + '/' + m.toString().padStart(2,'0');
+        var x = parseInt(document.getElementById('cday' + i).innerHTML) - 7;
+        document.getElementById('cday' + i).innerHTML = x.toString().padStart(2,'0') + '/' + m.toString().padStart(2,'0');
         if(isValidDate(x,m,y) == false){
             if(x == 0){
                 m = m-1;
                 monthSub = true;
-                document.getElementById('day' + i).innerHTML = (x + daysInMonth(y,m-1)).toString().padStart(2,'0') + '/' + (m).toString().padStart(2,'0');
+                document.getElementById('cday' + i).innerHTML = (x + daysInMonth(y,m-1)).toString().padStart(2,'0') + '/' + (m).toString().padStart(2,'0');
             }else{
-                document.getElementById('day' + i).innerHTML =  (daysInMonth(y,m-1) + x).toString().padStart(2,'0') + '/' + (m).toString().padStart(2,'0');
+                document.getElementById('cday' + i).innerHTML =  (daysInMonth(y,m-1) + x).toString().padStart(2,'0') + '/' + (m).toString().padStart(2,'0');
             }
         }
     }
-  //  if(monthSub == true){
-  //      m = m-1;
-  //  }
+
+  //update calender
   fillCalender()
 }
 
 //runs get request to search for user in database and displays results
 async function searchForUser(){
+  document.getElementById('usersBookingError').innerHTML = ''
 
   //get parameters for search
   fName = document.getElementById("firstnameSearch").value;
@@ -417,17 +451,24 @@ async function searchForUser(){
 
         //inform customer of how many customers found in the database
         document.getElementById('searchResults').innerHTML += '<h5> Found ' + customers.length + ' match in the database </h5>';
-
         //for each matching customer display
         for(var i=0; i<customers.length; i++){
           document.getElementById('searchResults').innerHTML += '<p> Name : ' + customers[i].fName + ' ' +  customers[i].lName + ' Email: ' + customers[i].email + ' Phone Number: ' + customers[i].phone;
-          document.getElementById('searchResults').innerHTML += '<button type="button" class="btn btn-primary newColor" id="result'+i+'" data-toggle="modal" data-target="#viewUsersBookingsModal" onclick=setUser('+customers[i].id+')>View Bookings</button>';
 
+        }
+        if(customers.length != 1){
+          document.getElementById('searchResults').innerHTML += '<h5> Please narrow search down to one customer to view bookings made by them </h5>';
+
+        }else{
+          document.getElementById('searchResults').innerHTML += '<button type="button" class="btn btn-primary newColor" id="result0" data-toggle="modal" data-target="#viewUsersBookingsModal" onclick=setUser('+customers[0].id+')>View Bookings</button>';
           //on click of button
-          document.getElementById('result'+i).addEventListener('click', function(){
-            getUserBookings()});
+          document.getElementById('result0').addEventListener('click', function(){
+            getUserBookings()
+            });
           }
         }
+
+
         document.getElementById("searchModalFooter").hidden = true;
 
         //if no parameters sent to the database
@@ -444,6 +485,7 @@ async function searchForUser(){
 
 //creates tables from users community and hostel bookings
 async function getUserBookings(){
+
 
   //get customer id
   customerID = document.getElementById('customerId').value
@@ -472,7 +514,11 @@ async function getUserBookings(){
           //if response is fine
           if(response.ok){
             var body = await response.text();
+            if(body == '0bookings'){
+              document.getElementById('usersBookingError').innerHTML = 'No bookings found for that user'
+            }else{
             var bookings = JSON.parse(body);
+
 
             //if community bookings made
             if(bookings['community']!= null){
@@ -500,6 +546,7 @@ async function getUserBookings(){
               //display error message
               document.getElementById('usersBookingError').innerHTML = 'User has no bookings'
             }
+          }
           } else{
             throw new Error('Error getting customers' + response.code);
           }
@@ -512,7 +559,9 @@ async function getUserBookings(){
         document.getElementById('usersBookingError').innerHTML = 'User does not exist in the database'
       }
     }
-  }
+
+}
+
 
 //fills drop boxes
 async function updateRooms() {
@@ -851,6 +900,12 @@ async function fillFindBy(){
         document.getElementById('findByNameDropdown1').innerHTML += '<a onclick="hostelBookingView('+customers[i].id+')">' + customers[i].fName + ' ' + customers[i].lName + '</a>';
         document.getElementById('findByPhoneNumberDropdown1').innerHTML += '<a onclick="hostelBookingView('+customers[i].id+')">' + customers[i].phone + '</a>';
         document.getElementById('findByEmailDropdown1').innerHTML += '<a onclick="hostelBookingView('+customers[i].id+')">' + customers[i].email +  '</a>'
+        document.getElementById('findByNameDropdown2').innerHTML += '<a onclick="activityBookingView('+customers[i].id+')">' + customers[i].fName + ' ' + customers[i].lName + '</a>';
+        document.getElementById('findByPhoneNumberDropdown2').innerHTML += '<a onclick="activityBookingView('+customers[i].id+')">' + customers[i].phone + '</a>';
+        document.getElementById('findByEmailDropdown2').innerHTML += '<a onclick="activityBookingView('+customers[i].id+')">' + customers[i].email +  '</a>'
+        document.getElementById('findByNameDropdown3').innerHTML += '<a onclick="paymentView('+customers[i].id+')">' + customers[i].fName + ' ' + customers[i].lName + '</a>';
+        document.getElementById('findByPhoneNumberDropdown3').innerHTML += '<a onclick="paymentView('+customers[i].id+')">' + customers[i].phone + '</a>';
+        document.getElementById('findByEmailDropdown3').innerHTML += '<a onclick="paymentView('+customers[i].id+')">' + customers[i].email +  '</a>'
       }
     }else{
       throw new Error('Error getting customers' + response.code);
@@ -963,6 +1018,103 @@ async function hostelBookingView(id){
       document.getElementById('customerInfo1').innerHTML= 'Customer Name:' + customers[0].fName + ' ' + customers[0].lName;
       document.getElementById('hostelBookingButtonDiv').innerHTML = '<div class="col-sm-3"><a class="btn btn-primary newColor" href="#" role="button" onclick="newHostelBooking('+customers[0].id+')">Book & Pay at desk</a></div>'
 
+    }else{
+      throw new Error('Error getting customers' + response.code);
+    }
+    } catch (error) {
+      alert ('Error: ' + error);
+    }
+  }
+}
+
+//view hostel booking page
+async function activityBookingView(id){
+
+  //show form
+  document.getElementById('makeActivityBooking').hidden = false;
+  document.getElementById('findBy2').hidden = true;
+
+  //if no id supplied
+  if(id == null){
+
+    //print error
+    document.getElementById('errorMessage').innerHTML = 'No id supplied when searching for customer'
+  }else{
+
+  //search for customer
+  try{
+    let response = await fetch('http://localhost:8090/customersearch?id='+id,
+      {
+        method: 'GET',
+        headers: {
+            "Content-Type": "application/json"
+          }
+      });
+
+    //if response is fine
+    if(response.ok){
+      var body = await response.text();
+      var customers = JSON.parse(body);
+
+      //display customer name
+      document.getElementById('customerInfo2').innerHTML= 'Customer Name:' + customers[0].fName + ' ' + customers[0].lName;
+      document.getElementById('activityBookingButtonDiv').innerHTML = '<div class="col-sm-3"><a class="btn btn-primary newColor" href="#" role="button" onclick="newActivityBooking('+customers[0].id+')">Book & Pay at desk</a></div>'
+
+    }else{
+      throw new Error('Error getting customers' + response.code);
+    }
+    } catch (error) {
+      alert ('Error: ' + error);
+    }
+  }
+}
+
+//view payment page
+async function paymentView(id){
+  paymentDropdown = document.getElementById('usersBookingForPayment')
+  //show form
+  document.getElementById('makePayment').hidden = false;
+  document.getElementById('findBy3').hidden = true;
+
+  //if no id supplied
+  if(id == null){
+
+    //print error
+    document.getElementById('errorMessage').innerHTML = 'No id supplied when searching for customer'
+  }else{
+
+  //search for customer
+  try{
+    let response = await fetch('http://localhost:8090/paymentneeded?id='+id,
+      {
+        method: 'GET',
+        headers: {
+            "Content-Type": "application/json"
+          }
+      });
+
+    //if response is fine
+    if(response.ok){
+      var body = await response.text();
+      var bookings = JSON.parse(body);
+      for(var i=0; i< bookings['activity'].length; i++){
+        let option = document.createElement("option")
+        option.text = 'A ' + bookings['activity'][i].dateTime +  ' ' + ' £' + bookings['activity'][i].price
+        option.value = bookings['activity'][i].id
+        paymentDropdown.add(option);
+      }
+      for(var i=0; i< bookings['community'].length; i++){
+        let option = document.createElement("option")
+        option.text = 'C ' + bookings['community'][i].start +  ' ' + ' £' + bookings['community'][i].priceOfBooking
+        option.value = bookings['community'][i].id
+        paymentDropdown.add(option);
+      }
+      for(var i=0; i< bookings['hostel'].length; i++){
+        let option = document.createElement("option")
+        option.text = 'H ' + bookings['hostel'][i].startDate +  ' ' + ' £' + bookings['hostel'][i].price
+        option.value = bookings['hostel'][i].id
+        paymentDropdown.add(option);
+      }
     }else{
       throw new Error('Error getting customers' + response.code);
     }
@@ -1222,6 +1374,68 @@ async function newHostelBooking(id){
       }
 }
 
+//create new hostel booking
+async function newActivityBooking(id){
+
+  //get parameters
+  year = document.getElementById('yearActivityNew').value
+  month = document.getElementById('monthActivityNew').value
+  day = document.getElementById('monthActivityNew').value
+  time = document.getElementById('monthActivityNew').value + 8
+
+  //get number of guests
+  numberOfGuests = document.getElementById('numOfPeopleActivity').value
+
+  //check that number of guests is an integer
+  if(Number.isInteger(parseInt(numberOfGuests)) == false){
+
+    //print error message
+    document.getElementById('newActivityBookingError').innerHTML= 'Please enter an integer for number of people'
+
+    //check all parameters defined
+  }else if(day == '' || numberOfGuests == '' || time == ''){
+
+    //print error message
+    document.getElementById('newActivityBookingError').innerHTML= 'Please fill in all fields to complete booking'
+  }
+
+
+  //calculate epoch value for start and end date
+  startTime = new Date(year, month, day, time, 0, 0, 0).getTime()/1000;
+  activityId = document.getElementById('activityDropdown').value;
+  price = document.getElementById('totalActivityBookingPrice').innerText
+  numOfPeople = document.getElementById('numOfPeopleActivity').value
+
+  try{
+        //create new hostel booking
+        let response = await fetch('http://localhost:8090/staffactivitybooking',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          body: 'customerid=' + id + '&activityid=' + activityId + '&datetime=' + startTime + '&numberofpeople=' + numOfPeople + '&paid=0&price=' + price
+        });
+
+        //if response isn't fine
+        if(!response.ok){
+
+          //error message
+          throw new Error('problem adding new event ' + response.code);
+        }else{
+
+          //success message
+          document.getElementById('newActivityBookingError').innerHTML='Booking successful'
+
+          //reset forms
+          resetActivityBooking()
+        }
+
+    } catch (error) {
+      alert ('Error: ' + error);
+    }
+}
+
 //get price of community room
 async function fillPrice(){
 
@@ -1280,6 +1494,20 @@ function fillHostelPrice(){
 
     //calculate total by people * price
     document.getElementById('totalHostelBookingPrice').innerHTML = parseInt(document.getElementById('numPeople').innerHTML) * parseInt(document.getElementById('hostelRoomPricePerHour').innerHTML)
+
+}
+
+//get price of activity room
+function fillActivityPrice(){
+
+    //get number of people
+    document.getElementById('activityNumPeople').innerHTML= document.getElementById('numOfPeopleActivity').value;
+
+    //get price per hour from drop down
+    document.getElementById('activityPricePerHour').innerHTML = document.getElementById('activityDropdown').options[document.getElementById('activityDropdown').selectedIndex].text.split('£')[1];
+
+    //calculate total by people * price
+    document.getElementById('totalActivityBookingPrice').innerHTML = parseInt(document.getElementById('activityNumPeople').innerHTML) * parseInt(document.getElementById('activityPricePerHour').innerHTML)
 
 }
 
@@ -1474,6 +1702,19 @@ function resetHostelBooking(){
   document.getElementById('numberOfGuests').value = '';
 }
 
+//reset forms and hide calender
+function resetActivityBooking(){
+  document.getElementById('numOfPeopleActivity').value = '';
+}
+
+//reset forms and hide calender
+function resetPayment(){
+  document.getElementById('makePayment').hidden = true;
+  document.getElementById('findBy3').hidden = false;
+  document.getElementById('newPaymentError').innerHTML = '';
+}
+
+
 //add new ticket type to event
 function addTicketType(){
 
@@ -1559,7 +1800,6 @@ async function getNotifications(){
 
       //if community request exists
       if(requests['community'].length>=1){
-        console.log(requests['community'])
         document.getElementById('notificationBody').innerHTML += '<p> Community Booking Requests </p>';
         //display info about request
         statement = 'Booking Request for ' + requests['community'][0].name + ' from ' + requests['community'][0].start + ' - ' + requests['community'][0].end + ' by ' + requests['community'][0].fName + ' ' + requests['community'][0].lName;
@@ -1627,7 +1867,9 @@ async function getNotifications(){
   }
 }
 
+//approves a community booking request
 async function approveCRequest(id){
+
   //add new community booking and delete from request
   try{
     let response = await fetch('http://localhost:8090/approvecommunityrequest',
@@ -1650,7 +1892,9 @@ async function approveCRequest(id){
 }
 }
 
+//approves an activity booking request
 async function approveARequest(id){
+
   //add new activity booking and delete from request
   try{
     let response = await fetch('http://localhost:8090/approveactivityrequest',
@@ -1673,7 +1917,9 @@ async function approveARequest(id){
 }
 }
 
+//approves a hostel booking request
 async function approveHRequest(id){
+
   //add new hostel booking and delete from request
   try{
     let response = await fetch('http://localhost:8090/approvehostelrequest',
@@ -1696,7 +1942,9 @@ async function approveHRequest(id){
 }
 }
 
+//denys a community booking request
 async function denyCRequest(id){
+
   //delete from request
   try{
     let response = await fetch('http://localhost:8090/denycommunityrequest',
@@ -1719,7 +1967,9 @@ async function denyCRequest(id){
 }
 }
 
+//denys an activity booking request
 async function denyARequest(id){
+
   //delete from request
   try{
     let response = await fetch('http://localhost:8090/denyactivityrequest',
@@ -1742,7 +1992,9 @@ async function denyARequest(id){
 }
 }
 
+//denys a hostel booking request
 async function denyHRequest(id){
+
   //delete from request
   try{
     let response = await fetch('http://localhost:8090/denyhostelrequest',
@@ -1765,7 +2017,10 @@ async function denyHRequest(id){
 }
 }
 
+//fills calender with bookings
 async function fillCalender(){
+
+  //gets all events
   try{
     let response = await fetch('http://localhost:8090/events',
       {
@@ -1778,12 +2033,19 @@ async function fillCalender(){
       var body = await response.text();
       var events = JSON.parse(body)
       eventFound = false;
-      for(var i = 0; i<events.length; i++){
-            for(var j = 1; j< 8; j++){
-                if((events[i].datetime.substring(8,10)+'/'+events[i].datetime.substring(5,7)).toString()==document.getElementById('day' + j).textContent.toString()){
 
-                    document.getElementById('day' + j + 'E').innerHTML += 'Name: ' + events[i].name + '\n'
-                    document.getElementById('day' + j + 'E').innerHTML += '  Start Time: ' + events[i].datetime.substring(11,16)
+      //go through all events
+      for(var i = 0; i<events.length; i++){
+
+            //for each day in the week
+            for(var j = 1; j< 8; j++){
+
+                //if dates match, event in that week
+                if((events[i].datetime.substring(8,10)+'/'+events[i].datetime.substring(5,7)).toString()==document.getElementById('cday' + j).textContent.toString()){
+
+                    //display info about event
+                    document.getElementById('cday' + j + 'E').innerHTML += 'Name: ' + events[i].name + '\n'
+                    document.getElementById('cday' + j + 'E').innerHTML += '  Start Time: ' + events[i].datetime.substring(11,16)
 
                 }
             }
@@ -1792,6 +2054,8 @@ async function fillCalender(){
   }catch(error){
     alert('Error' + error)
   }
+
+  //get all bookings
   try{
     let response = await fetch('http://localhost:8090/bookings',
       {
@@ -1804,7 +2068,8 @@ async function fillCalender(){
       var body = await response.text();
       var bookings = JSON.parse(body)
       eventFound = false;
-      console.log(bookings)
+
+      //go through activity bookings
       for(var i = 0; i<bookings['activity'].length; i++){
             for(var j = 1; j< 8; j++){
                if((bookings['activity'][i].dateTime.substring(8,10)+'/'+bookings['activity'][i].dateTime.substring(5,7)).toString()==document.getElementById('day' + j).textContent.toString()){
@@ -1814,12 +2079,18 @@ async function fillCalender(){
                 }
             }
       }
+
+      // go through hostel bookings
       for(var i = 0; i<bookings['hostel'].length; i++){
             for(var j = 1; j< 8; j++){
+
+              //put start date in calender
                if((bookings['hostel'][i].startDate.substring(8,10)+'/'+bookings['hostel'][i].startDate.substring(5,7)).toString()==document.getElementById('day' + j).textContent.toString()){
                     document.getElementById('day' + j + 'H').innerHTML += ' Start of Booking for ' + bookings['activity'].noOfPeople + ' people'
 
               }
+
+              //put end date in calender
               if((bookings['hostel'][i].endDate.substring(8,10)+'/'+bookings['hostel'][i].endDate.substring(5,7)).toString()==document.getElementById('day' + j).textContent.toString()){
                    document.getElementById('day' + j + 'H').innerHTML += ' End of Booking for ' + bookings['hostel'].noOfPeople + ' people'
 
@@ -1827,11 +2098,13 @@ async function fillCalender(){
 
             }
       }
+
+      //go through community bookings
       for(var i = 0; i<bookings['community'].length; i++){
             for(var j = 1; j< 8; j++){
                if((bookings['community'][i].start.substring(8,10)+'/'+bookings['community'][i].start.substring(5,7)).toString()==document.getElementById('day' + j).textContent.toString()){
                     document.getElementById('day' + j + 'C').innerHTML += 'Start Time: ' + bookings['community'][i].start.substring(11,16) + '\n'
-                    document.getElementById('day' + j + 'C').innerHTML += '  End Time: ' + bookings['community'].end.substring(11,16)
+                    document.getElementById('day' + j + 'C').innerHTML += '  End Time: ' + bookings['community'][i].end.substring(11,16)
 
                 }
             }
@@ -1841,4 +2114,84 @@ async function fillCalender(){
   }catch(error){
     alert('Error' + error)
   }
+}
+
+//fill dropdown with activities avaliable to be booked
+async function fillActivities(){
+
+  //get dropdown
+  activityDropdown = document.getElementById('activityDropdown')
+
+  //fetch activities
+  try{
+    let response = await fetch('http://localhost:8090/activities',
+    {
+      method: 'GET',
+      headers: {
+          "Content-Type": "application/json"
+        }
+    });
+
+  //if response isn't fine
+  if(!response.ok){
+    throw new Error('Problem ' + response.code);
+  }else{
+    var body = await response.text();
+    var activities = JSON.parse(body)
+
+    //go through activities
+    for(var i=0; i<activities.length;i++){
+
+      //add as an option to dropdown
+      let option = document.createElement("option")
+      option.text = activities[i].name + ' £' + activities[i].price
+      option.value = activities[i].id
+      activityDropdown.add(option);
+    }
+  }
+}catch(error){
+  alert('Error' + error)
+}
+}
+
+//change payment status of booking
+async function makePayment(){
+
+  id = document.getElementById('usersBookingForPayment').value
+  type = document.getElementById('usersBookingForPayment').options[document.getElementById('usersBookingForPayment').selectedIndex].text.substring(0,1);
+
+  //get type of booking
+  switch(type){
+    case "A":
+      tableName = 'activity'
+      break;
+    case "C":
+      tableName = 'community'
+      break;
+    case "H":
+      tableName = 'hostel'
+      break
+  }
+
+  //make payment 
+  try{
+    let response = await fetch('http://localhost:8090/makepayment',
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: 'id=' + id + '&type=' + tableName
+    });
+
+  //if response isn't fine
+  if(!response.ok){
+    throw new Error('problem aproving event ' + response.code);
+  }else{
+    document.getElementById('newPaymentError').innerHTML = 'Database changed correctly'
+    resetPayment()
+  }
+}catch(error){
+  alert('Error' + error)
+}
 }
