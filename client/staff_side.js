@@ -1,19 +1,21 @@
 var submitAction = 0;
 var week = 1;
-//holds the current date
+//holds the current date for calender use
 var n =  new Date();
 var y = n.getYear();
 var m = n.getMonth() + 1;
 var d = n.getDate();
 var day = n.getDay();
+
 //on loading of content
 document.addEventListener("DOMContentLoaded", function () {
 
-
-
+  //sets up the calender dates to the current week
   for(var i = 1; i <8 ; i++){
         var x = day-i;
         document.getElementById('cday' + i).innerHTML = (d-x).toString().padStart(2,'0') + '/' + m.toString().padStart(2,'0');
+
+        //dealing with weeks that wrap over months
         if(isValidDate(d-x,m,y) == false){
             document.getElementById('cday' + i).innerHTML = (d-x  + daysInMonth(y,m) ).toString().padStart(2,'0')+ '/' + (m -1).toString().padStart(2,'0');
         }
@@ -334,21 +336,26 @@ document.addEventListener("DOMContentLoaded", function () {
     getNotifications()
   })
 
+  //moves the calender forward a week
   document.getElementById('nextWeek').addEventListener('click', function(){
     forwardWeek()
   })
 
+  //moves the calender back a week
   document.getElementById('prevWeek').addEventListener('click', function(){
     backWeek()
   })
 
+  //on click trys to mkae payment in database
   document.getElementById('makePaymentButton').addEventListener('click', function(){
     makePayment()
   })
 
+  //fills the calender with bookings for that week
   fillCalender()
 });
 
+//checks if date is valid ie 30th Feb not valid
 function isValidDate(d, m, y) {
     m = parseInt(m, 10) - 1;
     return m >= 0 && m < 12 && d > 0 && d <= daysInMonth(y, m);
@@ -372,7 +379,9 @@ function forwardWeek(){
           }
       }
   }
-    fillCalender()
+
+  //updates calender
+  fillCalender()
 }
 
 //changing the calender to the previous week
@@ -391,9 +400,8 @@ function backWeek(){
             }
         }
     }
-  //  if(monthSub == true){
-  //      m = m-1;
-  //  }
+
+  //update calender
   fillCalender()
 }
 
@@ -1859,7 +1867,9 @@ async function getNotifications(){
   }
 }
 
+//approves a community booking request
 async function approveCRequest(id){
+
   //add new community booking and delete from request
   try{
     let response = await fetch('http://localhost:8090/approvecommunityrequest',
@@ -1882,7 +1892,9 @@ async function approveCRequest(id){
 }
 }
 
+//approves an activity booking request
 async function approveARequest(id){
+
   //add new activity booking and delete from request
   try{
     let response = await fetch('http://localhost:8090/approveactivityrequest',
@@ -1905,7 +1917,9 @@ async function approveARequest(id){
 }
 }
 
+//approves a hostel booking request
 async function approveHRequest(id){
+
   //add new hostel booking and delete from request
   try{
     let response = await fetch('http://localhost:8090/approvehostelrequest',
@@ -1928,7 +1942,9 @@ async function approveHRequest(id){
 }
 }
 
+//denys a community booking request
 async function denyCRequest(id){
+
   //delete from request
   try{
     let response = await fetch('http://localhost:8090/denycommunityrequest',
@@ -1951,7 +1967,9 @@ async function denyCRequest(id){
 }
 }
 
+//denys an activity booking request
 async function denyARequest(id){
+
   //delete from request
   try{
     let response = await fetch('http://localhost:8090/denyactivityrequest',
@@ -1974,7 +1992,9 @@ async function denyARequest(id){
 }
 }
 
+//denys a hostel booking request
 async function denyHRequest(id){
+
   //delete from request
   try{
     let response = await fetch('http://localhost:8090/denyhostelrequest',
@@ -1997,7 +2017,10 @@ async function denyHRequest(id){
 }
 }
 
+//fills calender with bookings
 async function fillCalender(){
+
+  //gets all events
   try{
     let response = await fetch('http://localhost:8090/events',
       {
@@ -2010,10 +2033,17 @@ async function fillCalender(){
       var body = await response.text();
       var events = JSON.parse(body)
       eventFound = false;
+
+      //go through all events
       for(var i = 0; i<events.length; i++){
+
+            //for each day in the week
             for(var j = 1; j< 8; j++){
+
+                //if dates match, event in that week
                 if((events[i].datetime.substring(8,10)+'/'+events[i].datetime.substring(5,7)).toString()==document.getElementById('cday' + j).textContent.toString()){
 
+                    //display info about event
                     document.getElementById('cday' + j + 'E').innerHTML += 'Name: ' + events[i].name + '\n'
                     document.getElementById('cday' + j + 'E').innerHTML += '  Start Time: ' + events[i].datetime.substring(11,16)
 
@@ -2024,6 +2054,8 @@ async function fillCalender(){
   }catch(error){
     alert('Error' + error)
   }
+
+  //get all bookings
   try{
     let response = await fetch('http://localhost:8090/bookings',
       {
@@ -2036,6 +2068,8 @@ async function fillCalender(){
       var body = await response.text();
       var bookings = JSON.parse(body)
       eventFound = false;
+
+      //go through activity bookings
       for(var i = 0; i<bookings['activity'].length; i++){
             for(var j = 1; j< 8; j++){
                if((bookings['activity'][i].dateTime.substring(8,10)+'/'+bookings['activity'][i].dateTime.substring(5,7)).toString()==document.getElementById('day' + j).textContent.toString()){
@@ -2045,12 +2079,18 @@ async function fillCalender(){
                 }
             }
       }
+
+      // go through hostel bookings
       for(var i = 0; i<bookings['hostel'].length; i++){
             for(var j = 1; j< 8; j++){
+
+              //put start date in calender
                if((bookings['hostel'][i].startDate.substring(8,10)+'/'+bookings['hostel'][i].startDate.substring(5,7)).toString()==document.getElementById('day' + j).textContent.toString()){
                     document.getElementById('day' + j + 'H').innerHTML += ' Start of Booking for ' + bookings['activity'].noOfPeople + ' people'
 
               }
+
+              //put end date in calender
               if((bookings['hostel'][i].endDate.substring(8,10)+'/'+bookings['hostel'][i].endDate.substring(5,7)).toString()==document.getElementById('day' + j).textContent.toString()){
                    document.getElementById('day' + j + 'H').innerHTML += ' End of Booking for ' + bookings['hostel'].noOfPeople + ' people'
 
@@ -2058,6 +2098,8 @@ async function fillCalender(){
 
             }
       }
+
+      //go through community bookings
       for(var i = 0; i<bookings['community'].length; i++){
             for(var j = 1; j< 8; j++){
                if((bookings['community'][i].start.substring(8,10)+'/'+bookings['community'][i].start.substring(5,7)).toString()==document.getElementById('day' + j).textContent.toString()){
@@ -2074,8 +2116,13 @@ async function fillCalender(){
   }
 }
 
+//fill dropdown with activities avaliable to be booked
 async function fillActivities(){
+
+  //get dropdown
   activityDropdown = document.getElementById('activityDropdown')
+
+  //fetch activities
   try{
     let response = await fetch('http://localhost:8090/activities',
     {
@@ -2084,13 +2131,17 @@ async function fillActivities(){
           "Content-Type": "application/json"
         }
     });
+
   //if response isn't fine
   if(!response.ok){
     throw new Error('Problem ' + response.code);
   }else{
     var body = await response.text();
     var activities = JSON.parse(body)
+
+    //go through activities
     for(var i=0; i<activities.length;i++){
+
       //add as an option to dropdown
       let option = document.createElement("option")
       option.text = activities[i].name + ' £' + activities[i].price
@@ -2103,12 +2154,13 @@ async function fillActivities(){
 }
 }
 
+//change payment status of booking
 async function makePayment(){
-  //delete from request
-  id = document.getElementById('usersBookingForPayment').value
 
+  id = document.getElementById('usersBookingForPayment').value
   type = document.getElementById('usersBookingForPayment').options[document.getElementById('usersBookingForPayment').selectedIndex].text.substring(0,1);
 
+  //get type of booking
   switch(type){
     case "A":
       tableName = 'activity'
@@ -2120,6 +2172,8 @@ async function makePayment(){
       tableName = 'hostel'
       break
   }
+
+  //make payment 
   try{
     let response = await fetch('http://localhost:8090/makepayment',
     {
