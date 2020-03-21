@@ -9,240 +9,9 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-    <script>
-    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-    const dayNames = ["Mon", "Tues", "Wed", "Thur", "Fri", "Sat", "Sun"];
-    const hostAddr = "localhost";
-    const hostPort = "8090";
-    let rooms;
-
-    function mod(n, m) { // Because javascript mod % is broken
-        return ((n % m) + m) % m;
-    }
-    
-    async function getRooms(startDate, endDate) { // Need to add error handling at some point.
-        let response = await fetch('http://' + hostAddr + ":" + hostPort + '/rooms?types=community', {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json"
-            }
-        });
-        rooms = await response.json();
-        return rooms["community"]
-    }
-
-    async function updateRooms() {
-        rooms = await getRooms();
-        roomDrop = document.getElementById("roomDrop");
-        for (i = 0; i < rooms.length; i++) {
-            let option = document.createElement("option");
-            option.text = rooms[i]["name"];
-            option.value = rooms[i]["id"];
-            console.log(rooms[i]["id"]);
-            roomDrop.add(option);
-        }
-    }
-
-    updateRooms();
-
-    function Calender () { // Calender constructor/class
-        let targetMon = new Date(); // Date of the monday of the week being looked at, date initilizes as current date
-        let targetSun = new Date(); // Date of the sunday of the week being looked at (end of week)
-        let table = document.getElementById("calTable");
-        let eTable = document.getElementById("eventTable");
-        let cellHeight = 50; // Height of calender rows
-        let bookings = []; // Keeps a list of all bookings
-        let curRoom = -1; // The id of the room that is currently selected, for conveniance.
-        let userBooking = {
-            "element": document.createElement("div"),
-            "date": -1,
-            "bookingLength": 60
-        }; // Bookings added by user.
-        let peekElement = document.createElement("div");
-        let tableDims = table.getBoundingClientRect();
-        let colWidth = tableDims.width * 0.13; // Width of the columns
-        let paymentTable = document.getElementById("paymentTable");
-        
-        peekElement.className = "peekGraphic newColor";
-        peekElement.style.width = String(tableDims.width * 0.11) + "px"
-        peekElement.style.height = String((userBooking["bookingLength"]/60) * 50) + "px";
-        peekElement.style.visibility = "hidden";
-        eTable.rows[0].cells[1].appendChild(peekElement);
-        userBooking["element"].className = "peekGraphic newColor";
-        userBooking["element"].style.width = String(tableDims.width * 0.11) + "px";
-        userBooking["element"].style.height = String((userBooking["bookingLength"]/60) * 50) + "px";
-        userBooking["element"].innerHTML = "<p>Dom Newman </p>";
-        targetMon.setHours(0);
-        targetMon.setMinutes(0);
-        targetMon.setSeconds(1);
-        if (targetMon.getDay() != 1) { // Only changes date if not already a monday
-            targetMon.setDate(targetMon.getDate() - ((targetMon.getDay() - 1) % 7)); // Changes to last monday
-        }
-        targetSun.setDate(targetMon.getDate() + 7); // Sets the sunday of the week (conveniant to have, also, actually sets the next monday to prevent issues with comparisons)
-
-        let displayDates = async function() { // Displays/updates the dates above the calender
-            let tempDate = new Date(targetMon);
-            tempDate.setDate(tempDate.getDate() + 6);
-            document.getElementById("tableDate").innerHTML = monthNames[targetMon.getMonth()] + " " + targetMon.getDate() + " - " + monthNames[tempDate.getMonth()] + " " + tempDate.getDate();
-            headers = table.rows[0];
-            for (i = 0; i < 7; i++) {
-                newDate = new Date(targetMon);
-                newDate.setDate(newDate.getDate() + i);
-                headers.cells[i + 1].innerHTML = dayNames[i] + " " + newDate.getDate();
-            }
-        }
-
-        let clearCalender = function () { // Clears all the contents of the calender to prevent them 'building up'.
-            for (c = 1; c < table.rows[0].cells.length; c++) {
-                let target = eTable.rows[0].cells[c];
-                while (target.firstChild) {
-                    target.removeChild(target.firstChild);
-                }
-            }
-            
-            eTable.rows[0].cells[1].appendChild(peekElement); // Redisplay booking peek
-        }
-
-        let displayBookings = async function () { // Displays all the bookings on the calender
-            clearCalender();
-            for (i = 0; i < bookings.length; i++) {
-                if (bookings[i]["startTime"] <= targetMon || bookings[i]["startTime"] >= targetSun) {
-                    continue; // Continues if booking is not in this week.
-                }
-                let startCell = eTable.rows[0].cells[mod(bookings[i]["startTime"].getDay() - 1, 7) + 1];
-                if (bookings[i]["element"] == null) {
-                    let bookingGraphic = document.createElement("div");
-                    bookingGraphic.className = "bookingGraphic newColor";
-                    bookingGraphic.style.top = String(((bookings[i]["startTime"].getHours() - 9) * 50) + 50) + "px";
-                    bookingGraphic.style.height = String(bookings[i]["bookingLength"] * cellHeight) + "px";
-                    bookings[i]["element"] = bookingGraphic;
-                    bookings[i]["element"].innerHTML = "<p>Booked <br>" + 
-                        String(bookings[i]["startTime"].getHours()).padStart(2, '0') + ":" + 
-                        String(bookings[i]["startTime"].getMinutes()).padStart(2, '0') + " - " + 
-                        String(bookings[i]["endTime"].getHours()).padStart(2, '0') + ":" + 
-                        String(bookings[i]["endTime"].getMinutes()).padStart(2, '0') + "</p>";
-                }
-                startCell.appendChild(bookings[i]["element"]);
-            }
-        }
-        
-        this.changeRoom = async function () { // Called when the room is changed
-            tableDims = table.getBoundingClientRect();
-            curRoom = document.getElementById("roomDrop").value; // The list is in order of room id but offset by one due to the default option
-            await getBookings(curRoom);
-            displayBookings();
-            document.getElementById("roomDesc").innerHTML = rooms[parseInt(curRoom) + 1]["description"];
-        }
-
-        let getBookings = async function(roomID) { // Gets the bookings and formats them nicely
-            if (roomID == -1) {
-                return;
-            }
-            let response = await fetch('http://' + hostAddr + ":" + hostPort + '/roomavailability?type=community&id=' + roomID, {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json"
-                }
-            });
-            let availability = await response.json();
-            rawBookings = availability["busy"];
-            bookings = []; // Reset bookings
-            for (i = 0; i < rawBookings.length; i++) {
-                let ss = rawBookings[i]["start"].split(/[- :TZ]/);
-                let es = rawBookings[i]["end"].split(/[- :TZ]/);
-                let startTime = new Date(Date.UTC(ss[0], ss[1] - 1, ss[2], ss[3], ss[4], 0));
-                let endTime = new Date(Date.UTC(es[0], es[1] - 1, es[2], es[3], es[4], 0));
-                let bookingLength = (endTime.getHours() - startTime.getHours()) + (endTime.getMinutes() - startTime.getMinutes()) / 60;
-                bookings.push({
-                    "startTime": startTime,
-                    "endTime": endTime,
-                    "bookingLength": bookingLength,
-                    "element": null
-                });
-            }
-            return;
-        }
-        
-        this.leaveMouse = function () {
-            //peekElement.style.visibility = "hidden";
-        }
-        
-        this.mouseEnter = function () {
-            peekElement.style.visibility = "visible";
-        }
-
-        this.bookingPeek = async function (e) { // Displays a potential booking over where the mouse hovers.
-            tableDims = table.getBoundingClientRect();
-            colWidth = tableDims.width * 0.13; 
-            let calX = tableDims.left;
-            let calY = tableDims.top;
-            let leftCol = eTable.rows[0].cells[0].offsetWidth + calX; // pos of left column
-            let topRow = table.rows[0].offsetHeight + calY; // pos of top row
-
-            if (e.clientX > leftCol && e.clientY > topRow) { // Checks in table
-                let curColumn = Math.floor((e.clientX - leftCol) / colWidth);
-                let curRow = Math.floor((e.clientY - topRow) / cellHeight) + 1;
-                peekElement.style.top = String(curRow * cellHeight) + "px";
-                peekElement.style.left = String((curColumn * colWidth)) + "px";
-            }
-        }
-        
-        this.placeBooking = async function (e) {
-            if (userBooking["element"].parentNode) {
-                userBooking["element"].parentNode.removeChild(userBooking["element"])
-            }
-            
-            let calX = tableDims.left;
-            let calY = tableDims.top;
-            let leftCol = eTable.rows[0].cells[0].offsetWidth + calX; // pos of left column
-            let topRow = table.rows[0].offsetHeight + calY; // pos of top 
-            
-            if (e.clientX > leftCol && e.clientY > topRow) {
-                let curColumn = Math.floor((e.clientX - leftCol) / colWidth);
-                let curRow = Math.floor((e.clientY - topRow) / cellHeight) + 1;
-                userBooking["element"].style.top = String(curRow * cellHeight) + "px";
-                let selectedDate = new Date(targetMon);
-                selectedDate.setDate(targetMon.getDate() + curColumn);
-                userBooking["date"] = new Date();
-                eTable.rows[0].cells[curColumn + 1].appendChild(userBooking["element"]);
-            }
-            
-            // update payment table:
-            if (curRoom != "-1") {
-                console.log(curRoom);
-                paymentTable.rows[1].cells[0].innerHTML = rooms[curRoom]["name"];
-                paymentTable.rows[1].cells[1].innerHTML = rooms[curRoom]["pricePerHour"];
-                paymentTable.rows[1].cells[2].innerHTML = rooms[curRoom]["pricePerHour"] * userBooking["bookingLength"];
-            }
-            
-        }
-        
-        this.setBookingLength = async function(e) { // Sets what the booking length should be
-            let lengthDrop = document.getElementById("lengthDrop");
-            userBooking["bookingLength"] = lengthDrop.value;
-            userBooking["element"].style.height = String((userBooking["bookingLength"]/60) * 50) + "px";
-            peekElement.style.height = String((userBooking["bookingLength"]/60) * 50) + "px";
-        }
-        
-        displayDates();
-
-        this.nextWeek = function() {
-            targetMon.setDate(targetMon.getDate() + 7);
-            targetSun.setDate(targetSun.getDate() + 7);
-            displayDates();
-            displayBookings();
-        }
-
-        this.prevWeek = function() {
-            targetMon.setDate(targetMon.getDate() - 7);
-            targetSun.setDate(targetSun.getDate() - 7);
-            displayDates();
-            displayBookings();
-        }
-    }
-  </script>
+    <script src="room_booking.js"></script>
 </head>
-<body>
+<body onload="calender = new Calender();">
 <div class="container" style="font-size: 100%; position: relative;">
     <h1> Room Booking </h1>
     <p class="mt-2 "> Book a room by first selecting which room you would like to book, then choosing the date, time and duration. </p>
@@ -265,8 +34,8 @@
     <p id="roomDesc"></p>
     <p class="mt-2" > Select the time by selecting the date you want below. </p>
     <div class="row">
-        <div class="col"><button type="button" class="btn btn-primary newColor" onclick="calender.prevWeek()">Prev</button></div>
-        <div class="col" ><h3 id="tableDate"></h3></div>
+        <div class="col"><button type="button" class="btn btn-primary newColor" onclick="calender.prevWeek()" id="prevBut" style="visibility: hidden;">Prev</button></div>
+        <div class="col" ><h3 id="tableDate" style="text-align: center;"></h3></div>
         <div class="col"><button type="button" class="btn btn-primary newColor" onclick="calender.nextWeek()" style="float: right;">Next</a></div>
     </div>
     <div onmouseout="calender.leaveMouse()" onmouseenter="calender.mouseEnter()">
@@ -445,12 +214,8 @@
     </table>
     <div class="row" style="margin-bottom: 30px;">
         <div class="col-sm-6"></div>
-        <div class="col-sm-2"><a class="btn btn-primary newColor" href="#" role="button" >Book & Pay now</a></div>
-        <div class="col-sm-1" style="text-align: center;"><h5>or</h5></div>
-        <div class="col-sm-3"><a class="btn btn-primary newColor" href="#" role="button" >Book & Pay at desk</a></div>
+        <div class="col-sm-3"></div>
+        <div class="col-sm-3"><a class="btn btn-primary newColor" href="#" role="button" style="float: right;" onclick="calender.submitBooking()">Book & Pay at desk</a></div>
     </div>
 </div>
-<script>
-    calender = new Calender();
-</script>
 </body>
