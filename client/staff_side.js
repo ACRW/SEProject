@@ -13,9 +13,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
   for(var i = 1; i <8 ; i++){
         var x = day-i;
-        document.getElementById('day' + i).innerHTML = (d-x).toString().padStart(2,'0') + '/' + m.toString().padStart(2,'0');
+        document.getElementById('cday' + i).innerHTML = (d-x).toString().padStart(2,'0') + '/' + m.toString().padStart(2,'0');
         if(isValidDate(d-x,m,y) == false){
-            document.getElementById('day' + i).innerHTML = (d-x  + daysInMonth(y,m) ).toString().padStart(2,'0')+ '/' + (m -1).toString().padStart(2,'0');
+            document.getElementById('cday' + i).innerHTML = (d-x  + daysInMonth(y,m) ).toString().padStart(2,'0')+ '/' + (m -1).toString().padStart(2,'0');
         }
     }
 
@@ -358,17 +358,17 @@ function isValidDate(d, m, y) {
 //changing the calender to the next week
 function forwardWeek(){
   for(var i = 1; i <8 ; i++){
-      var x = parseInt(document.getElementById('day' + i).innerHTML) + 7;
-      document.getElementById('day' + i).innerHTML = x + '/' + m;
+      var x = parseInt(document.getElementById('cday' + i).innerHTML) + 7;
+      document.getElementById('cday' + i).innerHTML = x + '/' + m;
       if(isValidDate(x,m,y) == false){
           if(daysInMonth(y,m)-x == 0){
             m = m+ 1;
-            document.getElementById('day' + i).innerHTML = (x+1)% daysInMonth(y,m-1) + '/' + (m);
+            document.getElementById('cday' + i).innerHTML = (x+1)% daysInMonth(y,m-1) + '/' + (m);
           }else if (daysInMonth(y,m)-x < 0){
-            document.getElementById('day' + i).innerHTML = (x+1)% daysInMonth(y,m-1) + '/' + (m);
+            document.getElementById('cday' + i).innerHTML = (x+1)% daysInMonth(y,m-1) + '/' + (m);
 
           }else{
-              document.getElementById('day' + i).innerHTML = x% daysInMonth(y,m-2) + '/' + (m);
+              document.getElementById('cday' + i).innerHTML = x% daysInMonth(y,m-2) + '/' + (m);
           }
       }
   }
@@ -379,15 +379,15 @@ function forwardWeek(){
 function backWeek(){
     var monthSub = false;
     for(var i = 7; i > 0 ; i--){
-        var x = parseInt(document.getElementById('day' + i).innerHTML) - 7;
-        document.getElementById('day' + i).innerHTML = x.toString().padStart(2,'0') + '/' + m.toString().padStart(2,'0');
+        var x = parseInt(document.getElementById('cday' + i).innerHTML) - 7;
+        document.getElementById('cday' + i).innerHTML = x.toString().padStart(2,'0') + '/' + m.toString().padStart(2,'0');
         if(isValidDate(x,m,y) == false){
             if(x == 0){
                 m = m-1;
                 monthSub = true;
-                document.getElementById('day' + i).innerHTML = (x + daysInMonth(y,m-1)).toString().padStart(2,'0') + '/' + (m).toString().padStart(2,'0');
+                document.getElementById('cday' + i).innerHTML = (x + daysInMonth(y,m-1)).toString().padStart(2,'0') + '/' + (m).toString().padStart(2,'0');
             }else{
-                document.getElementById('day' + i).innerHTML =  (daysInMonth(y,m-1) + x).toString().padStart(2,'0') + '/' + (m).toString().padStart(2,'0');
+                document.getElementById('cday' + i).innerHTML =  (daysInMonth(y,m-1) + x).toString().padStart(2,'0') + '/' + (m).toString().padStart(2,'0');
             }
         }
     }
@@ -399,6 +399,7 @@ function backWeek(){
 
 //runs get request to search for user in database and displays results
 async function searchForUser(){
+  document.getElementById('usersBookingError').innerHTML = ''
 
   //get parameters for search
   fName = document.getElementById("firstnameSearch").value;
@@ -442,17 +443,24 @@ async function searchForUser(){
 
         //inform customer of how many customers found in the database
         document.getElementById('searchResults').innerHTML += '<h5> Found ' + customers.length + ' match in the database </h5>';
-
         //for each matching customer display
         for(var i=0; i<customers.length; i++){
           document.getElementById('searchResults').innerHTML += '<p> Name : ' + customers[i].fName + ' ' +  customers[i].lName + ' Email: ' + customers[i].email + ' Phone Number: ' + customers[i].phone;
-          document.getElementById('searchResults').innerHTML += '<button type="button" class="btn btn-primary newColor" id="result'+i+'" data-toggle="modal" data-target="#viewUsersBookingsModal" onclick=setUser('+customers[i].id+')>View Bookings</button>';
 
+        }
+        if(customers.length != 1){
+          document.getElementById('searchResults').innerHTML += '<h5> Please narrow search down to one customer to view bookings made by them </h5>';
+
+        }else{
+          document.getElementById('searchResults').innerHTML += '<button type="button" class="btn btn-primary newColor" id="result0" data-toggle="modal" data-target="#viewUsersBookingsModal" onclick=setUser('+customers[0].id+')>View Bookings</button>';
           //on click of button
-          document.getElementById('result'+i).addEventListener('click', function(){
-            getUserBookings()});
+          document.getElementById('result0').addEventListener('click', function(){
+            getUserBookings()
+            });
           }
         }
+
+
         document.getElementById("searchModalFooter").hidden = true;
 
         //if no parameters sent to the database
@@ -469,6 +477,7 @@ async function searchForUser(){
 
 //creates tables from users community and hostel bookings
 async function getUserBookings(){
+
 
   //get customer id
   customerID = document.getElementById('customerId').value
@@ -497,7 +506,11 @@ async function getUserBookings(){
           //if response is fine
           if(response.ok){
             var body = await response.text();
+            if(body == '0bookings'){
+              document.getElementById('usersBookingError').innerHTML = 'No bookings found for that user'
+            }else{
             var bookings = JSON.parse(body);
+
 
             //if community bookings made
             if(bookings['community']!= null){
@@ -525,6 +538,7 @@ async function getUserBookings(){
               //display error message
               document.getElementById('usersBookingError').innerHTML = 'User has no bookings'
             }
+          }
           } else{
             throw new Error('Error getting customers' + response.code);
           }
@@ -537,7 +551,9 @@ async function getUserBookings(){
         document.getElementById('usersBookingError').innerHTML = 'User does not exist in the database'
       }
     }
-  }
+
+}
+
 
 //fills drop boxes
 async function updateRooms() {
@@ -1996,10 +2012,10 @@ async function fillCalender(){
       eventFound = false;
       for(var i = 0; i<events.length; i++){
             for(var j = 1; j< 8; j++){
-                if((events[i].datetime.substring(8,10)+'/'+events[i].datetime.substring(5,7)).toString()==document.getElementById('day' + j).textContent.toString()){
+                if((events[i].datetime.substring(8,10)+'/'+events[i].datetime.substring(5,7)).toString()==document.getElementById('cday' + j).textContent.toString()){
 
-                    document.getElementById('day' + j + 'E').innerHTML += 'Name: ' + events[i].name + '\n'
-                    document.getElementById('day' + j + 'E').innerHTML += '  Start Time: ' + events[i].datetime.substring(11,16)
+                    document.getElementById('cday' + j + 'E').innerHTML += 'Name: ' + events[i].name + '\n'
+                    document.getElementById('cday' + j + 'E').innerHTML += '  Start Time: ' + events[i].datetime.substring(11,16)
 
                 }
             }
@@ -2046,7 +2062,7 @@ async function fillCalender(){
             for(var j = 1; j< 8; j++){
                if((bookings['community'][i].start.substring(8,10)+'/'+bookings['community'][i].start.substring(5,7)).toString()==document.getElementById('day' + j).textContent.toString()){
                     document.getElementById('day' + j + 'C').innerHTML += 'Start Time: ' + bookings['community'][i].start.substring(11,16) + '\n'
-                    document.getElementById('day' + j + 'C').innerHTML += '  End Time: ' + bookings['community'].end.substring(11,16)
+                    document.getElementById('day' + j + 'C').innerHTML += '  End Time: ' + bookings['community'][i].end.substring(11,16)
 
                 }
             }
