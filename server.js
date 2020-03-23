@@ -1,6 +1,7 @@
 // import app
 const app = require('./app');
 
+/*
 // for HTTPS
 const fs = require('fs');
 const https = require('https');
@@ -10,3 +11,6 @@ https.createServer({
     key: fs.readFileSync('server.key'),
     cert: fs.readFileSync('server.cert')
 }, app).listen(8090);
+*/
+
+app.listen(8090);
