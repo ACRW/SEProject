@@ -1,4 +1,4 @@
-// for GET & POST methods
+// for GET & POST methods over HTTPS
 const express = require('express');
 const app = express();
 
@@ -1456,8 +1456,6 @@ app.post('/denyactivityrequest', async function(req, resp) {
 });
 
 // user accounts
-
-// look into HTTPS
 
 // handle staff sign in
 app.post('/staffsignin', async function(req, resp) {
