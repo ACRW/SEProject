@@ -50,6 +50,7 @@ function ActivityCard (activity) { // Activity card class, each instantiated cla
   card.className = "card";
   card.appendChild(img);
   card.appendChild(body);
+  card.style.display = "display: inline-block";
   
   document.getElementById("activityCards").appendChild(card);
 }

@@ -5,7 +5,7 @@ let roomCards = {} // Keeps track of all the activity card classes
 let rooms = {}
 
 async function createCards () { // Get the card information and create them
-  let response = await fetch('http://' + hostAddr + ":" + hostPort + '/rooms', {
+  let response = await fetch('http://' + hostAddr + ":" + hostPort + '/rooms?types=hostel', {
       method: "GET",
       headers: {
         "Content-Type": "application/json"
@@ -13,52 +13,51 @@ async function createCards () { // Get the card information and create them
     });
   let tempRooms = await response.json();
   
-  for (room of tempRooms) {
-    roomCards[room["id"]] = new Room(room);
+  for (room of tempRooms["hostel"]) {
+    roomCards[room["id"]] = new RoomCard(room);
     rooms[room["id"]] = room;
   }
 }
 
-function RoomCard (activity) { // Activity card class, each instantiated class refers to a single card on the document.
+function RoomCard (room) { // room card class, each instantiated class refers to a single card on the document.
   let title = document.createElement('h4');
   title.className="card-title";
-  title.innerHTML = activity["name"];
+  title.innerHTML = "Room " + String(room["roomNumber"]);
   
-  let desc = document.createElement('p');
+  /*let desc = document.createElement('p');
   desc.className = "card-text";
-  desc.innerHTML = activity["description"];
+  desc.innerHTML = room["description"];*/
 
   let button = document.createElement('a');
   button.className = "btn btn-primary newColor";
   button.type = "button";
   button.innerHTML = "Book Now";
-  button.onclick= function(){modifyPopUp(activity["id"]);};//function () {console.log("test");};
+  button.onclick= function(){updateFields(room["id"]);};//function () {console.log("test");};
   button.setAttribute("data-toggle", "modal");
   button.setAttribute("data-target", "#popUp");
   
   let body = document.createElement('div');
   body.className = "card-body";
   body.appendChild(title);
-  body.appendChild(desc);
+  //body.appendChild(desc);
   body.appendChild(button);
   
   let img = document.createElement('img');
   img.className = "card-img-top";
-  img.src = activity["imagePath"];
+  img.src = room["imagePath"];
   
   let card = document.createElement('div');
   card.className = "card";
   card.appendChild(img);
   card.appendChild(body);
+  card.style.display = "display: inline-block";
   
-  document.getElementById("activityCards").appendChild(card);
+  document.getElementById("roomCards").appendChild(card);
 }
 
 function modifyPopUp(id) {
-  activity = activities[id];
-  document.getElementById("popUpTitle").innerHTML = activity["name"];
-  document.getElementById("popUpDesc").innerHTML = activity["description"];
-  document.getElementById("popUpImg").src = activity["imagePath"];
+  room = rooms[id];
+  //document.getElementById("popUpImg").src = room["imagePath"];
 }
 
 createCards();
@@ -88,7 +87,7 @@ const endDateTable=document.getElementById('endDayTable');// table content 5
 const durationTable=document.getElementById('duration');// table content 6
 const totalPrice = document.getElementById('totalPrice'); // table content 7
 
-const submitButton =document.getElementById("submitButton"); // the submittion button
+const submitButton = document.getElementById("submitButton"); // the submittion button
 
 
 ////// All functions //////
@@ -135,7 +134,7 @@ const getWeekInfo = async(roomid) =>{
 // return a proper calander. the already booked date colored grey 
 async function roomRented(year,month,roomid){
   let i;
-  let response = await fetch('http://' + hostAddr + ":" + hostPort + '/roomavailability?type=hostel&id=' + roomid, {
+  let response = await fetch('http://' + hostAddr + ":" + hostPort + '/roomavailability?type=hostel&id=' + String(roomid - 1), {
     method: "GET",
     headers: {
         "Content-Type": "application/json"
@@ -150,7 +149,6 @@ async function roomRented(year,month,roomid){
           {"startDate":"2020-02-23T00:00:00.000Z","endDate":"2020-03-17T00:00:00.000Z"}]}
   */
   const bookings = availability["busy"];// get the list
-  console.log(bookings)
   let startlist=[];
   let endlist=[];
 
@@ -178,7 +176,6 @@ async function roomRented(year,month,roomid){
     let month2 = Number(idb[1])-1;
     let day2 = Number(idb[2]);
     let date2 = new Date(year2,month2,day2);//end date
-    console.log(date2)
 
     let dayinmonth=new Date(year,month+1,0).getDate();//days=28~31 as number of days in this month
 
@@ -593,10 +590,10 @@ const eraseFields = () =>{
   submitButton.hidden=true;
 }
 
-// update the whole form
+// update the whole form, room number now uses the actual id value, so must add one upon recieving it.
 const updateFields = async(roomNumber) =>{
+    roomNumber += 1;
     const rooms = await getHostel();
-    console.log(rooms);
     if(rooms == "Error"){
       responseField.innerHTML = "<p>Error fetching hostel rooms</P>";
     }else{
@@ -736,7 +733,7 @@ updateFields(1);
 
 window.onload = function() {
   // paging buttons
-  room1.addEventListener("click",function(){
+/*  room1.addEventListener("click",function(){
     updateFields(1);
   });
   room2.addEventListener("click",function(){
@@ -753,7 +750,7 @@ window.onload = function() {
 
   room5.addEventListener("click",function(){
     updateFields(5);
-  })
+  })*/
 
   // submitbutton event listener.
   submitButton.addEventListener("click", function(event){

@@ -73,10 +73,12 @@
 <!-- Presentation -->
 <div class="container">
   <h2 style="color: #A5B686 ;">Book your bedrooms here.</h2>
-  <p>The Hub boasts 5 bedrooms which sleep between 3 and 8 people in a combination of bunks and single beds.</p>
-
+  <p>The Hub boasts 5 rooms which sleep between 3 and 8 people in a combination of bunks and single beds.</p>
+  <div class="card-columns" id="roomCards">
+    
+  </div> 
   <!-- Nav tabs -->
-  <ul class="nav nav-tabs" role="tablist">
+<!--  <ul class="nav nav-tabs" role="tablist">
     <li class="nav-item">
       <a class="nav-link active" data-toggle="tab" href="#type1" style="color:gray;font-size: 25px;" id="room1">Room 1</a>
     </li>
@@ -94,7 +96,7 @@
     </li>
   </ul>
 
-  <!-- Tab panes -->
+  <!-- Tab panes
   <div class="tab-content">
 
     <div id="type1" class="container tab-pane active"><br>
@@ -186,107 +188,119 @@
       </div>
 
     </div>
-  </div>
-
-<br>
-
+  </div>-->
 </div>
 
-<!-- Fill info -->
-<div style="padding-left: 170px;">
-  <h3>
-    Please fill in the following information
-    <small class="text-muted">To book</small>
-  </h3>
-  <!-- response Message -->
-  <div ><h4 id="responseField"></h4>
-  </div>
 
-  <!-- number of people-->
-  <div class="form-group">
-    <label>Number of people: </label>
-    <input type="number" min='0' value='0' id='maxPeople'>
-    <br>
-  </div>
+<div class="modal fade" id="popUp">
+ <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Book your room</h5>
+        <button type="button" class="close" data-dismiss="modal">X</button>
+      </div>
+      <div class="modal-body" >
+        <!-- Fill info -->
+        <div>
+          <h3>
+            Please fill in the following information
+            <small class="text-muted">To book</small>
+          </h3>
+          <!-- response Message -->
+          <div ><h4 id="responseField"></h4>
+          </div>
 
-  <!--calendar-->
-  <div class="calendar form-group">
-    <p>Please choose the start date and the end date of your booking from the calendar:</p>
+          <!-- number of people-->
+          <div class="form-group">
+            <label>Number of people: </label>
+            <input type="number" min='0' value='0' id='maxPeople'>
+            <br>
+          </div>
 
-    <div id="cldFrame">
-      <div id="cldBody">
-          <table >
-            <thead>
+          <!--calendar-->
+          <div class="calendar form-group">
+            <p>Please choose the start date and the end date of your booking from the calendar:</p>
+
+            <div id="cldFrame">
+              <div id="cldBody">
+                  <table >
+                    <thead>
+                      <tr>
+                        <td colspan="7">
+                            <div id="top">
+                                <span id="left">&lt;</span>
+                                <span id="topDate">waitforjs</span>
+                                <span id="right">&gt;</span>
+                            </div>
+                        </td>
+                      </tr>
+                      <tr id="week">
+                          <td>Sun</td>
+                          <td>Mon</td>
+                          <td>Tue</td>
+                          <td>Wed</td>
+                          <td>Thu</td>
+                          <td>Fri</td>
+                          <td>Sat</td>
+                      </tr>
+                      </thead>
+                      <tbody id="tbody"></tbody>
+                  </table>
+              </div>
+            </div>
+
+            <br>
+            
+            <p>Start Date:(yyyy-mm-dd)</p> <P id='startDateCalender'>--</P>
+            <p>End Date:(yyyy-mm-dd)</p> <P id='endDateCalender'>--</P>
+
+          </div>
+
+          <!--table-->
+          <div class="form-group" style="padding-top: 20px;">
+            <p>Please check your information in the table:</p>
+
+            <table class="table" style="margin-top:30px">
               <tr>
-                <td colspan="7">
-                    <div id="top">
-                        <span id="left">&lt;</span>
-                        <span id="topDate">waitforjs</span>
-                        <span id="right">&gt;</span>
-                    </div>
-                </td>
+                <td>Room Number</td>
+                <td>Price per person</td>
+                <td>No. of people</td> 
+                <td>Start</td>
+                <td>End</td>
+                <td>Duration</td>
+                <td>Total Price</td>
               </tr>
-              <tr id="week">
-                  <td>Sun</td>
-                  <td>Mon</td>
-                  <td>Tue</td>
-                  <td>Wed</td>
-                  <td>Thu</td>
-                  <td>Fri</td>
-                  <td>Sat</td>
+              <tr>
+                <td id='roomNum'>--</td>
+                <td id='pricePerNight'>--</td>
+                <td id='numOfPeople'>--</td>
+                <td id='startDayTable'>--</td>
+                <td id='endDayTable'>--</td>
+                <td id='duration'>--</td>
+                <td id='totalPrice'>--</td>
               </tr>
-              </thead>
-              <tbody id="tbody"></tbody>
-          </table>
+            </table>
+
+            <!--submit buttom-->
+            <div class="row" style="margin-bottom: 30px;" >
+              <div class="col-sm-6"></div>
+              <div class="col-sm-4"></div>
+              <div class="col-sm-2"><a class="btn btn-primary newColor" href="#" role="button" id='submitButton' hidden="true">Book and pay now</a></div>
+            </div>
+
+            <!--submittion response-->
+            <div name="SubmittionResponse">
+            </div>
+
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary newColor" id="submitButton">Book these dates</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
       </div>
     </div>
-
-    <br>
-    
-    <p>Start Date:(yyyy-mm-dd)</p> <P id='startDateCalender'>--</P>
-    <p>End Date:(yyyy-mm-dd)</p> <P id='endDateCalender'>--</P>
-
   </div>
-
-  <!--table-->
-  <div class="form-group" style="padding-top: 20px;">
-    <p>Please check your information in the table:</p>
-
-    <table class="table" style="margin-top:30px">
-      <tr>
-        <td>Room Number</td>
-        <td>Price per person per night</td>
-        <td>number of people</td> 
-        <td>Start Date</td>
-        <td>End Date</td>
-        <td>Duration</td>
-        <td>Total Price</td>
-      </tr>
-      <tr>
-        <td id='roomNum'>--</td>
-        <td id='pricePerNight'>--</td>
-        <td id='numOfPeople'>--</td>
-        <td id='startDayTable'>--</td>
-        <td id='endDayTable'>--</td>
-        <td id='duration'>--</td>
-        <td id='totalPrice'>--</td>
-      </tr>
-    </table>
-
-    <!--submit buttom-->
-    <div class="row" style="margin-bottom: 30px;" >
-      <div class="col-sm-6"></div>
-      <div class="col-sm-4"></div>
-      <div class="col-sm-2"><a class="btn btn-primary newColor" href="#" role="button" id='submitButton' hidden="true">Book and pay now</a></div>
-    </div>
-
-    <!--submittion response-->
-    <div name="SubmittionResponse">
-    </div>
-
-  </div>
-
-
 </div>
 
 
