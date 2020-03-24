@@ -1,3 +1,68 @@
+const hostAddr = "localhost";
+const hostPort = "8090";
+
+let roomCards = {} // Keeps track of all the activity card classes
+let rooms = {}
+
+async function createCards () { // Get the card information and create them
+  let response = await fetch('http://' + hostAddr + ":" + hostPort + '/rooms', {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json"
+      }
+    });
+  let tempRooms = await response.json();
+  
+  for (room of tempRooms) {
+    roomCards[room["id"]] = new Room(room);
+    rooms[room["id"]] = room;
+  }
+}
+
+function RoomCard (activity) { // Activity card class, each instantiated class refers to a single card on the document.
+  let title = document.createElement('h4');
+  title.className="card-title";
+  title.innerHTML = activity["name"];
+  
+  let desc = document.createElement('p');
+  desc.className = "card-text";
+  desc.innerHTML = activity["description"];
+
+  let button = document.createElement('a');
+  button.className = "btn btn-primary newColor";
+  button.type = "button";
+  button.innerHTML = "Book Now";
+  button.onclick= function(){modifyPopUp(activity["id"]);};//function () {console.log("test");};
+  button.setAttribute("data-toggle", "modal");
+  button.setAttribute("data-target", "#popUp");
+  
+  let body = document.createElement('div');
+  body.className = "card-body";
+  body.appendChild(title);
+  body.appendChild(desc);
+  body.appendChild(button);
+  
+  let img = document.createElement('img');
+  img.className = "card-img-top";
+  img.src = activity["imagePath"];
+  
+  let card = document.createElement('div');
+  card.className = "card";
+  card.appendChild(img);
+  card.appendChild(body);
+  
+  document.getElementById("activityCards").appendChild(card);
+}
+
+function modifyPopUp(id) {
+  activity = activities[id];
+  document.getElementById("popUpTitle").innerHTML = activity["name"];
+  document.getElementById("popUpDesc").innerHTML = activity["description"];
+  document.getElementById("popUpImg").src = activity["imagePath"];
+}
+
+createCards();
+
 let flag = true;
 ////// Selecting page elements //////
 const room1 = document.getElementById("room1");
@@ -70,7 +135,7 @@ const getWeekInfo = async(roomid) =>{
 // return a proper calander. the already booked date colored grey 
 async function roomRented(year,month,roomid){
   let i;
-  let response = await fetch('/roomavailability?type=hostel&id=' + roomid, {
+  let response = await fetch('http://' + hostAddr + ":" + hostPort + '/roomavailability?type=hostel&id=' + roomid, {
     method: "GET",
     headers: {
         "Content-Type": "application/json"
@@ -615,7 +680,7 @@ getHostel = async() => {
 // get room availability
 async function roomAvailability(roomid){
   let i;
-  let response = await fetch('/roomavailability?type=hostel&id=' + roomid, {
+  let response = await fetch('http://' + hostAddr + ":" + hostPort + '/roomavailability?type=hostel&id=' + roomid, {
     method: "GET",
     headers: {
         "Content-Type": "application/json"
@@ -642,7 +707,7 @@ async function roomAvailability(roomid){
       }*/
 submitBooking = async(customerid,roomid,start,end)=>{
   //create new hostel booking
-  let response = await fetch('http://localhost:8090/staffhostelbooking',
+  let response = await fetch('http://' + hostAddr + ":" + hostPort + '/staffhostelbooking',
   {
     method: 'POST',
     headers: {

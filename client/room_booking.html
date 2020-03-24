@@ -1,221 +1,221 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>TCR Hub Booking</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-    <link rel="stylesheet" href="style.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-    <script src="room_booking.js"></script>
+  <title>TCR Hub Booking</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  <script src="room_booking.js"></script>
 </head>
 <body onload="calender = new Calender();">
 <div class="container" style="font-size: 100%; position: relative;">
-    <h1> Room Booking </h1>
-    <p class="mt-2 "> Book a room by first selecting which room you would like to book, then choosing the date, time and duration. </p>
-    <div class="row" style="margin-bottom: 5px;">
-        <div class="col-sm-8">
-            <select class="browser-default custom-select newDropdown" id="roomDrop" onchange="calender.changeRoom()">
-                <option selected="selected" value="-1">Select Room... </option> # Will fetch these from a database
-                <!--<option value="1">Music Room 1 (max 6 persons) £12/hour</option>-->
-            </select>
-        </div>
-        <div class="col-sm-4">
-            <select class="browser-default custom-select newDropdown" id="lengthDrop" onchange="calender.setBookingLength(event)">
-                <option value="30">30 minutes</option>
-                <option selected="selected" value="60">1 hour</option>
-                <option value="90">1 hour 30 minutes</option>
-                <option value="120">2 hours</option>
-            </select>
-        </div>
+  <h1> Room Booking </h1>
+  <p class="mt-2 "> Book a room by first selecting which room you would like to book, then choosing the date, time and duration. </p>
+  <div class="row" style="margin-bottom: 5px;">
+    <div class="col-sm-8">
+      <select class="browser-default custom-select newDropdown" id="roomDrop" onchange="calender.changeRoom()">
+        <option selected="selected" value="-1">Select Room... </option> # Will fetch these from a database
+        <!--<option value="1">Music Room 1 (max 6 persons) £12/hour</option>-->
+      </select>
     </div>
-    <p id="roomDesc"></p>
-    <p class="mt-2" > Select the time by selecting the date you want below. </p>
-    <div class="row">
-        <div class="col"><button type="button" class="btn btn-primary newColor" onclick="calender.prevWeek()" id="prevBut" style="visibility: hidden;">Prev</button></div>
-        <div class="col" ><h3 id="tableDate" style="text-align: center;"></h3></div>
-        <div class="col"><button type="button" class="btn btn-primary newColor" onclick="calender.nextWeek()" style="float: right;">Next</a></div>
+    <div class="col-sm-4">
+      <select class="browser-default custom-select newDropdown" id="lengthDrop" onchange="calender.setBookingLength(event)">
+        <option value="30">30 minutes</option>
+        <option selected="selected" value="60">1 hour</option>
+        <option value="90">1 hour 30 minutes</option>
+        <option value="120">2 hours</option>
+      </select>
     </div>
-    <div onmouseout="calender.leaveMouse()" onmouseenter="calender.mouseEnter()">
-    <table class="table newTable newHeight hiddenTable" id="eventTable" style="margin-top:5px; text-align: center;" onclick="calender.placeBooking(event)" onmousemove="calender.bookingPeek(event)" > <!-- Might be smarter to generate this with javascript. -->
-        <tr style="">
-            <th style="width:9%;"></th>
-            <th style="width:13%;"></th>
-            <th style="width:13%;"></th>
-            <th style="width:13%;"></th>
-            <th style="width:13%;"></th>
-            <th style="width:13%;"></th>
-            <th style="width:13%;"></th>
-            <th style="width:13%;"></th>
-        </tr>
-    </div>
-    <table class="table table-striped newTable newHeight" id="calTable" style="margin-top:-705px; text-align: center;"> <!-- Might be smarter to generate this with javascript. -->
-        <thead>
-          <tr style="background-color: #C2D6B6">
-            <th style="width:9%;">Time</th>
-            <th style="width:13%;">Mon</th>
-            <th style="width:13%;">Tues</th>
-            <th style="width:13%;">Wed</th>
-            <th style="width:13%;">Thurs</th>
-            <th style="width:13%;">Fri</th>
-            <th style="width:13%;">Sat</th>
-            <th style="width:13%;">Sun</th>
-          </tr>
-        </thead>
-        <colgroup>
-            <col style="border-right: 3px solid #DDDDDD;";</col>
-        </colgroup>
-        <tbody>
-          <tr>
-            <td>9am</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-          <tr>
-            <td>10am</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-          <tr>
-            <td>11am</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-          <tr>
-            <td>12pm</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-          <tr>
-            <td>1pm</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-          <tr>
-            <td>2pm</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-           <tr>
-            <td>3pm</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-          <tr>
-            <td>4pm</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-          <tr>
-            <td>5pm</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-          <tr>
-            <td>6pm</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-          <tr>
-            <td>7pm</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-          <tr>
-            <td>8pm</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-          <tr>
-            <td>9pm</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-        </tbody>
-    </table>
-    <table class="table" style="margin-top:30px" id="paymentTable">
-        <tr>
-            <td>Room</td>
-            <td>Price/Hour</td>
-            <td>Total Price</td>
-        </tr>
-        <tr>
-            <td>--</td>
-            <td>--</td>
-            <td>--</td>
-        </tr>
-    </table>
-    <div class="row" style="margin-bottom: 30px;">
-        <div class="col-sm-6"></div>
-        <div class="col-sm-3"></div>
-        <div class="col-sm-3"><a class="btn btn-primary newColor" href="#" role="button" style="float: right;" onclick="calender.submitBooking()">Book & Pay at desk</a></div>
-    </div>
+  </div>
+  <p id="roomDesc"></p>
+  <p class="mt-2" > Select the time by selecting the date you want below. </p>
+  <div class="row">
+    <div class="col"><button type="button" class="btn btn-primary newColor" onclick="calender.prevWeek()" id="prevBut" style="visibility: hidden;">Prev</button></div>
+    <div class="col" ><h3 id="tableDate" style="text-align: center;"></h3></div>
+    <div class="col"><button type="button" class="btn btn-primary newColor" onclick="calender.nextWeek()" style="float: right;">Next</a></div>
+  </div>
+  <div onmouseout="calender.leaveMouse()" onmouseenter="calender.mouseEnter()">
+  <table class="table newTable newHeight hiddenTable" id="eventTable" style="margin-top:5px; text-align: center;" onclick="calender.placeBooking(event)" onmousemove="calender.bookingPeek(event)" > <!-- Might be smarter to generate this with javascript. -->
+    <tr style="">
+      <th style="width:9%;"></th>
+      <th style="width:13%;"></th>
+      <th style="width:13%;"></th>
+      <th style="width:13%;"></th>
+      <th style="width:13%;"></th>
+      <th style="width:13%;"></th>
+      <th style="width:13%;"></th>
+      <th style="width:13%;"></th>
+    </tr>
+  </div>
+  <table class="table table-striped newTable newHeight" id="calTable" style="margin-top:-705px; text-align: center;"> <!-- Might be smarter to generate this with javascript. -->
+    <thead>
+      <tr style="background-color: #C2D6B6">
+      <th style="width:9%;">Time</th>
+      <th style="width:13%;">Mon</th>
+      <th style="width:13%;">Tues</th>
+      <th style="width:13%;">Wed</th>
+      <th style="width:13%;">Thurs</th>
+      <th style="width:13%;">Fri</th>
+      <th style="width:13%;">Sat</th>
+      <th style="width:13%;">Sun</th>
+      </tr>
+    </thead>
+    <colgroup>
+      <col style="border-right: 3px solid #DDDDDD;";</col>
+    </colgroup>
+    <tbody>
+      <tr>
+      <td>9am</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      </tr>
+      <tr>
+      <td>10am</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      </tr>
+      <tr>
+      <td>11am</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      </tr>
+      <tr>
+      <td>12pm</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      </tr>
+      <tr>
+      <td>1pm</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      </tr>
+      <tr>
+      <td>2pm</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      </tr>
+       <tr>
+      <td>3pm</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      </tr>
+      <tr>
+      <td>4pm</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      </tr>
+      <tr>
+      <td>5pm</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      </tr>
+      <tr>
+      <td>6pm</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      </tr>
+      <tr>
+      <td>7pm</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      </tr>
+      <tr>
+      <td>8pm</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      </tr>
+      <tr>
+      <td>9pm</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <table class="table" style="margin-top:30px" id="paymentTable">
+    <tr>
+      <td>Room</td>
+      <td>Price/Hour</td>
+      <td>Total Price</td>
+    </tr>
+    <tr>
+      <td>--</td>
+      <td>--</td>
+      <td>--</td>
+    </tr>
+  </table>
+  <div class="row" style="margin-bottom: 30px;">
+    <div class="col-sm-6"></div>
+    <div class="col-sm-3"></div>
+    <div class="col-sm-3"><a class="btn btn-primary newColor" href="#" role="button" style="float: right;" onclick="calender.submitBooking()">Book & Pay at desk</a></div>
+  </div>
 </div>
 </body>

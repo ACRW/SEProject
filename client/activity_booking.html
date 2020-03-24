@@ -1,21 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
 	<title>TCR Hub activity booking page</title>
-
 	<meta charset=utf-8>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
   <link rel="stylesheet" href="style.css">
-	
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  <script src="activity_booking.js"></script>
 
   <style type="text/css">
-      #cldFrame{
+    .card {
+      width: 300px;
+      float: left;
+    }
+    
+    #cldFrame{
       position: relative;
       width: 440px;
       
@@ -73,162 +75,138 @@
 <!-- Presentation -->
 <div class="container">
   <h2 style="color: #A5B686 ;">Book your activities here.</h2>
-
-  <!-- Nav tabs -->
-  <ul class="nav nav-tabs" role="tablist">
-    <li class="nav-item">
-      <a class="nav-link active" data-toggle="tab" href="#type1" style="color:gray;font-size: 25px;" id="act1">Archery</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" data-toggle="tab" href="#type2" style="color:gray;font-size: 25px;" id="act22">Kayaking</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" data-toggle="tab" href="#type3" style=" color:gray;font-size: 25px;" id="act3">Painting</a>
-    </li>
+  
+  <div class="card-deck" id="activityCards">
     
-  </ul>
-
-  <!-- Tab panes -->
-  <div class="tab-content">
-
-    <div id="type1" class="container tab-pane active"><br>
-      
-      <div style="width: 400px;height: 380px; display: flex;align-items: center;">
-        <img name="eventPic" id="0" src="webimage/Kayaking.jpg" alt='room' style="width: auto;height: 100%">
-      </div>
-      
-
-      <div style=' margin-top: 20px; '>
-        <h3>Archery</h3>
-      
-      </div>
-
-    </div>
-
-    <div id="type2" class="container tab-pane fade"><br>
-
-      <div style="width: 400px;height: 380px; display: flex;align-items: center;">
-        <img name="eventPic" id="0" src="webimage/Kayaking.jpg" alt='room' style="width: auto;height: 100%">
-      </div>  
-      
-      <div style=' margin-top: 20px; '>
-      <h3>Kayaking</h3>
-      
-      </div>
-    </div>
-
-    <div id="type3" class="container tab-pane fade"><br>
-      <div style="width: 400px;height: 380px; display: flex;align-items: center;">
-        <img name="eventPic" id="0" src="webimage/kayaking.jpg" alt='room' style="width: auto;height: 100%">
-      </div>
-
-      <div style=' margin-top: 20px; '>
-      <h3>painting</h3>
-     
-        </div> 
-    </div>
-
-    
-  </div>
-
-<br>
+  </div> 
 
 </div>
+
+<div class="modal fade" id="popUp">
+ <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Book your activity</h5>
+        <button type="button" class="close" data-dismiss="modal">
+          <span aria-hidden="true">X</span>
+        </button>
+      </div>
+      <div class="modal-body" >
+        <div class="container-fluid" style="padding-left: 0px";>
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <img id="popUpImg" style="width: 100%;"><img>
+            </div>
+            <div class="col-md-6">
+              <h4 id="popUpTitle">.</h4>
+              <p id="popUpDesc">.</p>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12">
+              <div class="form-group">
+                <label style="display:inline-block;">Group Size: </label>
+                  <select class="form-control" id="maxPeople" style="width: 5rem; display:inline-block; margin-left: 2rem;">
+                    <option>1</option>
+                    <option>2</option>
+                    <option>3</option>
+                    <option>4</option>
+                    <option>5</option>
+                    <option>6</option>
+                    <option>7</option>
+                    <option>8</option>
+                    <option>9</option>
+                  </select>
+                <br>
+              </div>
+            </div>
+
+ 
+          </div>
+          <div class="row">
+            <div class="col-md-12">
+                       <!--calendar-->
+              <div class="calendar form-group">
+                <p>Click to select the start, then the end of your booking.</p>
+
+                <div id="cldFrame">
+                  <div id="cldBody">
+                      <table >
+                        <thead>
+                          <tr>
+                            <td colspan="7">
+                                <div id="top">
+                                    <span id="left">&lt;</span>
+                                    <span id="topDate">waitforjs</span>
+                                    <span id="right">&gt;</span>
+                                </div>
+                            </td>
+                          </tr>
+                          <tr id="week">
+                              <td>Sun</td>
+                              <td>Mon</td>
+                              <td>Tue</td>
+                              <td>Wed</td>
+                              <td>Thu</td>
+                              <td>Fri</td>
+                              <td>Sat</td>
+                          </tr>
+                          </thead>
+                          <tbody id="tbody"></tbody>
+                      </table>
+                  </div>
+                </div>
+
+                <br>
+                
+                <p>Date:(yyyy-mm-dd)</p> <P id='date'>--</P>
+              
+              </div>
+            </div>
+
+            <!--table-->
+            <div class="form-group" style="padding-top: 20px; padding-right: 50px;">
+              <table class="table" style="margin-top:30px; ">
+                <tr>
+                  <td>Activity</td>
+                  <td>£ Per Person</td>
+                  <td>Group Size</td> 
+                  <td>Total Price</td>
+                </tr>
+                <tr>
+                  <td id='act'>--</td>
+                  <td id='pricepp'>--</td>
+                  <td id='numOfPeople'>--</td>
+                  <td id='totalPrice'>--</td>
+                </tr>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary newColor">Book these dates</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
 
 <!-- Fill info -->
 <div style="padding-left: 170px">
-  <h3>
-    Please fill in the following information
-    <small class="text-muted">To book</small>
-  </h3>
-  <!-- response Message -->
-  <div ><h4 id="responseField"></h4>
-  </div>
 
-  <!-- number of people-->
-  <div class="form-group">
-    <label>Number of people: </label>
-    <input type="number" min='0' value='0' id='maxPeople'>
-    <br>
-  </div>
-
-  <!--calendar-->
-  <div class="calendar form-group">
-    <p>Please choose the date of your booking from the calendar:</p>
-
-    <div id="cldFrame">
-      <div id="cldBody">
-          <table >
-            <thead>
-              <tr>
-                <td colspan="7">
-                    <div id="top">
-                        <span id="left">&lt;</span>
-                        <span id="topDate">waitforjs</span>
-                        <span id="right">&gt;</span>
-                    </div>
-                </td>
-              </tr>
-              <tr id="week">
-                  <td>Sun</td>
-                  <td>Mon</td>
-                  <td>Tue</td>
-                  <td>Wed</td>
-                  <td>Thu</td>
-                  <td>Fri</td>
-                  <td>Sat</td>
-              </tr>
-              </thead>
-              <tbody id="tbody"></tbody>
-          </table>
-      </div>
-    </div>
-
-    <br>
-    
-    <p>Date:(yyyy-mm-dd)</p> <P id='date'>--</P>
-   
-  </div>
-
-  <!--table-->
-  <div class="form-group" style="padding-top: 20px; padding-right: 50px;">
-    <p>Please check your information in the table:</p>
-
-    <table class="table" style="margin-top:30px; ">
-      <tr>
-        <td>Activity</td>
-        <td>Price per person</td>
-        <td>number of people</td> 
-        <td>Date</td>
-        <td>Total Price</td>
-      </tr>
-      <tr>
-        <td id='act'>--</td>
-        <td id='pricepp'>--</td>
-        <td id='numOfPeople'>--</td>
-        <td id='date'>--</td>
-        <td id='totalPrice'>--</td>
-      </tr>
-    </table>
-
-    <!--submit buttom-->
-    <div class="row" style="margin-bottom: 30px;" >
-      <div class="col-sm-6"></div>
-      <div class="col-sm-4"></div>
-      <div class="col-sm-2"><a class="btn btn-primary newColor" href="#" role="button" id='submitButton' hidden="true">Book and pay now</a></div>
-    </div>
-
-    <!--submittion response-->
-    <div name="SubmittionResponse">
-    </div>
-
-  </div>
 
 
 </div>
-
-
-<script src="activity_room.js"></script>
 
 </body>
 </html>
