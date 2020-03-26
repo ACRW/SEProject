@@ -4,9 +4,11 @@ const app = express();
 
 // for session variables
 const session = require('express-session');
-// IMPORTANT - needs better secret
+const crypto = require('crypto');
+
+// with random secret
 app.use(session({
-    secret: 'tcrhub',
+    secret: crypto.randomBytes(64).toString('hex'),
     resave: false,
     saveUninitialized: true
 }));
