@@ -129,6 +129,24 @@ function addToSearchClause(parameter, field, whereClause) {
     return whereClause;
 }
 
+// add parameter to values statement for database update
+function addToValuesStatement(parameter, field, valuesStatement) {
+    // if parameter defined
+    if (parameter) {
+        // if other parameters already in statement
+        if (valuesStatement.length > 0) {
+            // add comma
+            valuesStatement += ', ';
+        }
+
+        // add parameter to statement
+        valuesStatement += field + ' = ' + parameter;
+    }
+
+    // return statement
+    return valuesStatement;
+}
+
 // rooms
 
 // get rooms
@@ -444,7 +462,6 @@ app.get('/activities', async function(req, resp) {
         }
     }
 });
-
 
 // bookings
 
@@ -916,6 +933,73 @@ app.post('/customerhostelbooking', async function(req, resp) {
         }
     }
 });
+
+// update activity booking (request)
+app.post('/updateactivitybooking', async function(req, resp) {
+    // if valid session
+    if (validateGeneralSession(req, resp)) {
+        // booking ID
+        const bookingID = req.body.bookingid;
+
+        // if booking ID specified
+        if (bookingID) {
+            // type
+            const type = req.body.type;
+
+            // if valid type
+            if (['booking', 'request'].includes(type)) {
+                // parameters
+                const numberOfPeople = req.body.numberofpeople;
+                const price = req.body.price;
+
+                // values statment for SQL
+                let values = '';
+
+                // add parameters to values statement
+                values = addToValuesStatement(numberOfPeople, 'numberOfPeople', values);
+                values = addToValuesStatement(price, 'price', values);
+
+                // if at least one parameter defined
+                if (values.length > 0) {
+                    // database table names
+                    const tableNames = {'booking': 'activityBookings', 'request': 'activityRequests'};
+
+                    // update appropriate table
+                    const result = await performQuery('UPDATE ' + tableNames[type] + ' SET ' + values + ' WHERE id = ' + bookingID);
+
+                    // if no database error
+                    if (processQueryResult(result, resp)) {
+                        // if correct number of rows updated
+                        if (result['affectedRows'] == 1) {
+                            // success response
+                            resp.status(200).send('1success');
+
+                        // booking does not exist
+                        } else {
+                            // booking ID error
+                            resp.status(400).send('0bookingID');
+                        }
+                    }
+
+                } else {
+                    // parameters error
+                    resp.status(400).send('0parameters');
+                }
+
+            } else {
+                // type error
+                resp.status(400).send('0type');
+            }
+
+        } else {
+            // booking ID error
+            resp.status(400).send('0bookingID');
+        }
+    }
+});
+
+// community - start, end, price
+// hostel - startDate, endDate, price, number of people
 
 // cancel booking
 app.post('/cancelbooking', async function(req, resp) {

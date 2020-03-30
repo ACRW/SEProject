@@ -1,4 +1,4 @@
-let customerID;
+/*let customerID;
 
 async function onSignIn(googleUser) {
     document.getElementById('googleButton').setAttribute('hidden', '');
@@ -122,4 +122,19 @@ window.addEventListener('DOMContentLoaded', function() {
             document.getElementById('phoneContinue').setAttribute('disabled', '');
         }
     });
+});*/
+
+window.addEventListener('DOMContentLoaded', async function() {
+    let response = await fetch('/updateactivitybooking',
+    {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: 'bookingid=3&type=booking&numberofpeople=3&price=100'
+    });
+
+    const responseBody = await response.text();
+
+    console.log(responseBody);
 });
