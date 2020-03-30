@@ -438,7 +438,7 @@ app.get('/activities', async function(req, resp) {
         const activities = await performQuery('SELECT * FROM activities');
 
         // if no database error
-        if (processQueryResult(activity, resp)) {
+        if (processQueryResult(activities, resp)) {
             // send activities
             resp.status(200).send(JSON.stringify(activities));
         }
