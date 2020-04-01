@@ -998,7 +998,82 @@ app.post('/updateactivitybooking', async function(req, resp) {
     }
 });
 
-// community - start, end, price
+// update community booking (request)
+app.post('/updatecommunitybooking', async function(req, resp) {
+    // if valid session
+    if (validateGeneralSession(req, resp)) {
+        // booking ID
+        const bookingID = req.body.bookingid;
+
+        // if booking ID specified
+        if (bookingID) {
+            // type
+            const type = req.body.type;
+
+            // if valid type
+            if (['booking', 'request'].includes(type)) {
+                // parameters
+                const start = req.body.start;
+                const end = req.body.end;
+                const price = req.body.price;
+
+                // values statment for SQL
+                let values = '';
+
+                // if start timestamp specified
+                if (start) {
+                    // add start to values statement
+                    values = addToValuesStatement('FROM_UNIXTIME(' + start + ')', 'start', values);
+                }
+
+                // if end timestamp specified
+                if (end) {
+                    // add end to values statement
+                    values = addToValuesStatement('FROM_UNIXTIME(' + end + ')', 'end', values);
+                }
+
+                // add price to values statement
+                values = addToValuesStatement(price, 'priceOfBooking', values);
+
+                // if at least one parameter defined
+                if (values.length > 0) {
+                    // database table names
+                    const tableNames = {'booking': 'communityBookings', 'request': 'communityRequests'};
+
+                    // update appropriate table
+                    const result = await performQuery('UPDATE ' + tableNames[type] + ' SET ' + values + ' WHERE id = ' + bookingID);
+
+                    // if no database error
+                    if (processQueryResult(result, resp)) {
+                        // if correct number of rows updated
+                        if (result['affectedRows'] == 1) {
+                            // success response
+                            resp.status(200).send('1success');
+
+                        // booking does not exist
+                        } else {
+                            // booking ID error
+                            resp.status(400).send('0booking');
+                        }
+                    }
+
+                } else {
+                    // parameters error
+                    resp.status(400).send('0parameters');
+                }
+
+            } else {
+                // type error
+                resp.status(400).send('0type');
+            }
+
+        } else {
+            // booking ID error
+            resp.status(400).send('0bookingID');
+        }
+    }
+});
+
 // hostel - startDate, endDate, price, number of people
 
 // cancel booking
