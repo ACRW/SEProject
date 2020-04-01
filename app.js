@@ -1365,6 +1365,39 @@ app.post('/eventbooking', async function(req, resp) {
     }
 });
 
+// cancel event booking
+app.post('/canceleventbooking', async function(req, resp) {
+    // if valid session
+    if (validateGeneralSession(req, resp)) {
+        // booking ID
+        const bookingID = req.body.bookingid;
+
+        // if booking ID specified
+        if (bookingID) {
+            // remove booking
+            const result = await performQuery('DELETE FROM ticketsSold WHERE id = ' + bookingID);
+
+            // if no database error
+            if (processQueryResult(result, resp)) {
+                // if one row removed
+                if (result['affectedRows'] == 1) {
+                    // success response
+                    resp.status(200).send('1success');
+
+                // booking does not exist
+                } else {
+                    // booking error
+                    resp.status(400).send('0booking');
+                }
+            }
+
+        } else {
+            // booking ID error
+            resp.status(400).send('0bookingID');
+        }
+    }
+});
+
 // get statistics for specified event
 app.get('/eventstatistics', async function(req, resp) {
     // if valid session
