@@ -976,8 +976,8 @@ app.post('/updateactivitybooking', async function(req, resp) {
 
                         // booking does not exist
                         } else {
-                            // booking ID error
-                            resp.status(400).send('0bookingID');
+                            // booking error
+                            resp.status(400).send('0booking');
                         }
                     }
 
@@ -1052,7 +1052,7 @@ app.post('/updatecommunitybooking', async function(req, resp) {
 
                         // booking does not exist
                         } else {
-                            // booking ID error
+                            // booking error
                             resp.status(400).send('0booking');
                         }
                     }
@@ -1074,7 +1074,83 @@ app.post('/updatecommunitybooking', async function(req, resp) {
     }
 });
 
-// hostel - startDate, endDate, price, number of people
+// update hostel booking (request)
+app.post('/updatehostelbooking', async function(req, resp) {
+    // if valid session
+    if (validateGeneralSession(req, resp)) {
+        // booking ID
+        const bookingID = req.body.bookingid;
+
+        // if booking ID specified
+        if (bookingID) {
+            // type
+            const type = req.body.type;
+
+            // if valid type
+            if (['booking', 'request'].includes(type)) {
+                // parameters
+                const start = req.body.start;
+                const end = req.body.end;
+                const price = req.body.price;
+                const numberOfPeople = req.body.numberofpeople;
+
+                // values statment for SQL
+                let values = '';
+
+                // if start timestamp specified
+                if (start) {
+                    // add start to values statement
+                    values = addToValuesStatement('FROM_UNIXTIME(' + start + ')', 'startDate', values);
+                }
+
+                // if end timestamp specified
+                if (end) {
+                    // add end to values statement
+                    values = addToValuesStatement('FROM_UNIXTIME(' + end + ')', 'endDate', values);
+                }
+
+                // add remaining parameters to values statement
+                values = addToValuesStatement(price, 'price', values);
+                values = addToValuesStatement(numberOfPeople, 'noOfPeople', values);
+
+                // if at least one parameter defined
+                if (values.length > 0) {
+                    // database table names
+                    const tableNames = {'booking': 'hostelBookings', 'request': 'hostelRequests'};
+
+                    // update appropriate table
+                    const result = await performQuery('UPDATE ' + tableNames[type] + ' SET ' + values + ' WHERE id = ' + bookingID);
+
+                    // if no database error
+                    if (processQueryResult(result, resp)) {
+                        // if correct number of rows updated
+                        if (result['affectedRows'] == 1) {
+                            // success response
+                            resp.status(200).send('1success');
+
+                        // booking does not exist
+                        } else {
+                            // booking error
+                            resp.status(400).send('0booking');
+                        }
+                    }
+
+                } else {
+                    // parameters error
+                    resp.status(400).send('0parameters');
+                }
+
+            } else {
+                // type error
+                resp.status(400).send('0type');
+            }
+
+        } else {
+            // booking ID error
+            resp.status(400).send('0bookingID');
+        }
+    }
+});
 
 // cancel booking
 app.post('/cancelbooking', async function(req, resp) {

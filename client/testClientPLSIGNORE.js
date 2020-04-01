@@ -125,13 +125,13 @@ window.addEventListener('DOMContentLoaded', function() {
 });*/
 
 window.addEventListener('DOMContentLoaded', async function() {
-    let response = await fetch('/updatecommunitybooking',
+    let response = await fetch('/',
     {
         method: "POST",
         headers: {
             "Content-Type": "application/x-www-form-urlencoded"
         },
-        body: 'bookingid=18&type=booking&start=1582203600&end=1582207200&price=50'
+        body: ''
     });
 
     const responseBody = await response.text();
