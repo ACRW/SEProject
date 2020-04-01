@@ -1258,10 +1258,42 @@ app.get('/eventsearch', async function(req, resp) {
     }
 });
 
+// get ticket types for specified event
+app.get('/tickets', async function(req, resp) {
+    // if valid session
+    if (validateGeneralSession(req, resp)) {
+        // event ID
+        const eventID = req.query.eventid;
+
+        // if event ID specified
+        if (eventID) {
+            // fetch ticket types
+            const tickets = await performQuery('SELECT id, ticketType, ticketPrice FROM tickets WHERE eventId = ' + eventID);
+
+            // if no database error
+            if (processQueryResult(tickets, resp)) {
+                // if event exists & has associated ticket(s)
+                if (tickets.length > 0) {
+                    // send ticket types
+                    resp.status(200).send(JSON.stringify(tickets));
+
+                } else {
+                    // event error
+                    resp.status(400).send('0event');
+                }
+            }
+
+        } else {
+            // event ID error
+            resp.status(400).send('0eventID');
+        }
+    }
+});
+
 // get statistics for specified event
 app.get('/eventstatistics', async function(req, resp) {
     // if valid session
-    if (validateGeneralSession(req, resp)) {
+    if (validateSession('staff', req, resp)) {
         // event ID
         const eventID = req.query.id;
 
@@ -1310,7 +1342,6 @@ app.post('/newevent', async function(req, resp) {
             if (processQueryResult(result, resp)) {
                 // if correct number of rows inserted
                 if (result['affectedRows'] == 1) {
-
                     // get event ID
                     const eventID = await performQuery('SELECT id FROM events WHERE name = "' + name + '" AND description = "' + description + '"');
 
