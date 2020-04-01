@@ -47,7 +47,7 @@ function Calender () { // Calender constructor/class
   let prevBut = document.getElementById("prevBut");
   let thisWeek = true; // Determintes weather or not on this week.
   let today = new Date(); // Stores the value date of today a week ago.
-  let firstSun = new Date;
+  let firstSun = new Date();
   let table = document.getElementById("calTable");
   let eTable = document.getElementById("eventTable");
   let bookings = []; // Keeps a list of all bookings
@@ -80,8 +80,9 @@ function Calender () { // Calender constructor/class
   if (targetMon.getDay() != 1) { // Only changes date if not already a monday
     targetMon.setDate(targetMon.getDate() - ((targetMon.getDay() - 1) % 7)); // Changes to last monday
   }
+
   targetSun.setDate(targetMon.getDate() + 6); // Sets the sunday of the week (conveniant to have, also, actually sets the next monday to prevent issues with comparisons)
-  firstSun.setDate(targetSun.getDate());
+  firstSun.setTime(targetSun.getTime());
   
   let displayDates = async function() { // Displays/updates the dates above the calender
     let tempDate = new Date(targetMon);
@@ -160,6 +161,7 @@ function Calender () { // Calender constructor/class
     if (targetMon < firstSun) {
       prevBut.style.visibility = "hidden";
       thisWeek = true;
+      
     } else {
       prevBut.style.visibility = "visible";
       thisWeek = false;
@@ -306,58 +308,58 @@ function Calender () { // Calender constructor/class
   }
   
   this.submitBooking = async function () {
-  if (curRoom == -1) {
-    alert("Please select a room. ");
-  return;
-  } else if (!userBooking["placed"]) {
-  alert("Please put down a booking. ");
-  return;
-  }
-  
-  let response = await fetch('http://' + hostAddr + ":" + hostPort + '/customercommunitybooking', {
-  method: "POST",
-  headers: {
-  "Content-Type": "application/x-www-form-urlencoded",
-  },
-  body: "roomid=" + String(curRoom)
-  + "&start=" + userBooking["startTime"].getTime()
-  + "&end=" + userBooking["endTime"].getTime()
-  + "&price=" + String(userBooking["price"])
-  });
-  if (response.status == 200) {
-  let success = await response.json();
-  alert("Booking sucessfully made. ");
-  } else {
-  alert("There was an error making your booking. ");
-  }
+    if (curRoom == -1) {
+      alert("Please select a room. ");
+      return;
+    } else if (!userBooking["placed"]) {
+      alert("Please put down a booking. ");
+      return;
+    }
+    let response = await fetch('http://' + hostAddr + ":" + hostPort + '/customercommunitybooking', {
+      method: "POST",
+      headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: "roomid=" + String(curRoom)
+      + "&start=" + userBooking["startTime"].getTime()
+      + "&end=" + userBooking["endTime"].getTime()
+      + "&price=" + String(userBooking["price"])
+      });
+    
+    if (response.status == 200) {
+      let success = await response.json();
+      alert("Booking sucessfully made. ");
+    } else {
+      alert("There was an error making your booking. ");
+    }
   }
   
   this.setBookingLength = async function(e) { // Sets what the booking length should be
-  let lengthDrop = document.getElementById("lengthDrop");
-  userBooking["bookingLength"] = lengthDrop.value;
-  userBooking["price"] = rooms[curRoom]["pricePerHour"] * userBooking["bookingLength"]/60;
-  userBooking["element"].style.height = String((userBooking["bookingLength"]/60) * 50) + "px";
-  peekElement.style.height = String((userBooking["bookingLength"]/60) * 50) + "px";
-  updPayTable();
+    let lengthDrop = document.getElementById("lengthDrop");
+    userBooking["bookingLength"] = lengthDrop.value;
+    userBooking["price"] = rooms[curRoom]["pricePerHour"] * userBooking["bookingLength"]/60;
+    userBooking["element"].style.height = String((userBooking["bookingLength"]/60) * 50) + "px";
+    peekElement.style.height = String((userBooking["bookingLength"]/60) * 50) + "px";
+    updPayTable();
   }
 
   this.nextWeek = function() {
-  targetMon.setDate(targetMon.getDate() + 7);
-  targetSun.setDate(targetSun.getDate() + 7);
-  displayDates();
-  displayBookings();
-  hideOldColumns();
-  hidePrev();
+    targetMon.setDate(targetMon.getDate() + 7);
+    targetSun.setDate(targetSun.getDate() + 7);
+    displayDates();
+    displayBookings();
+    hideOldColumns();
+    hidePrev();
   }
 
   this.prevWeek = function() {
-  if (thisWeek) return; // Do not allow clicks if on this week;
-  targetMon.setDate(targetMon.getDate() - 7);
-  targetSun.setDate(targetSun.getDate() - 7);
-  displayDates();
-  displayBookings();
-  hideOldColumns();
-  hidePrev();
+    if (thisWeek) return; // Do not allow clicks if on this week;
+    targetMon.setDate(targetMon.getDate() - 7);
+    targetSun.setDate(targetSun.getDate() - 7);
+    displayDates();
+    displayBookings();
+    hideOldColumns();
+    hidePrev();
   }
   
   // Run necessary functions;

@@ -9,7 +9,6 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-  <script src="activity_booking.js"></script>
 
   <style type="text/css">
     .card {
@@ -29,6 +28,7 @@
     }
     #top{
         position: relative;
+        background-color: transparent;
         height: 60px;
         text-align: center;
         line-height: 60px;
@@ -41,7 +41,7 @@
         font-weight: bold;
     }
     
-    table{
+    #week{
         background-color: #C2D6B6;
     }
     #week td{
@@ -51,19 +51,36 @@
     td{
         height: 60px;
         width: 60px;
+        padding-top: 20px;
         text-align: center;
-        
         font-size: 20px;
     }
+    tbody>tr>td {
+      background-color: #F2F2F2;
+      user-select: none;
+      -moz-user-select: none;
+      -khtml-user-select: none;
+      -webkit-user-select: none;
+      -o-user-select: none;
+
+    }
+    tbody>tr>td:hover {
+      background-color: rgba(30, 30, 30, 0.2);
+    }
     #left, #right{
-        position: absolute;
-        width: 60px;
-        height: 60px;
+      position: absolute;
+      width: 60px;
+      height: 60px;
     }
     #left{left: 0px;}
     #right{right: 0px;}
     #left:hover, #right:hover{
-        background-color: rgba(30, 30, 30, 0.2);
+      background-color: rgba(30, 30, 30, 0.2);
+      user-select: none;
+      -moz-user-select: none;
+      -khtml-user-select: none;
+      -webkit-user-select: none;
+      -o-user-select: none;
     }
   </style>
 	
@@ -128,39 +145,35 @@
                        <!--calendar-->
               <div class="calendar form-group">
                 <p>Click to select the start, then the end of your booking.</p>
-
                 <div id="cldFrame">
                   <div id="cldBody">
-                      <table >
-                        <thead>
-                          <tr>
-                            <td colspan="7">
-                                <div id="top">
-                                    <span id="left">&lt;</span>
-                                    <span id="topDate">waitforjs</span>
-                                    <span id="right">&gt;</span>
-                                </div>
-                            </td>
-                          </tr>
-                          <tr id="week">
-                              <td>Sun</td>
-                              <td>Mon</td>
-                              <td>Tue</td>
-                              <td>Wed</td>
-                              <td>Thu</td>
-                              <td>Fri</td>
-                              <td>Sat</td>
-                          </tr>
-                          </thead>
-                          <tbody id="tbody"></tbody>
-                      </table>
+                    <table id="bookingCalender">
+                      <thead>
+                        <tr>
+                          <td colspan="7">
+                            <div id="top">
+                              <span id="left">&lt;</span>
+                              <span id="topDate">waitforjs</span>
+                              <span id="right">&gt;</span>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr id="week">
+                          <td>Sun</td>
+                          <td>Mon</td>
+                          <td>Tue</td>
+                          <td>Wed</td>
+                          <td>Thu</td>
+                          <td>Fri</td>
+                          <td>Sat</td>
+                        </tr>
+                      </thead>
+                      <tbody id="tbody">
+                      
+                      </tbody>
+                    </table>
                   </div>
                 </div>
-
-                <br>
-                
-                <p>Date:(yyyy-mm-dd)</p> <P id='date'>--</P>
-              
               </div>
             </div>
 
@@ -191,5 +204,6 @@
     </div>
   </div>
 </div>
+<script src="activity_booking.js"></script>
 </body>
 </html>
