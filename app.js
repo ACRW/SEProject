@@ -1290,6 +1290,81 @@ app.get('/tickets', async function(req, resp) {
     }
 });
 
+// book tickets for specified event
+app.post('/eventbooking', async function(req, resp) {
+    // if valid customer session
+    if (validateSession('customer', req, resp)) {
+        // booking parameters
+        const eventID = req.body.eventid;
+        let numberOfTickets = req.body.numberoftickets;
+        const price = req.body.price;
+
+        // if all parameters specified
+        if (eventID && numberOfTickets && price) {
+            // convert number of tickets to integer
+            numberOfTickets = parseInt(numberOfTickets);
+
+            // if number of tickets valid positive integer
+            if (!isNaN(numberOfTickets) && numberOfTickets > 0) {
+                // fetch event capacity
+                const capacity = await performQuery('SELECT capacity FROM events WHERE id = ' + eventID);
+
+                // if no database error
+                if (processQueryResult(capacity, resp)) {
+                    // if event exists
+                    if (capacity.length == 1) {
+                        // fetch number of tickets already sold
+                        const ticketsSold = await performQuery('SELECT SUM(noOfTickets) as sold FROM ticketsSold WHERE eventId = ' + eventID);
+
+                        // if no database error
+                        if (processQueryResult(ticketsSold, resp)) {
+                            // event capacity
+                            const eventCapacity = capacity[0].capacity;
+                            // number of tickets sold
+                            const sold = ticketsSold[0].sold;
+
+                            // if able to complete booking based on number of tickets available
+                            if ((sold == null && numberOfTickets <= eventCapacity) || (sold != null && sold + numberOfTickets <= eventCapacity)) {
+                                // book tickets
+                                const result = await performQuery('INSERT INTO ticketsSold (userId, noOfTickets, price, eventId) VALUES (' + req.session.userID + ', ' + numberOfTickets + ', ' + price + ', ' + eventID + ')');
+
+                                // if no database error
+                                if (processQueryResult(result, resp)) {
+                                    // if correct number of rows inserted
+                                    if (result['affectedRows'] == 1) {
+                                        // success response
+                                        resp.status(200).send('1success');
+
+                                    } else {
+                                        // database error
+                                        resp.status(500).send('0database');
+                                    }
+                                }
+
+                            } else {
+                                // capacity error
+                                resp.status(403).send('0capacity');
+                            }
+                        }
+
+                    } else {
+                        // event error
+                        resp.status(400).send('0event');
+                    }
+                }
+
+            } else {
+                // number of tickets error
+                resp.status(400).send('0numberoftickets');
+            }
+
+        } else {
+            // parameters error
+            resp.status(400).send('0parameters');
+        }
+    }
+});
+
 // get statistics for specified event
 app.get('/eventstatistics', async function(req, resp) {
     // if valid session
