@@ -645,7 +645,7 @@ app.post('/staffactivitybooking', async function(req, resp) {
                 const numberOfPeople = req.body.numberofpeople;
                 const price = req.body.price;
                 const paid = req.body.paid;
-                
+
                 // if all parameters specified
                 if (activityID && dateTime && numberOfPeople && price && paid) {
                     // insert row
@@ -2123,6 +2123,48 @@ app.get('/currentuser', async function(req, resp) {
 
         // send session information
         resp.status(200).send(JSON.stringify(sessionInformation));
+
+    } else {
+        // activity error
+        resp.status(403).send('0inactive');
+    }
+});
+
+// current user's name
+app.get('/currentusername', async function(req, resp) {
+    // if session active
+    if (req.session.active) {
+        // if session type valid
+        if (['staff', 'customer'].includes(req.session.type)) {
+            // database table name
+            let tableName = req.session.type;
+
+            // if customer session
+            if (tableName == 'customer') {
+                // update table name
+                tableName = 'customers';
+            }
+
+            // fetch user's name
+            const result = await performQuery('SELECT fName, lName FROM ' + tableName + ' WHERE id = ' + req.session.userID);
+
+            // if no database error
+            if (processQueryResult(result, resp)) {
+                // if user in database
+                if (result.length == 1) {
+                    // send user's name
+                    resp.status(200).send(JSON.stringify(result));
+
+                } else {
+                    // session error
+                    resp.status(500).send('0session');
+                }
+            }
+
+        } else {
+            // session error
+            resp.status(500).send('0session');
+        }
 
     } else {
         // activity error
