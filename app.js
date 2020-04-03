@@ -645,6 +645,7 @@ app.post('/staffactivitybooking', async function(req, resp) {
                 const numberOfPeople = req.body.numberofpeople;
                 const price = req.body.price;
                 const paid = req.body.paid;
+                
                 // if all parameters specified
                 if (activityID && dateTime && numberOfPeople && price && paid) {
                     // insert row
