@@ -123,6 +123,42 @@ async function phoneInput() {
     }
 }
 
+// hide & reset sign in card
+function resetSignInCard() {
+    // hide sign in card
+    document.getElementById('signInCard').setAttribute('hidden', '');
+
+    // reset sign in card
+    document.getElementById('googleButton').removeAttribute('hidden');
+    document.getElementById('spinner').setAttribute('hidden', '');
+}
+
+// display welcome message
+function showWelcomeMessage() {
+    // listen for sign out
+    document.getElementById('signOut').addEventListener('click', signOut);
+
+    // show user dropdown menu
+    document.getElementById('userMenu').removeAttribute('hidden');
+    // show placeholder content
+    document.getElementById('contentCard').removeAttribute('hidden');
+}
+
+// handle sign in error
+function signInError() {
+    // sign out of Google account
+    let auth2 = gapi.auth2.getAuthInstance();
+    auth2.signOut();
+
+    // show Google button
+    document.getElementById('googleButton').removeAttribute('hidden');
+    // hide spinner
+    document.getElementById('spinner').setAttribute('hidden', '');
+
+    // inform user of error
+    alert('Something went wrong! We were unable to sign you in. Please refresh the page and try again.');
+}
+
 // on Google sign in
 async function onSignIn(googleUser) {
     // hide Google button
@@ -130,68 +166,93 @@ async function onSignIn(googleUser) {
     // show spinner
     document.getElementById('spinner').removeAttribute('hidden');
 
-    // get ID token
-    const token = googleUser.getAuthResponse().id_token;
-
     // make call to API
-    let response = await fetch('/customersignin',
+    let sessionResponse = await fetch('/currentuser',
     {
-        method: "POST",
+        method: "GET",
         headers: {
             "Content-Type": "application/x-www-form-urlencoded"
-        },
-        body: 'token=' + token
+        }
     });
 
-    // if unable to sign customer in
-    if (!response.ok) {
-        // sign out of Google account
-        let auth2 = gapi.auth2.getAuthInstance();
-        auth2.signOut();
+    // if session not currently active
+    if (sessionResponse.status == 403) {
+        // get ID token
+        const token = googleUser.getAuthResponse().id_token;
 
-        // show Google button
-        document.getElementById('googleButton').removeAttribute('hidden');
-        // hide spinner
-        document.getElementById('spinner').setAttribute('hidden', '');
+        // make call to API
+        let response = await fetch('/customersignin',
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: 'token=' + token
+        });
 
-        // inform user of error
-        alert('Something went wrong! We were unable to sign you in. Please refresh the page and try again.');
+        // if unable to sign customer in
+        if (!response.ok) {
+            // handle sign in error
+            signInError();
+
+        } else {
+            // hide & reset sign in card
+            resetSignInCard();
+
+            // if existing customer
+            if (response.status == 200) {
+                // get customer's name
+                const body = JSON.parse(await response.text());
+
+                // set customer's name on page
+                document.getElementById('userName').innerHTML = body['fname'] + ' ' + body['sname'];
+
+                // display welcome message
+                showWelcomeMessage();
+
+            } else if (response.status == 201) {
+                // set customer ID
+                customerID = parseInt(JSON.parse(await response.text()));
+
+                // listen for phone number input
+                document.getElementById('phoneInput').addEventListener('input', validatePhoneInput);
+                // listen for form submission
+                document.getElementById('phoneContinue').addEventListener('click', phoneInput);
+
+                // show new customer card
+                document.getElementById('newCustomerCard').removeAttribute('hidden');
+            }
+        }
 
     } else {
-        // hide sign in card
-        document.getElementById('signInCard').setAttribute('hidden', '');
+        // extract session details
+        const sessionDetails = JSON.parse(await sessionResponse.text());
 
-        // reset sign in card
-        document.getElementById('googleButton').removeAttribute('hidden');
-        document.getElementById('spinner').setAttribute('hidden', '');
+        // make call to API
+        let customerResponse = await fetch('/currentusername',
+        {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            }
+        });
 
-        // if existing customer
-        if (response.status == 200) {
-            // get customer's name
-            const body = JSON.parse(await response.text());
+        // if successfully fetched customer's name
+        if (customerResponse.status == 200) {
+            // extract customer's name
+            const customerDetails = JSON.parse(await customerResponse.text());
 
             // set customer's name on page
-            document.getElementById('userName').innerHTML = body['fname'] + ' ' + body['sname'];
+            document.getElementById('userName').innerHTML = customerDetails[0]['fName'] + ' ' + customerDetails[0]['lName'];
 
-            // listen for sign out
-            document.getElementById('signOut').addEventListener('click', signOut);
+            // hide & reset sign in card
+            resetSignInCard();
+            // display welcome message
+            showWelcomeMessage();
 
-            // show user dropdown menu
-            document.getElementById('userMenu').removeAttribute('hidden');
-            // show placeholder content
-            document.getElementById('contentCard').removeAttribute('hidden');
-
-        } else if (response.status == 201) {
-            // set customer ID
-            customerID = parseInt(JSON.parse(await response.text()));
-
-            // listen for phone number input
-            document.getElementById('phoneInput').addEventListener('input', validatePhoneInput);
-            // listen for form submission
-            document.getElementById('phoneContinue').addEventListener('click', phoneInput);
-
-            // show new customer card
-            document.getElementById('newCustomerCard').removeAttribute('hidden');
+        } else {
+            // handle sign in error
+            signInError();
         }
     }
 }
