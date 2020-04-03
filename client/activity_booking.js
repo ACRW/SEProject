@@ -2,8 +2,10 @@ const hostAddr = "localhost";
 const hostPort = "8090";
 const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
-let actCards = {} // Keeps track of all the activity card classes
+let actCards = {} // Keeps track of all the activity card classes, id matches position
 let activities = {}
+let activity; // Current activity being looked at
+let groupSize = 1;
 
 async function createCards () { // Get the card information and create them
   let response = await fetch('http://' + hostAddr + ":" + hostPort + '/activities', {
@@ -18,6 +20,7 @@ async function createCards () { // Get the card information and create them
     actCards[activity["id"]] = new ActivityCard(activity);
     activities[activity["id"]] = activity;
   }
+  console.log(activities);
 }
 
 function ActivityCard (activity) { // Activity card class, each instantiated class refers to a single card on the document.
@@ -54,28 +57,34 @@ function ActivityCard (activity) { // Activity card class, each instantiated cla
   card.style.display = "display: inline-block";
   
   document.getElementById("activityCards").appendChild(card);
+  
+  function modifyPopUp(id) {
+    activity = activities[id];
+    document.getElementById("popUpTitle").innerHTML = activity["name"];
+    document.getElementById("popUpDesc").innerHTML = activity["description"];
+    document.getElementById("popUpImg").src = activity["imagePath"];
+    document.getElementById("act").innerHTML = activity["name"];
+    document.getElementById("pricepp").innerHTML = "£" + activity["price"];
+    document.getElementById("numOfPeople").innerHTML = "1";
+    document.getElementById("totalPrice").innerHTML = "£" + activity["price"];
+    document.getElementById("maxPeople").value = 1;
+    cal.reset();
+  }
 }
-
-function modifyPopUp(id) {
-  activity = activities[id];
-  document.getElementById("popUpTitle").innerHTML = activity["name"];
-  document.getElementById("popUpDesc").innerHTML = activity["description"];
-  document.getElementById("popUpImg").src = activity["imagePath"];
-}
-
-createCards();
 
 function monthCalender(calTable, monthTitle, objName) {
   const dateRows = 6; // This is the number of rows that dates appear in, it does not include the header
+  const selCol = "#CCCCFF";
   
   let body = calTable.getElementsByTagName('tbody')[0];
   let head = calTable.getElementsByTagName('thead')[0];
+  let cellColor = head.rows[0].cells[0].getAttribute("background-color");
+  let outRangeColor = "#DDDDDD";
   let soMonth = new Date(); // Start of month
   soMonth.setDate(1);
   soMonth.setHours(0, 0, 0, 0);
   let booking = {
-    "date": new Date(),
-    "bookedCellPos"
+    "date": -1
   };
   
   let genCells = function() {
@@ -83,15 +92,16 @@ function monthCalender(calTable, monthTitle, objName) {
       let row = document.createElement('tr');
       for (let x = 0; x < 7; x++) {
         let cell = document.createElement('td');
-        cell.setAttribute("onclick", objName + ".bookDate(" + x + ", " + y + ");")))
+        cell.setAttribute("onclick", objName + ".bookDate(" + x + ", " + y + ");");
         row.appendChild(cell);
       }
       body.appendChild(row);
     }
-  }
+  };
   
   let popCells = function() {
     monthTitle.innerHTML = monthNames[soMonth.getMonth()] + " " + String(soMonth.getYear() + 1900);
+    clearSel();
     for (let y = 0; y < dateRows; y++) {
       for (let x = 0; x < 7; x++) {
         let datDif = (y * 7) + x -soMonth.getDay();
@@ -99,33 +109,103 @@ function monthCalender(calTable, monthTitle, objName) {
         tempDate.setTime(soMonth.getTime());
         tempDate.setDate(tempDate.getDate() + datDif);
         let cell = body.rows[y].cells[x];
-        cell.setAttribute("time", tempDate.getUTCDate());
         cell.innerHTML = "<p>" + tempDate.getDate() + "<\p>";
+
+        if (booking["date"] != -1 && tempDate.getTime() == booking["date"].getTime()) {
+          cell.style.backgroundColor = selCol;
+          cell.setAttribute("sel", "t");
+        }
+        if(tempDate.getMonth() != soMonth.getMonth()) {
+          //cell.style.backgroundColor = outRangeColor;
+        } else if (cell.getAttribute("sel") == "t") {
+          cell.style.backgroundColor = cellColor;
+          cell.setAttribute("sel", "f")
+        }
       }
     }
-  }
+  };
+  
+  let clearSel = function() {
+    for (let y = 0; y < dateRows; y++) {
+      for (let x = 0; x < 7; x++) {
+        let temp = body.rows[y].cells[x];
+        if (temp.getAttribute("sel") == "t") {
+          temp.style.backgroundColor = cellColor;
+          temp.setAttribute("sel", "f")
+          break;
+        }
+      }
+    }
+  };
+  
+  this.getBookingDate = function () {
+    return booking["date"];
+  };
   
   this.iniatiate = function () {
     genCells();
     popCells();
-  }
+  };
   
   this.prev = function () {
     soMonth.setMonth(soMonth.getMonth() - 1);
     popCells();
-  }
+  };
   
   this.next = function () {
     soMonth.setMonth(soMonth.getMonth() + 1);
-    console.log(soMonth);
     popCells();
-  }
+  };
+  
+  this.reset = function() {
+    booking = {
+    "date": -1
+    };
+    soMonth = new Date();
+    soMonth.setDate(1);
+    soMonth.setHours(0, 0, 0, 0);
+    popCells();
+  };
   
   this.bookDate = function (x, y) {
-    y = 
-  }
+    let tarCell = body.rows[y].cells[x];
+    clearSel();
+    let datDif = (y * 7) + x - soMonth.getDay();
+    let tempDate = new Date();
+    tempDate.setTime(soMonth.getTime());
+    tempDate.setDate(tempDate.getDate() + datDif);
+    booking["date"] = tempDate;
+    tarCell.setAttribute("sel", "t");
+    tarCell.style.backgroundColor = selCol;
+  };
 }
 
+function groupSizeChange(size) {
+  groupSize = size;
+  document.getElementById("numOfPeople").innerHTML = groupSize;
+  document.getElementById("totalPrice").innerHTML = "£" + groupSize * activity["price"]; 
+};
+
+async function submit() {
+  bookDate = cal.getBookingDate();
+  if (bookDate == -1) {
+    alert("Please select a booking date.");
+    return;
+  }
+  let response = await fetch('http://' + hostAddr + ":" + hostPort + '/customeractivitybooking', {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      body: "activityid=" + String(activity["id"]) +
+        "&datetime=" + String(bookDate.getTime()) +
+        "&numberofpeople=" + String(groupSize) +
+        "&price=" + String(groupSize * activity["price"])
+    });
+  let tempActs = await response.json();
+};
+
+createCards();
 calElement = document.getElementById("bookingCalender");
 cal = new monthCalender(calElement, document.getElementById("topDate"), "cal");
 cal.iniatiate();
