@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         //dealing with weeks that wrap over months
         if(isValidDate(d-x,m,y) == false){
-            document.getElementById('cday' + i).innerHTML = (d-x  + daysInMonth(y,m) ).toString().padStart(2,'0')+ '/' + (m -1).toString().padStart(2,'0');
+            document.getElementById('cday' + i).innerHTML = (d-x  + daysInMonth(y,m-1) ).toString().padStart(2,'0')+ '/' + (m -1).toString().padStart(2,'0');
         }
     }
 
@@ -338,12 +338,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
   //moves the calender forward a week
   document.getElementById('nextWeek').addEventListener('click', function(){
-    forwardWeek()
+    m = forwardWeek(m)
   })
 
   //moves the calender back a week
   document.getElementById('prevWeek').addEventListener('click', function(){
-    backWeek()
+    m = backWeek(m)
   })
 
   //on click trys to mkae payment in database
@@ -362,47 +362,86 @@ function isValidDate(d, m, y) {
 }
 
 
+
+function aforwardWeek(m){
+    for(var i = 1; i <8 ; i++){
+      var x = parseInt(document.getElementById('cday' + i).innerHTML.substring(0,2)) + 7;
+
+      document.getElementById('cday' + i).innerHTML = x.toString().padStart(2,'0') + '/' + m.toString().padStart(2,'0');
+    }
+}
+
+
 //changing the calender to the next week
-function forwardWeek(){
+function forwardWeek(m){
+
+  overMonth = false
   for(var i = 1; i <8 ; i++){
-      var x = parseInt(document.getElementById('cday' + i).innerHTML) + 7;
-      document.getElementById('cday' + i).innerHTML = x + '/' + m;
-      if(isValidDate(x,m,y) == false){
+      var x = parseInt(document.getElementById('cday' + i).innerHTML.substring(0,2)) + 7;
+      document.getElementById('cday' + i).innerHTML = x.toString().padStart(2,'0') + '/' + m.toString().padStart(2,'0');
+      if(isValidDate(x,m-1,y) == false && overMonth == false){
+
+
           if(daysInMonth(y,m)-x == 0){
+            document.getElementById('cday' + i).innerHTML = ((x)% daysInMonth(y,m-1)).toString().padStart(2,'0') + '/' + m.toString().padStart(2,'0');
+
             m = m+ 1;
-            document.getElementById('cday' + i).innerHTML = (x+1)% daysInMonth(y,m-1) + '/' + (m);
-          }else if (daysInMonth(y,m)-x < 0){
-            document.getElementById('cday' + i).innerHTML = (x+1)% daysInMonth(y,m-1) + '/' + (m);
+            overMonth = true
+
+          }else if(daysInMonth(y,m)-x == -1 && overMonth == false ){
+
+            m = m+ 1;
+            overMonth = true
+            document.getElementById('cday' + i).innerHTML = ((x)% daysInMonth(y,m-1)).toString().padStart(2,'0') + '/' + m.toString().padStart(2,'0');
 
           }else{
-              document.getElementById('cday' + i).innerHTML = x% daysInMonth(y,m-2) + '/' + (m);
+            document.getElementById('cday' + i).innerHTML = ((x)% daysInMonth(y,m-1)).toString().padStart(2,'0') + '/' + m.toString().padStart(2,'0');
           }
+      }else{
+        if(isValidDate(x,m-2,y) == false && overMonth == true){
+          document.getElementById('cday' + i).innerHTML = ((x)% daysInMonth(y,m-1)).toString().padStart(2,'0') + '/' + m.toString().padStart(2,'0');
+
+        }
       }
   }
-
+  week +=1
+  if( week == 3){
+        document.getElementById('nextWeek').style.visibility = 'hidden';
+    }else{
+        document.getElementById('prevWeek').style.visibility = 'visible';
+    }
   //updates calender
   fillCalender()
+  return m
 }
 
 //changing the calender to the previous week
-function backWeek(){
+function backWeek(m){
     var monthSub = false;
     for(var i = 7; i > 0 ; i--){
         var x = parseInt(document.getElementById('cday' + i).innerHTML) - 7;
         document.getElementById('cday' + i).innerHTML = x.toString().padStart(2,'0') + '/' + m.toString().padStart(2,'0');
-        if(isValidDate(x,m,y) == false){
-            if(x == 0){
+        if(isValidDate(x,m-1,y) == false){
+            console.log(x)
+            if(x == 0 && monthSub == false){
+                document.getElementById('cday' + i).innerHTML = (x + daysInMonth(y,m)).toString().padStart(2,'0') + '/' + (m).toString().padStart(2,'0');
+
                 m = m-1;
                 monthSub = true;
-                document.getElementById('cday' + i).innerHTML = (x + daysInMonth(y,m-1)).toString().padStart(2,'0') + '/' + (m).toString().padStart(2,'0');
             }else{
                 document.getElementById('cday' + i).innerHTML =  (daysInMonth(y,m-1) + x).toString().padStart(2,'0') + '/' + (m).toString().padStart(2,'0');
             }
         }
     }
-
+    week += -1
+    if(week == -1){
+        document.getElementById('prevWeek').style.visibility = 'hidden';
+    }else{
+        document.getElementById('nextWeek').style.visibility = 'visible';
+    }
   //update calender
   fillCalender()
+  return m
 }
 
 //runs get request to search for user in database and displays results
@@ -2034,6 +2073,13 @@ async function fillCalender(){
       var events = JSON.parse(body)
       eventFound = false;
 
+      //reset
+      for(var j = 1; j< 8; j++){
+        document.getElementById('day' + j + 'E').innerHTML = ''
+        document.getElementById('day' + j + 'A').innerHTML = ''
+        document.getElementById('day' + j + 'C').innerHTML = ''
+        document.getElementById('day' + j + 'H').innerHTML = ''
+      }
       //go through all events
       for(var i = 0; i<events.length; i++){
 
@@ -2044,8 +2090,8 @@ async function fillCalender(){
                 if((events[i].datetime.substring(8,10)+'/'+events[i].datetime.substring(5,7)).toString()==document.getElementById('cday' + j).textContent.toString()){
 
                     //display info about event
-                    document.getElementById('cday' + j + 'E').innerHTML += 'Name: ' + events[i].name + '\n'
-                    document.getElementById('cday' + j + 'E').innerHTML += '  Start Time: ' + events[i].datetime.substring(11,16)
+                    document.getElementById('day' + j + 'E').innerHTML += 'Name: ' + events[i].name + '\n'
+                    document.getElementById('day' + j + 'E').innerHTML += '  Start Time: ' + events[i].datetime.substring(11,16)
 
                 }
             }
@@ -2071,7 +2117,9 @@ async function fillCalender(){
 
       //go through activity bookings
       for(var i = 0; i<bookings['activity'].length; i++){
+        console.log(bookings)
             for(var j = 1; j< 8; j++){
+
                if((bookings['activity'][i].dateTime.substring(8,10)+'/'+bookings['activity'][i].dateTime.substring(5,7)).toString()==document.getElementById('day' + j).textContent.toString()){
                     document.getElementById('day' + j + 'A').innerHTML += 'Start Time: ' + bookings['activity'][i].datetime.substring(11,16) + '\n'
                     document.getElementById('day' + j + 'A').innerHTML += '  Number of People: ' + bookings['activity'].numberOfPeople
@@ -2173,7 +2221,7 @@ async function makePayment(){
       break
   }
 
-  //make payment 
+  //make payment
   try{
     let response = await fetch('http://localhost:8090/makepayment',
     {
