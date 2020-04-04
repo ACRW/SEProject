@@ -20,7 +20,6 @@ async function createCards () { // Get the card information and create them
     actCards[activity["id"]] = new ActivityCard(activity);
     activities[activity["id"]] = activity;
   }
-  console.log(activities);
 }
 
 function ActivityCard (activity) { // Activity card class, each instantiated class refers to a single card on the document.
@@ -81,6 +80,8 @@ function monthCalender(calTable, monthTitle, objName) {
   let cellColor = head.rows[0].cells[0].getAttribute("background-color");
   let outRangeColor = "#DDDDDD";
   let soMonth = new Date(); // Start of month
+  let today = new Date();
+  today.setHours(0, 0, 0, 0);
   soMonth.setDate(1);
   soMonth.setHours(0, 0, 0, 0);
   let booking = {
@@ -101,26 +102,26 @@ function monthCalender(calTable, monthTitle, objName) {
   
   let popCells = function() {
     monthTitle.innerHTML = monthNames[soMonth.getMonth()] + " " + String(soMonth.getYear() + 1900);
-    clearSel();
     for (let y = 0; y < dateRows; y++) {
       for (let x = 0; x < 7; x++) {
         let datDif = (y * 7) + x -soMonth.getDay();
         let tempDate = new Date();
         tempDate.setTime(soMonth.getTime());
         tempDate.setDate(tempDate.getDate() + datDif);
+        
         let cell = body.rows[y].cells[x];
         cell.innerHTML = "<p>" + tempDate.getDate() + "<\p>";
-
-        if (booking["date"] != -1 && tempDate.getTime() == booking["date"].getTime()) {
+        
+        if (tempDate < today) {
+          cell.style.backgroundColor = outRangeColor;
+        } else if (booking["date"] != -1 && tempDate.getTime() === booking["date"].getTime()) { // Selects the cell that has been booked
           cell.style.backgroundColor = selCol;
-          cell.setAttribute("sel", "t");
-        }
-        if(tempDate.getMonth() != soMonth.getMonth()) {
-          //cell.style.backgroundColor = outRangeColor;
-        } else if (cell.getAttribute("sel") == "t") {
+        } else {
           cell.style.backgroundColor = cellColor;
-          cell.setAttribute("sel", "f")
         }
+        //if(tempDate.getMonth() != soMonth.getMonth()) {
+        //  cell.style.backgroundColor = outRangeColor;
+        //}
       }
     }
   };
@@ -168,12 +169,15 @@ function monthCalender(calTable, monthTitle, objName) {
   };
   
   this.bookDate = function (x, y) {
-    let tarCell = body.rows[y].cells[x];
-    clearSel();
     let datDif = (y * 7) + x - soMonth.getDay();
     let tempDate = new Date();
     tempDate.setTime(soMonth.getTime());
-    tempDate.setDate(tempDate.getDate() + datDif);
+    tempDate.setDate(tempDate.getDate() + datDif); // Set tempdate to be the date of the selection.
+    
+    if (tempDate < today) return; // Return if old date;
+    
+    let tarCell = body.rows[y].cells[x];
+    clearSel();
     booking["date"] = tempDate;
     tarCell.setAttribute("sel", "t");
     tarCell.style.backgroundColor = selCol;
@@ -198,11 +202,16 @@ async function submit() {
         "Content-Type": "application/x-www-form-urlencoded"
       },
       body: "activityid=" + String(activity["id"]) +
-        "&datetime=" + String(bookDate.getTime()) +
+        "&datetime=" + String(Math.floor(bookDate.getTime()/1000)) +
         "&numberofpeople=" + String(groupSize) +
         "&price=" + String(groupSize * activity["price"])
     });
-  let tempActs = await response.json();
+  let answer = await response;
+  if (answer.status == 200) {
+    alert("Booking Request succesfully made! ");
+  } else {
+    alert("Error making booking.");
+  }
 };
 
 createCards();

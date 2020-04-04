@@ -321,8 +321,8 @@ function Calender () { // Calender constructor/class
       "Content-Type": "application/x-www-form-urlencoded",
       },
       body: "roomid=" + String(curRoom)
-      + "&start=" + userBooking["startTime"].getTime()
-      + "&end=" + userBooking["endTime"].getTime()
+      + "&start=" + Math.floor(userBooking["startTime"].getTime()/1000)
+      + "&end=" + Math.floor(userBooking["endTime"].getTime()/1000)
       + "&price=" + String(userBooking["price"])
       });
     
