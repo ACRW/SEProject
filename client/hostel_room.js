@@ -5,6 +5,7 @@ let roomCards = {} // Keeps track of all the activity card classes
 let rooms = {}
 
 async function createCards () { // Get the card information and create them
+  // http://localhost:8090/rooms?types=hostel
   let response = await fetch('http://' + hostAddr + ":" + hostPort + '/rooms?types=hostel', {
       method: "GET",
       headers: {
@@ -12,17 +13,25 @@ async function createCards () { // Get the card information and create them
       }
     });
   let tempRooms = await response.json();
+  /* what inside the json file 
+  {"hostel":[
+    {"id":0,"roomNumber":"1","noOfPeople":4,"pricePerNight":"100","nights":"1111100","imagePath":"webimage/room1.jpg"},
+    {"id":1,"roomNumber":"2","noOfPeople":5,"pricePerNight":"120","nights":"1111111","imagePath":"webimage/room2.jpg"},
+    {"id":2,"roomNumber":"3","noOfPeople":3,"pricePerNight":"60","nights":"1110000","imagePath":"webimage/room2.jpg"},
+    {"id":3,"roomNumber":"4","noOfPeople":6,"pricePerNight":"150","nights":"1111100","imagePath":"webimage/room2.jpg"},
+    {"id":4,"roomNumber":"5","noOfPeople":3,"pricePerNight":"80","nights":"1111111","imagePath":"webimage/room2.jpg"}]}
+  */
   
-  for (room of tempRooms["hostel"]) {
-    roomCards[room["id"]] = new RoomCard(room);
+  for (room of tempRooms["hostel"]) { // for each {..}
+    roomCards[room["id"]] = new RoomCard(room); //
     rooms[room["id"]] = room;
   }
 }
 
-function RoomCard (room) { // room card class, each instantiated class refers to a single card on the document.
-  let title = document.createElement('h4');
-  title.className="card-title";
-  title.innerHTML = "Room " + String(room["roomNumber"]);
+function RoomCard (room) { // room card class, each instantiated/具现化 class refers to a single card on the document.
+  let title = document.createElement('h4'); // <h4></h4>
+  title.className="card-title"; 
+  title.innerHTML = "Room " + String(room["roomNumber"]); //<h4 className="card-title">Room1</h4>
   
   /*let desc = document.createElement('p');
   desc.className = "card-text";
@@ -33,8 +42,9 @@ function RoomCard (room) { // room card class, each instantiated class refers to
   button.type = "button";
   button.innerHTML = "Book Now";
   button.onclick= function(){updateFields(room["id"]);};//function () {console.log("test");};
+  // these 2 are the core
   button.setAttribute("data-toggle", "modal");
-  button.setAttribute("data-target", "#popUp");
+  button.setAttribute("data-target", "#popUp"); // # point to the id
   
   let body = document.createElement('div');
   body.className = "card-body";
@@ -590,7 +600,7 @@ const eraseFields = () =>{
   submitButton.hidden=true;
 }
 
-// update the whole form, room number now uses the actual id value, so must add one upon recieving it.
+// update the whole form, room number now uses the actual id value, so must add one upon recieving it. 
 const updateFields = async(roomNumber) =>{
     roomNumber += 1;
     const rooms = await getHostel();
@@ -702,26 +712,38 @@ async function roomAvailability(roomid){
         start: start,//format:"2020-02-23T00:00:00.000Z"
         end: end// format:"2020-03-17T00:00:00.000Z"
       }*/
-submitBooking = async(customerid,roomid,start,end)=>{
+submitBooking = async(roomid,start,end,price,numOfPeople)=>{
+  const temp ='roomid=' + roomid + '&start=' + start + '&end=' + end + '&prince=' + price + '&numberofpeople=' + numOfPeople
+  console.log(temp)
   //create new hostel booking
-  let response = await fetch('http://' + hostAddr + ":" + hostPort + '/staffhostelbooking',
+  let response = await fetch('http://' + hostAddr + ":" + hostPort + '/customerhostelbooking',
   {
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded'
     },
-    body: 'customerid=' + customerid + '&roomid=' + roomid + '&start=' + start + '&end=' + end
+    body: 'roomid=' + roomid + '&start=' + start + '&end=' + end + '&price=' + price + '&numberofpeople=' + numOfPeople
   });
+
+  /*//reset forms
+  eraseFields();
+  updateFields(roomid1); */
+
+
+
   //if response isn't fine
   if(!response.ok){
     //error message
+    console.log(response)
+    if(response.status == 400){
+      responseField.innerHTML='Booking NOT successful. Someone made a reservation during this time period before you.';
+    }else if(response.status == 500){
+      responseField.innerHTML='Booking NOT successful. Internal database error';
+    }
     throw new Error('problem adding new event ' + response.code);
   }else{
     //success message
     responseField.innerHTML='Booking successful.';
-
-    //reset forms
-    eraseFields();
   }
 
 };
@@ -756,7 +778,7 @@ window.onload = function() {
   submitButton.addEventListener("click", function(event){
     event.preventDefault()
     // get all info needed
-    const customerid = 0;//fake for now
+    //const customerid = 0;//fake for now
     const roomid = Number(roomNumTable.innerHTML);
     let start = startDateTable.innerHTML;
     start=start.split('-');
@@ -767,12 +789,23 @@ window.onload = function() {
     let month1 = Number(start[1])-1;
     let day1 = Number(start[2]);
     let date1 = new Date(year1,month1,day1);//start date
+    //2020-04-25 11:00:00
+    const startDate = Math.floor(date1.getTime() / 1000)
 
     let year2 = Number(end[0]);
     let month2 = Number(end[1])-1;
     let day2 = Number(end[2]);
     let date2 = new Date(year2,month2,day2);//end date
+    const endDate = Math.floor(date2.getTime() / 1000)
+
+    // price
+    totalPriceTemp = Number(totalPrice.innerHTML)
+
+    // numberofpeople
+    numOfPeopleTemp = Number(numOfPeople.innerHTML)
+
+
     // send
-    submitBooking(customerid,roomid,date1,date2);
+    submitBooking(roomid,startDate,endDate,totalPriceTemp,numOfPeopleTemp);
   });
 };

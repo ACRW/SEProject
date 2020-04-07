@@ -898,7 +898,7 @@ app.post('/customerhostelbooking', async function(req, resp) {
         const numberOfPeople = req.body.numberofpeople;
 
         // if all parameters specified
-        if (roomID && start && end && price && paid && numberOfPeople) {
+        if (roomID && start && end && price && numberOfPeople) {
             // check for clashing bookings
             const clashes = await performQuery('(SELECT startDate, endDate FROM hostelBookings WHERE startDate < FROM_UNIXTIME(' + end + ') AND endDate > FROM_UNIXTIME(' + start + ')) UNION (SELECT startDate, endDate FROM hostelRequests WHERE startDate < FROM_UNIXTIME(' + end + ') AND endDate > FROM_UNIXTIME(' + start + '))');
 
@@ -2171,5 +2171,39 @@ app.get('/currentusername', async function(req, resp) {
         resp.status(403).send('0inactive');
     }
 });
+
+// get all booking by the customer
+app.get('/alluserbookings', async function(req, resp) {
+    // if valid staff session
+    if (validateSession('customer', req, resp)) {
+        // requests object
+        let requests = {}
+
+        // activity requests
+        const activityRequests = await performQuery('SELECT r.id, r.dateTime, a.name, a.description, a.price, c.fName, c.lName, c.email, c.phone FROM activityBookings AS r INNER JOIN customers AS c ON r.userId = c.id INNER JOIN activities AS a ON r.activityId = a.id Where c.id = '+req.session.userID);
+
+        // community requests
+        const communityRequests = await performQuery('SELECT r.id, r.start, r.end, r.priceOfBooking, co.name, co.description, cu.fName, cu.lName, cu.email, cu.phone  FROM communityBookings AS r INNER JOIN customers AS cu ON r.userId = cu.id INNER JOIN communityRooms AS co ON r.roomId = co.id Where cu.id = '+req.session.userID);
+
+        // hostel requests
+        const hostelRequests = await performQuery('SELECT r.id, r.startDate, r.endDate, r.price, r.noOfPeople, hr.roomNumber, c.id, c.fName, c.lName, c.email, c.phone  FROM hostelBookings AS r INNER JOIN customers AS c ON r.userId = c.id INNER JOIN hostelRooms AS hr ON r.roomId = hr.id Where c.id = '+req.session.userID);
+
+        // if no database errors
+        if (processQueryResult(activityRequests, resp) && processQueryResult(communityRequests, resp) && processQueryResult(hostelRequests, resp)) {
+            // add each type to requests object
+            requests['activity'] = activityRequests;
+            requests['community'] = communityRequests;
+            requests['hostel'] = hostelRequests;
+
+            // send requests
+            resp.status(200).send(JSON.stringify(requests));
+        }
+    }
+});
+
+
+
+
+
 
 module.exports = app;
