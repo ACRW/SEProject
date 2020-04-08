@@ -502,7 +502,7 @@ async function bookings(customerID, resp) {
     // community room bookings
     const community = await performQuery('SELECT b.id AS bookingID, b.start, b.end, b.priceOfBooking, b.paid, r.id AS roomID, r.name, r.description FROM communityBookings b INNER JOIN communityRooms r ON b.roomId = r.id WHERE b.userId = ' + customerID + ' ORDER BY b.start');
     // hostel room bookings
-    const hostel = await performQuery('SELECT b.id AS bookingID, b.startDate, b.endDate, r.id AS roomID, r.noOfPeople, r.pricePerNight FROM hostelBookings b INNER JOIN hostelRooms r ON b.roomId = r.id WHERE b.userId = ' + customerID + ' ORDER BY b.startDate');
+    const hostel = await performQuery('SELECT b.id AS bookingID, b.startDate, b.endDate, b.price, b.paid, r.id AS roomID, r.noOfPeople, r.pricePerNight FROM hostelBookings b INNER JOIN hostelRooms r ON b.roomId = r.id WHERE b.userId = ' + customerID + ' ORDER BY b.startDate');
 
     // if no database errors
     if (processQueryResult(activity, resp) && processQueryResult(community, resp) && processQueryResult(hostel, resp)) {
@@ -545,7 +545,7 @@ async function bookingRequests(customerID, resp) {
     // community room booking requests
     const community = await performQuery('SELECT b.id AS requestID, b.start, b.end, b.priceOfBooking, r.id AS roomID, r.name, r.description FROM communityRequests b INNER JOIN communityRooms r ON b.roomId = r.id WHERE b.userId = ' + customerID + ' ORDER BY b.start');
     // hostel room booking requests
-    const hostel = await performQuery('SELECT b.id AS requestID, b.startDate, b.endDate, r.id AS roomID, r.noOfPeople, r.pricePerNight FROM hostelRequests b INNER JOIN hostelRooms r ON b.roomId = r.id WHERE b.userId = ' + customerID + ' ORDER BY b.startDate');
+    const hostel = await performQuery('SELECT b.id AS requestID, b.startDate, b.endDate, b.price, r.id AS roomID, r.noOfPeople, r.pricePerNight FROM hostelRequests b INNER JOIN hostelRooms r ON b.roomId = r.id WHERE b.userId = ' + customerID + ' ORDER BY b.startDate');
 
     // if no database errors
     if (processQueryResult(activity, resp) && processQueryResult(community, resp) && processQueryResult(hostel, resp)) {

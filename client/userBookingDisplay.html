@@ -35,10 +35,11 @@
 </head>
 
 <body>
+
   <!-- page title -->
   <div class="jumbotron">
     <div class="container">
-      <h1 class="display-3">Welcome back, <p> username </p></h1>
+      <h1 class="display-3">Welcome back: <p id="username"> customer </p></h1>
       <p>view and manage your bookings </p>
       <!-- <p><a class="btn btn-primary btn-lg" href="#" role="button">Learn more »</a></p>-->
       <hr class="my-4">
@@ -46,117 +47,269 @@
     </div>
   </div>
 
+    <!-- Nav tabs( the tab )-->
+    <ul class="nav nav-tabs" role="tablist">
+      <li class="nav-item">
+        <a class="nav-link active" data-toggle="tab" href="#type1" style="color:gray;font-size: 25px;" id="booking1">Confirmed booking(s)</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" data-toggle="tab" href="#type2" style="color:gray;font-size: 25px;" id="booking2">Booking request(s) </a>
+      </li>
+    </ul>
   
-  <!-- cards  -->
-  <div class="row">
-    <div class="col-sm-8 offset-sm-2">
-      <div class="card text-center">
-
-        <div class="card-header">
-          Time stamps /eg: 2 days ago/ comming in 2 days 
-        </div>
-
-        <div class="card-body">
-          <h4 class="card-title">Event title</h4>
-
-          <ul class="list-group list-group-flush">
-            <li class="list-group-item"><b>Time:</b> <a>eg: 2020 Apr 24th 20:00 to 21:00</a> </li>
-            <li class="list-group-item"><b>Ticket type:</b> <a>eg: event nanme/room type</a></li>
-            <li class="list-group-item"> <b>Number of people:</b> <a>eg: 1 adults and 1 children/ a room </a></li>
-          </ul>
-
-          <label> <p class="card-text">  </p></label>
-          
-
-          <div class="input-group mb-3">
-            <div class="input-group-prepend">
-              <label class="input-group-text" for="inputGroupSelect01">Manage my booking</label>
+    <!-- Tab panes( the tab ) -->
+    <div class="tab-content">
+      <div id="type1" class="container tab-pane active"><br>
+        <div style=' margin-top: 20px; '>
+          <div id = "activity1">
+            <h3>Activity Booking:</h3>
+            <div class="mx-auto" style="width: 200px;" id = "activity1default">
+              No booking records.
             </div>
-            <select class="custom-select" id="inputGroupSelect01">
-              <option selected>Choose...</option>
-              <option value="1">Change time</option>
-              <option value="2">Refund tickets</option>
-              <option value="3">Expense reciept</option>
-            </select>
           </div>
 
-          <div>
-            <!-- A calander for change time-->
+          <div id = "community1">
+            <h3>Community Booking:</h3>
+            <div class="mx-auto" style="width: 200px;" id = "community1default">
+              No booking records.
+            </div>
           </div>
 
-          <div>
-            <!-- Infor for refund tickets-->
+          <div id = "hostel1">
+            <h3>Hostel Booking:</h3>
+            <div class="mx-auto" style="width: 200px;" id = "hostel1default">
+              No booking records.
+            </div>
           </div>
 
-          <div>
-            <!-- A form for expense reciept -->
+          <!-- cards  -->
+          <div class="row">
+            <div class="col-sm-8 offset-sm-2">
+              <div class="card text-center">
+
+                <div class="card-header">
+                  Time stamps /eg: 2 days ago/ comming in 2 days 
+                </div>
+
+                <div class="card-body">
+                  <h4 class="card-title">Event title</h4>
+
+                  <ul class="list-group list-group-flush">
+                    <li class="list-group-item"><b>Time:</b> <a>eg: 2020 Apr 24th 20:00 to 21:00</a> </li>
+                    <li class="list-group-item"><b>Ticket type:</b> <a>eg: event nanme/room type</a></li>
+                    <li class="list-group-item"> <b>Number of people:</b> <a>eg: 1 adults and 1 children/ a room </a></li>
+                  </ul>
+
+                  <label> <p class="card-text"> wkl;';lkjht' </p></label>
+                  
+
+                  <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                      <label class="input-group-text" for="inputGroupSelect01">Manage my booking</label>
+                    </div>
+                    <select class="custom-select" id="inputGroupSelect01">
+                      <option selected>Choose...</option>
+                      <option value="1">Change time</option>
+                      <option value="2">Refund tickets</option>
+                      <option value="3">Expense reciept</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <!-- A calander for change time-->
+                  </div>
+
+                  <div>
+                    <!-- Infor for refund tickets-->
+                  </div>
+
+                  <div>
+                    <!-- A form for expense reciept -->
+                  </div>
+
+
+                  <a href="#" class="btn btn-outline-success" type="submit">submit</a>
+                </div>
+
+
+              </div>
+            </div>
+
+            <div class="col-sm-8 offset-sm-2" class="expire" disabled = true>
+              <div class="card text-center">
+
+                <div class="card-header">
+                  Time stamps /eg: 2 days ago/ comming in 2 days 
+                </div>
+
+                <div class="card-body">
+                  <h4 class="card-title">Event title</h4>
+
+                  <ul class="list-group list-group-flush">
+                    <li class="list-group-item"><b>Time:</b> <a>eg: 2020 Apr 24th 20:00 to 21:00</a> </li>
+                    <li class="list-group-item"><b>Ticket type:</b> <a>eg: event nanme/room type</a></li>
+                    <li class="list-group-item"> <b>Number of people:</b> <a>eg: 1 adults and 1 children/ a room </a></li>
+                  </ul>
+
+                  <label> <p class="card-text">  </p></label>
+                  
+
+                  <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                      <label class="input-group-text" for="inputGroupSelect01">Manage my booking</label>
+                    </div>
+                    <select class="custom-select" id="inputGroupSelect01">
+                      <option selected>Choose...</option>
+                      <option value="1">Change time</option>
+                      <option value="2">Refund tickets</option>
+                      <option value="3">Expense reciept</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <!-- A calander for change time-->
+                  </div>
+
+                  <div>
+                    <!-- Infor for refund tickets-->
+                  </div>
+
+                  <div>
+                    <!-- A form for expense reciept -->
+                  </div>
+
+
+                  <a href="#" class="btn btn-outline-success" type="submit">submit</a>
+                </div>
+
+
+              </div>
+            </div>
+
+            
+          
           </div>
-
-
-          <a href="#" class="btn btn-outline-success" type="submit">submit</a>
         </div>
+      </div>
+  
+      <div id="type2" class="container tab-pane fade"><br>
+        <div style=' margin-top: 20px; '>
+          <!-- cards  -->
+          <div class="row">
+            <div class="col-sm-8 offset-sm-2">
+              <div class="card text-center">
+
+                <div class="card-header">
+                  Time stamps /eg: 2 days ago/ comming in 2 days 
+                </div>
+
+                <div class="card-body">
+                  <h4 class="card-title">Event title</h4>
+
+                  <ul class="list-group list-group-flush">
+                    <li class="list-group-item"><b>Time:</b> <a>eg: 2020 Apr 24th 20:00 to 21:00</a> </li>
+                    <li class="list-group-item"><b>Ticket type:</b> <a>eg: event nanme/room type</a></li>
+                    <li class="list-group-item"> <b>Number of people:</b> <a>eg: 1 adults and 1 children/ a room </a></li>
+                  </ul>
+
+                  <label> <p class="card-text">  </p></label>
+                  
+
+                  <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                      <label class="input-group-text" for="inputGroupSelect01">Manage my booking</label>
+                    </div>
+                    <select class="custom-select" id="inputGroupSelect01">
+                      <option selected>Choose...</option>
+                      <option value="1">Change time</option>
+                      <option value="2">Refund tickets</option>
+                      <option value="3">Expense reciept</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <!-- A calander for change time-->
+                  </div>
+
+                  <div>
+                    <!-- Infor for refund tickets-->
+                  </div>
+
+                  <div>
+                    <!-- A form for expense reciept -->
+                  </div>
 
 
+                  <a href="#" class="btn btn-outline-success" type="submit">submit</a>
+                </div>
+
+
+              </div>
+            </div>
+
+            <div class="col-sm-8 offset-sm-2" class="expire" disabled = true>
+              <div class="card text-center">
+
+                <div class="card-header">
+                  Time stamps /eg: 2 days ago/ comming in 2 days 
+                </div>
+
+                <div class="card-body">
+                  <h4 class="card-title">Event title</h4>
+
+                  <ul class="list-group list-group-flush">
+                    <li class="list-group-item"><b>Time:</b> <a>eg: 2020 Apr 24th 20:00 to 21:00</a> </li>
+                    <li class="list-group-item"><b>Ticket type:</b> <a>eg: event nanme/room type</a></li>
+                    <li class="list-group-item"> <b>Number of people:</b> <a>eg: 1 adults and 1 children/ a room </a></li>
+                  </ul>
+
+                  <label> <p class="card-text">  </p></label>
+                  
+
+                  <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                      <label class="input-group-text" for="inputGroupSelect01">Manage my booking</label>
+                    </div>
+                    <select class="custom-select" id="inputGroupSelect01">
+                      <option selected>Choose...</option>
+                      <option value="1">Change time</option>
+                      <option value="2">Refund tickets</option>
+                      <option value="3">Expense reciept</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <!-- A calander for change time-->
+                  </div>
+
+                  <div>
+                    <!-- Infor for refund tickets-->
+                  </div>
+
+                  <div>
+                    <!-- A form for expense reciept -->
+                  </div>
+
+
+                  <a href="#" class="btn btn-outline-success" type="submit">submit</a>
+                </div>
+
+
+              </div>
+            </div>
+
+            
+          
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="col-sm-8 offset-sm-2" class="expire" disabled = true>
-      <div class="card text-center">
-
-        <div class="card-header">
-          Time stamps /eg: 2 days ago/ comming in 2 days 
-        </div>
-
-        <div class="card-body">
-          <h4 class="card-title">Event title</h4>
-
-          <ul class="list-group list-group-flush">
-            <li class="list-group-item"><b>Time:</b> <a>eg: 2020 Apr 24th 20:00 to 21:00</a> </li>
-            <li class="list-group-item"><b>Ticket type:</b> <a>eg: event nanme/room type</a></li>
-            <li class="list-group-item"> <b>Number of people:</b> <a>eg: 1 adults and 1 children/ a room </a></li>
-          </ul>
-
-          <label> <p class="card-text">  </p></label>
-          
-
-          <div class="input-group mb-3">
-            <div class="input-group-prepend">
-              <label class="input-group-text" for="inputGroupSelect01">Manage my booking</label>
-            </div>
-            <select class="custom-select" id="inputGroupSelect01">
-              <option selected>Choose...</option>
-              <option value="1">Change time</option>
-              <option value="2">Refund tickets</option>
-              <option value="3">Expense reciept</option>
-            </select>
-          </div>
-
-          <div>
-            <!-- A calander for change time-->
-          </div>
-
-          <div>
-            <!-- Infor for refund tickets-->
-          </div>
-
-          <div>
-            <!-- A form for expense reciept -->
-          </div>
-
-
-          <a href="#" class="btn btn-outline-success" type="submit">submit</a>
-        </div>
-
-
-      </div>
-    </div>
-
-    
   
-  </div>
+
 
   
 
 </body>
-<script src="hostel_room.js"></script>
+<script src="userBookingDisplay.js"></script>
 </html>
