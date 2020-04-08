@@ -39,6 +39,7 @@ async function getUserInfo () {
   return [tempUserName[0]["fName"], tempUserName[0]["lName"]]
 }
 
+// Done
 async function getConfirmedBookings () {
   let response = await fetch('http://' + hostAddr + ":" + hostPort + '/mybookings', {
     method: "GET",
@@ -132,6 +133,7 @@ async function getConfirmedBookings () {
         }
       }
     }
+
     // formating date 
     const months = ["JAN", "FEB", "MAR","APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
     let formatted_date = addzero(startTime.getDate(), 2) + "-" + months[startTime.getMonth()] + "-" + startTime.getFullYear()+ " " + addzero(startTime.getHours(), 2) + ":" + addzero(startTime.getMinutes(), 2) + ":" + addzero(startTime.getSeconds(), 2);
@@ -144,14 +146,14 @@ async function getConfirmedBookings () {
     document.getElementById("one-community-description-" +String(flag)).innerHTML = booking["description"];
     document.getElementById("one-community-price-" +String(flag)).innerHTML = booking["priceOfBooking"];
     document.getElementById("one-community-paid-" +String(flag)).innerHTML = booking["paid"];
-    document.getElementById("one-community-id-" +String(flag)).innerHTML = booking["roomID"];
+    document.getElementById("one-community-id-" +String(flag)).innerHTML = booking["bookingID"];
 
     flag++;
   }
 
   flag = 1;
   for(booking of Object.assign([], tempBookings["hostel"]).reverse()){
-    console.log(booking);
+    //console.log(booking);
     if(booking == null){
       break;
     };
@@ -183,12 +185,13 @@ async function getConfirmedBookings () {
         }
       }
     }
-        // formating date 
-        const months = ["JAN", "FEB", "MAR","APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
-        let formatted_date = addzero(startTime.getDate(), 2) + "-" + months[startTime.getMonth()] + "-" + startTime.getFullYear()+ " " + addzero(startTime.getHours(), 2) + ":" + addzero(startTime.getMinutes(), 2) + ":" + addzero(startTime.getSeconds(), 2);
-        document.getElementById("one-hostel-starttime-" +String(flag)).innerHTML = formatted_date;
-        let formatted_date2 = addzero(endTime.getDate(), 2) + "-" + months[endTime.getMonth()] + "-" + endTime.getFullYear()+ " " + addzero(endTime.getHours(), 2) + ":" + addzero(endTime.getMinutes(), 2) + ":" + addzero(endTime.getSeconds(), 2);
-        document.getElementById("one-hostel-endtime-" +String(flag)).innerHTML = formatted_date2;
+
+    // formating date 
+    const months = ["JAN", "FEB", "MAR","APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+    let formatted_date = addzero(startTime.getDate(), 2) + "-" + months[startTime.getMonth()] + "-" + startTime.getFullYear()+ " " + addzero(startTime.getHours(), 2) + ":" + addzero(startTime.getMinutes(), 2) + ":" + addzero(startTime.getSeconds(), 2);
+    document.getElementById("one-hostel-starttime-" +String(flag)).innerHTML = formatted_date;
+    let formatted_date2 = addzero(endTime.getDate(), 2) + "-" + months[endTime.getMonth()] + "-" + endTime.getFullYear()+ " " + addzero(endTime.getHours(), 2) + ":" + addzero(endTime.getMinutes(), 2) + ":" + addzero(endTime.getSeconds(), 2);
+    document.getElementById("one-hostel-endtime-" +String(flag)).innerHTML = formatted_date2;
 
     // substitute others 
     document.getElementById("one-hostel-title-" +String(flag)).innerHTML ="Room"+ String(parseInt(booking["roomID"])+1);
@@ -200,7 +203,7 @@ async function getConfirmedBookings () {
     flag++;    
   }
 }
-
+// in process
 async function getBookingRequests () {
   let response = await fetch('http://' + hostAddr + ":" + hostPort + '/mybookingrequests', {
     method: "GET",
@@ -209,6 +212,152 @@ async function getBookingRequests () {
     }
   });
   let tempBookings = await response.json();
+
+  let flag = 1;
+  for(booking of Object.assign([], tempBookings["activity"]).reverse()){
+    //console.log(booking);
+    if(booking == null){
+      break;
+    };
+    let card = twoActivityCard(flag);
+    document.getElementById("activity2").appendChild(card);
+
+    // prepare time (早为小，晚为大
+    startTime = new Date(booking["dateTime"]);
+    nowTime = Date.now();
+    if(startTime < nowTime){
+      // in the past
+      document.getElementById("two-activity-header-" +String(flag)).innerHTML = "Expired";
+    }else{
+      // in the future
+      let difference = startTime-nowTime;
+      let day = parseInt(difference/(1000*60*60*24));
+      if (day > 0){
+        // comming in day days
+        document.getElementById("two-activity-header-" +String(flag)).innerHTML = "Comming in " + String(day) + " days."
+      }else{
+        let hours =  parseInt(difference/(1000*60*60));
+        if (hours > 0){
+          // comming in hours hours
+          document.getElementById("two-activity-header-" +String(flag)).innerHTML = "Comming in " + String(hours) + " hours. Please consider make a phone call."
+        }else{
+          // less than one hour, don't be late
+          document.getElementById("two-activity-header-" +String(flag)).innerHTML = "Comming in less than one hour! Definitely make a phone call now."
+        }
+      }
+    }    
+
+    // substitute others 
+    document.getElementById("two-activity-title-" +String(flag)).innerHTML = booking["name"];
+    document.getElementById("two-activity-description-" +String(flag)).innerHTML = booking["description"];
+    document.getElementById("two-activity-people-" +String(flag)).innerHTML = booking["numberOfPeople"];
+    document.getElementById("two-activity-price-" +String(flag)).innerHTML = booking["price"];
+    document.getElementById("two-activity-id-" +String(flag)).innerHTML = booking["activityID"];
+    
+    flag++;
+  }
+
+  flag = 1;
+  for(booking of Object.assign([], tempBookings["community"]).reverse()){
+    //console.log(booking);
+    if(booking == null){
+      break;
+    };
+    let card = twoCommunityCard(flag); 
+    document.getElementById("community2").appendChild(card);
+
+    // prepare time (早为小，晚为大
+    startTime = new Date(booking["start"]);
+    endTime = new Date(booking["end"]);
+    nowTime = Date.now();
+    if(startTime < nowTime){
+      // in the past
+      document.getElementById("two-community-header-" +String(flag)).innerHTML = "Expired";
+    }else{
+      // in the future
+      let difference = startTime-nowTime;
+      let day = parseInt(difference/(1000*60*60*24));
+      if (day > 0){
+        // comming in day days
+        document.getElementById("two-community-header-" +String(flag)).innerHTML = "Comming in " + String(day) + " days."
+      }else{
+        let hours =  parseInt(difference/(1000*60*60));
+        if (hours > 0){
+          // comming in hours hours
+          document.getElementById("two-community-header-" +String(flag)).innerHTML = "Comming in " + String(hours) + " hours. Please consider make a phone call."
+        }else{
+          // less than one hour, don't be late
+          document.getElementById("two-activity-header-" +String(flag)).innerHTML = "Comming in less than one hour! Definitely make a phone call now."
+        }
+      }
+    }
+
+    // formating date 
+    const months = ["JAN", "FEB", "MAR","APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+    let formatted_date = addzero(startTime.getDate(), 2) + "-" + months[startTime.getMonth()] + "-" + startTime.getFullYear()+ " " + addzero(startTime.getHours(), 2) + ":" + addzero(startTime.getMinutes(), 2) + ":" + addzero(startTime.getSeconds(), 2);
+    document.getElementById("two-community-starttime-" +String(flag)).innerHTML = formatted_date;
+    let formatted_date2 = addzero(endTime.getDate(), 2) + "-" + months[endTime.getMonth()] + "-" + endTime.getFullYear()+ " " + addzero(endTime.getHours(), 2) + ":" + addzero(endTime.getMinutes(), 2) + ":" + addzero(endTime.getSeconds(), 2);
+    document.getElementById("two-community-endtime-" +String(flag)).innerHTML = formatted_date2;    
+
+    // substitute others 
+    document.getElementById("two-community-title-" +String(flag)).innerHTML = booking["name"];
+    document.getElementById("two-community-description-" +String(flag)).innerHTML = booking["description"];
+    document.getElementById("two-community-price-" +String(flag)).innerHTML = booking["priceOfBooking"];
+    document.getElementById("two-community-id-" +String(flag)).innerHTML = booking["requestID"];
+    flag++;
+  }
+
+  flag = 1;
+  for(booking of Object.assign([], tempBookings["hostel"]).reverse()){
+    //console.log(booking);
+    if(booking == null){
+      break;
+    };
+    let card = twoHostelCard(flag); 
+    document.getElementById("hostel2").appendChild(card);
+
+    // prepare time (早为小，晚为大
+    startTime = new Date(booking["startDate"]);
+    endTime = new Date(booking["endDate"]);
+    nowTime = Date.now();
+    if(startTime < nowTime){
+      // in the past
+      document.getElementById("two-hostel-header-" +String(flag)).innerHTML = "Expired";
+    }else{
+      // in the future
+      let difference = startTime-nowTime;
+      let day = parseInt(difference/(1000*60*60*24));
+      if (day > 0){
+        // comming in day days
+        document.getElementById("two-hostel-header-" +String(flag)).innerHTML = "Comming in " + String(day) + " days."
+      }else{
+        let hours =  parseInt(difference/(1000*60*60));
+        if (hours > 0){
+          // comming in hours hours
+          document.getElementById("two-hostel-header-" +String(flag)).innerHTML = "Comming in " + String(hours) + " hours. Please consider make a phone call."
+        }else{
+          // less than one hour, don't be late
+          document.getElementById("two-hostel-header-" +String(flag)).innerHTML = "Comming in less than one hour! Definitely make a phone call now."
+        }
+      }
+    }
+
+    // formating date 
+    const months = ["JAN", "FEB", "MAR","APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+    let formatted_date = addzero(startTime.getDate(), 2) + "-" + months[startTime.getMonth()] + "-" + startTime.getFullYear()+ " " + addzero(startTime.getHours(), 2) + ":" + addzero(startTime.getMinutes(), 2) + ":" + addzero(startTime.getSeconds(), 2);
+    document.getElementById("two-hostel-starttime-" +String(flag)).innerHTML = formatted_date;
+    let formatted_date2 = addzero(endTime.getDate(), 2) + "-" + months[endTime.getMonth()] + "-" + endTime.getFullYear()+ " " + addzero(endTime.getHours(), 2) + ":" + addzero(endTime.getMinutes(), 2) + ":" + addzero(endTime.getSeconds(), 2);
+    document.getElementById("two-hostel-endtime-" +String(flag)).innerHTML = formatted_date2;
+
+    // substitute others 
+    document.getElementById("two-hostel-title-" +String(flag)).innerHTML ="Room"+ String(parseInt(booking["roomID"])+1);
+    document.getElementById("two-hostel-people-" +String(flag)).innerHTML = booking["noOfPeople"];
+    document.getElementById("two-hostel-price-" +String(flag)).innerHTML = booking["price"];
+    document.getElementById("two-hostel-id-" +String(flag)).innerHTML = booking["requestID"];
+
+    flag++;
+  }
+
 }
 
 ///// make the card functions /////
@@ -502,8 +651,260 @@ function oneHostelCard(number){
 }
 
 // booking2 activity
+function twoActivityCard(number){
+  let head = document.createElement('div');
+  head.className = "card-header";
+  head.id="two-activity-header-" +String(number);
+  head.innerHTML = "Time stamps /eg: 2 days ago/ comming in 2 days";
+
+  let title = document.createElement('h4'); // <h4></h4>
+  title.className="card-title"; 
+  title.id="two-activity-title-" +String(number);
+  title.innerHTML = "Event type"; //<h4 className="card-title">Event type</h4>
+
+  let description = document.createElement('b');
+  description.innerHTML="Description: ";
+  let descriptionContent = document.createElement('a');
+  descriptionContent.id = "two-activity-description-" +String(number);
+  descriptionContent.innerHTML = "paint(e)";
+  let ilist2 =  document.createElement('li');
+  ilist2.className ="list-group-item";
+  ilist2.appendChild(description);
+  ilist2.appendChild(descriptionContent);
+
+  let startTime = document.createElement('b');
+  startTime.innerHTML="Start Time(dd-mm-yyyy hh:mm:ss): ";
+  let startTimeContent = document.createElement('a');
+  startTimeContent.id = "two-activity-starttime-" +String(number);
+  startTimeContent.innerHTML = "2020-01-27T02:00:00.000Z(e)";
+  let ilist3 =  document.createElement('li');
+  ilist3.className ="list-group-item";
+  ilist3.appendChild(startTime);
+  ilist3.appendChild(startTimeContent);
+
+  let people = document.createElement('b');
+  people.innerHTML="Number of people: ";
+  let peopleContent = document.createElement('a');
+  peopleContent.id = "two-activity-people-" +String(number);
+  peopleContent.innerHTML = "2(e)";
+  let ilist4 =  document.createElement('li');
+  ilist4.className ="list-group-item";
+  ilist4.appendChild(people);
+  ilist4.appendChild(peopleContent);
+
+  let price = document.createElement('b');
+  price.innerHTML="Price to pay: ";
+  let priceContent = document.createElement('a');
+  priceContent.id = "two-activity-price-" +String(number);
+  priceContent.innerHTML = "60(e)";
+  let ilist5 =  document.createElement('li');
+  ilist5.className ="list-group-item";
+  ilist5.appendChild(price);
+  ilist5.appendChild(priceContent);
+
+  let bookingId = document.createElement('b');
+  bookingId.innerHTML="The unique booking request ID: ";
+  let bookingIdContent = document.createElement('a');
+  bookingIdContent.id = "two-activity-id-" +String(number);
+  bookingIdContent.innerHTML = "27(e)";
+  let ilist7 =  document.createElement('li');
+  ilist7.className ="list-group-item";
+  ilist7.appendChild(bookingId);
+  ilist7.appendChild(bookingIdContent);
+
+  let ulist = document.createElement('ul');
+  ulist.className = "list-group list-group-flush";
+  ulist.appendChild(ilist2);
+  ulist.appendChild(ilist3);
+  ulist.appendChild(ilist4);
+  ulist.appendChild(ilist5);
+  ulist.appendChild(ilist7);
+
+  let body = document.createElement('div');
+  body.className = "card-body";
+  body.appendChild(title);
+  body.appendChild(ulist);
+
+  let text = document.createElement('div');
+  text.className = "card text-center";
+  text.appendChild(head);
+  text.appendChild(body);
+
+  let card = document.createElement('div');
+  card.className = "col-sm-8 offset-sm-2";
+  card.appendChild(text);
+  return card
+}
 // booking2 community
+function twoCommunityCard(number){
+  let head = document.createElement('div');
+  head.className = "card-header";
+  head.id="two-community-header-" +String(number);
+  head.innerHTML = "Time stamps /eg: 2 days ago/ comming in 2 days";
+
+  let title = document.createElement('h4'); // <h4></h4>
+  title.className="card-title"; 
+  title.id="two-community-title-" +String(number);
+  title.innerHTML = "Event type"; //<h4 className="card-title">Event type</h4>
+
+  let description = document.createElement('b');
+  description.innerHTML="Description: ";
+  let descriptionContent = document.createElement('a');
+  descriptionContent.id = "two-community-description-" +String(number);
+  descriptionContent.innerHTML = "paint(e)";
+  let ilist2 =  document.createElement('li');
+  ilist2.className ="list-group-item";
+  ilist2.appendChild(description);
+  ilist2.appendChild(descriptionContent);
+
+  let startTime = document.createElement('b');
+  startTime.innerHTML="Start Time(dd-mm-yyyy hh:mm:ss): ";
+  let startTimeContent = document.createElement('a');
+  startTimeContent.id = "two-community-starttime-" +String(number);
+  startTimeContent.innerHTML = "2020-01-27T02:00:00.000Z(e)";
+  let ilist3 =  document.createElement('li');
+  ilist3.className ="list-group-item";
+  ilist3.appendChild(startTime);
+  ilist3.appendChild(startTimeContent);
+  
+  let endTime = document.createElement('b');
+  endTime.innerHTML="End Time(dd-mm-yyyy hh:mm:ss): ";
+  let endTimeContent = document.createElement('a');
+  endTimeContent.id = "two-community-endtime-" +String(number);
+  endTimeContent.innerHTML = "2020-01-27T02:00:00.000Z(e)";
+  let ilist1 =  document.createElement('li');
+  ilist1.className ="list-group-item";
+  ilist1.appendChild(endTime);
+  ilist1.appendChild(endTimeContent);
+
+  let price = document.createElement('b');
+  price.innerHTML="Price to pay: ";
+  let priceContent = document.createElement('a');
+  priceContent.id = "two-community-price-" +String(number);
+  priceContent.innerHTML = "60(e)";
+  let ilist5 =  document.createElement('li');
+  ilist5.className ="list-group-item";
+  ilist5.appendChild(price);
+  ilist5.appendChild(priceContent);
+
+  let bookingId = document.createElement('b');
+  bookingId.innerHTML="The unique booking request ID: ";
+  let bookingIdContent = document.createElement('a');
+  bookingIdContent.id = "two-community-id-" +String(number);
+  bookingIdContent.innerHTML = "27(e)";
+  let ilist7 =  document.createElement('li');
+  ilist7.className ="list-group-item";
+  ilist7.appendChild(bookingId);
+  ilist7.appendChild(bookingIdContent);
+
+  let ulist = document.createElement('ul');
+  ulist.className = "list-group list-group-flush";
+  ulist.appendChild(ilist2);
+  ulist.appendChild(ilist3);
+  ulist.appendChild(ilist1);
+  ulist.appendChild(ilist5);
+  ulist.appendChild(ilist7);
+
+  let body = document.createElement('div');
+  body.className = "card-body";
+  body.appendChild(title);
+  body.appendChild(ulist);
+
+  let text = document.createElement('div');
+  text.className = "card text-center";
+  text.appendChild(head);
+  text.appendChild(body);
+
+  let card = document.createElement('div');
+  card.className = "col-sm-8 offset-sm-2";
+  card.appendChild(text);
+  return card
+}
 // booking2 hostel
+function twoHostelCard(number){
+  let head = document.createElement('div');
+  head.className = "card-header";
+  head.id="two-hostel-header-" +String(number);
+  head.innerHTML = "Time stamps /eg: 2 days ago/ comming in 2 days";
+
+  let title = document.createElement('h4'); // <h4></h4>
+  title.className="card-title"; 
+  title.id="two-hostel-title-" +String(number);
+  title.innerHTML = "Event type"; //<h4 className="card-title">Event type</h4>
+
+  let startTime = document.createElement('b');
+  startTime.innerHTML="Start Time(dd-mm-yyyy hh:mm:ss): ";
+  let startTimeContent = document.createElement('a');
+  startTimeContent.id = "two-hostel-starttime-" +String(number);
+  startTimeContent.innerHTML = "2020-01-27T02:00:00.000Z(e)";
+  let ilist3 =  document.createElement('li');
+  ilist3.className ="list-group-item";
+  ilist3.appendChild(startTime);
+  ilist3.appendChild(startTimeContent);
+  
+  let endTime = document.createElement('b');
+  endTime.innerHTML="End Time(dd-mm-yyyy hh:mm:ss): ";
+  let endTimeContent = document.createElement('a');
+  endTimeContent.id = "two-hostel-endtime-" +String(number);
+  endTimeContent.innerHTML = "2020-01-27T02:00:00.000Z(e)";
+  let ilist1 =  document.createElement('li');
+  ilist1.className ="list-group-item";
+  ilist1.appendChild(endTime);
+  ilist1.appendChild(endTimeContent);
+
+  let people = document.createElement('b');
+  people.innerHTML="Number of people: ";
+  let peopleContent = document.createElement('a');
+  peopleContent.id = "two-hostel-people-" +String(number);
+  peopleContent.innerHTML = "2(e)";
+  let ilist4 =  document.createElement('li');
+  ilist4.className ="list-group-item";
+  ilist4.appendChild(people);
+  ilist4.appendChild(peopleContent);
+
+  let price = document.createElement('b');
+  price.innerHTML="Price to pay: ";
+  let priceContent = document.createElement('a');
+  priceContent.id = "two-hostel-price-" +String(number);
+  priceContent.innerHTML = "60(e)";
+  let ilist5 =  document.createElement('li');
+  ilist5.className ="list-group-item";
+  ilist5.appendChild(price);
+  ilist5.appendChild(priceContent);
+
+  let bookingId = document.createElement('b');
+  bookingId.innerHTML="The unique booking ID: ";
+  let bookingIdContent = document.createElement('a');
+  bookingIdContent.id = "two-hostel-id-" +String(number);
+  bookingIdContent.innerHTML = "27(e)";
+  let ilist7 =  document.createElement('li');
+  ilist7.className ="list-group-item";
+  ilist7.appendChild(bookingId);
+  ilist7.appendChild(bookingIdContent);
+
+  let ulist = document.createElement('ul');
+  ulist.className = "list-group list-group-flush";
+  ulist.appendChild(ilist3);
+  ulist.appendChild(ilist1);
+  ulist.appendChild(ilist4);
+  ulist.appendChild(ilist5);
+  ulist.appendChild(ilist7);
+
+  let body = document.createElement('div');
+  body.className = "card-body";
+  body.appendChild(title);
+  body.appendChild(ulist);
+
+  let text = document.createElement('div');
+  text.className = "card text-center";
+  text.appendChild(head);
+  text.appendChild(body);
+
+  let card = document.createElement('div');
+  card.className = "col-sm-8 offset-sm-2";
+  card.appendChild(text);
+  return card
+}
 
 /////  load the page functions /////
 const updateName = async() =>{
@@ -518,19 +919,15 @@ const updateName = async() =>{
 updateName();
 
 getConfirmedBookings();
-/*
-
-updateConfirmedBookings();
 
 window.onload = function() {
   // paging buttons
   booking1.addEventListener("click",function(){
-    updateConfirmedBookings();
+    getConfirmedBookings();
   });
 
   booking2.addEventListener("click",function(){
-    updateBookingRequests();
+    getBookingRequests();
   });
 };
 
-*/
