@@ -35,7 +35,7 @@ function ActivityCard (activity) { // Activity card class, each instantiated cla
   button.className = "btn btn-primary newColor";
   button.type = "button";
   button.innerHTML = "Book Now";
-  button.onclick= function(){modifyPopUp(activity["id"]);};//function () {console.log("test");};
+  button.onclick= function(){modifyPopUp();};//function () {console.log("test");};
   button.setAttribute("data-toggle", "modal");
   button.setAttribute("data-target", "#popUp");
   
@@ -47,7 +47,8 @@ function ActivityCard (activity) { // Activity card class, each instantiated cla
   
   let img = document.createElement('img');
   img.className = "card-img-top";
-  img.src = activity["imagePath"];
+  if (!activity["imagePath"]) img.src = "webimage/default.jpg"; // Select a default image if there is no image.
+  else img.src = activity["imagePath"];
   
   let card = document.createElement('div');
   card.className = "card";
@@ -57,8 +58,7 @@ function ActivityCard (activity) { // Activity card class, each instantiated cla
   
   document.getElementById("activityCards").appendChild(card);
   
-  function modifyPopUp(id) {
-    activity = activities[id];
+  function modifyPopUp() {
     document.getElementById("popUpTitle").innerHTML = activity["name"];
     document.getElementById("popUpDesc").innerHTML = activity["description"];
     document.getElementById("popUpImg").src = activity["imagePath"];

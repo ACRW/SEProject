@@ -1,3 +1,10 @@
+.unselectable {
+  user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  -moz-user-select: none;
+}
+
 .newTable>tbody>tr>td {
     padding: 0px;
     margin: 0px;
@@ -22,14 +29,14 @@
     position: relative;
 }
 
-.newColor {
+.newColor , .newColorHov {
     background-color: #C2D6B6;
     color: black;
     border-style: none;
     font-size: 115%;
 }
 
-.newColor:hover {
+.newColorHov:hover {
     background-color: #A5B686;
 }
 
