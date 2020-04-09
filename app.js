@@ -937,8 +937,8 @@ app.post('/customerhostelbooking', async function(req, resp) {
 
 // update activity booking (request)
 app.post('/updateactivitybooking', async function(req, resp) {
-    // if valid session
-    if (validateGeneralSession(req, resp)) {
+    // if valid staff session
+    if (validateSession('staff', req, resp)) {
         // booking ID
         const bookingID = req.body.bookingid;
 
@@ -1001,8 +1001,8 @@ app.post('/updateactivitybooking', async function(req, resp) {
 
 // update community booking (request)
 app.post('/updatecommunitybooking', async function(req, resp) {
-    // if valid session
-    if (validateGeneralSession(req, resp)) {
+    // if valid staff session
+    if (validateSession('staff', req, resp)) {
         // booking ID
         const bookingID = req.body.bookingid;
 
@@ -1077,8 +1077,8 @@ app.post('/updatecommunitybooking', async function(req, resp) {
 
 // update hostel booking (request)
 app.post('/updatehostelbooking', async function(req, resp) {
-    // if valid session
-    if (validateGeneralSession(req, resp)) {
+    // if valid staff session
+    if (validateSession('staff', req, resp)) {
         // booking ID
         const bookingID = req.body.bookingid;
 
