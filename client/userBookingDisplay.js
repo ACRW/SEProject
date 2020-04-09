@@ -21,6 +21,47 @@ function addzero(num, length) {
   return (Array(length).join("0") + num).slice(-length);
 };
 
+const eraseFields = () =>{
+  // both show the 'waiting response'
+  document.getElementById("activity1default").hidden = false;
+  document.getElementById("community1default").hidden = false;
+  document.getElementById("hostel1default").hidden = false;
+  document.getElementById("activity2default").hidden = false;
+  document.getElementById("community2default").hidden = false;
+  document.getElementById("hostel2default").hidden = false;
+
+  // both hide all the 'no booking records'
+  document.getElementById("activity1NoRecord").hidden = true;
+  document.getElementById("community1NoRecord").hidden = true;
+  document.getElementById("hostel1NoRecord").hidden = true;
+  document.getElementById("activity2NoRecord").hidden = true;
+  document.getElementById("community2NoRecord").hidden = true;
+  document.getElementById("hostel2NoRecord").hidden = true;
+
+  // both clean all the content cards
+  document.getElementById("activity1").innerHTML = "";
+  document.getElementById("community1").innerHTML = "";
+  document.getElementById("hostel1").innerHTML = "";
+  document.getElementById("activity2").innerHTML = "";
+  document.getElementById("community2").innerHTML = "";
+  document.getElementById("hostel2").innerHTML = "";
+};
+
+function showNav1(){
+  // show nav 1
+  document.getElementById("navigation1").hidden = false;
+  // hide nav 2
+  document.getElementById("navigation2").hidden = true;
+}
+
+function showNav2(){
+  // show nav 2
+  document.getElementById("navigation2").hidden = false;
+  // hide nav 1
+  document.getElementById("navigation1").hidden = true;
+}
+
+
 ///// fetch infor from the database ////
 // return [firstname, lastname]
 async function getUserInfo () {
@@ -39,7 +80,6 @@ async function getUserInfo () {
   return [tempUserName[0]["fName"], tempUserName[0]["lName"]]
 }
 
-// Done
 async function getConfirmedBookings () {
   let response = await fetch('http://' + hostAddr + ":" + hostPort + '/mybookings', {
     method: "GET",
@@ -47,8 +87,24 @@ async function getConfirmedBookings () {
       "Content-Type": "application/json"
     }
   });
-  let tempBookings = await response.json();
 
+  // when no booking record
+  let temp = await response.text();
+  if (temp == '0bookings'){
+    // no booking record
+    document.getElementById("activity1default").hidden = true;
+    document.getElementById("activity1NoRecord").hidden = false;
+    document.getElementById("community1default").hidden = true;
+    document.getElementById("community1NoRecord").hidden = false;
+    document.getElementById("hostel1default").hidden = true;
+    document.getElementById("hostel1NoRecord").hidden = false;
+    return
+  }
+
+  // have booking record
+  let tempBookings = JSON.parse(temp);
+
+  let elementNum = 0;
   let flag = 1;
   for(booking of Object.assign([], tempBookings["activity"]).reverse()){ // lastest one first
     //console.log(booking)
@@ -57,6 +113,7 @@ async function getConfirmedBookings () {
     };
     let card = oneActivityCard(flag);
     document.getElementById("activity1").appendChild(card);
+    elementNum ++;
 
     // prepare time (早为小，晚为大
     startTime = new Date(booking["dateTime"]);
@@ -98,7 +155,17 @@ async function getConfirmedBookings () {
 
     flag++;
   }
+  if(elementNum > 0){
+    // more than one 
+    document.getElementById("activity1default").hidden = true;
+    document.getElementById("activity1NoRecord").hidden = true;
+  }else{
+    // less than one 
+    document.getElementById("activity1default").hidden = true;
+    document.getElementById("activity1NoRecord").hidden = false;
+  }
 
+  elementNum = 0;
   flag = 1;
   for(booking of Object.assign([], tempBookings["community"]).reverse()){
     //console.log(booking);
@@ -107,6 +174,7 @@ async function getConfirmedBookings () {
     };
     let card = oneCommunityCard(flag); 
     document.getElementById("community1").appendChild(card);
+    elementNum ++;
 
     // prepare time (早为小，晚为大
     startTime = new Date(booking["start"]);
@@ -150,7 +218,17 @@ async function getConfirmedBookings () {
 
     flag++;
   }
+  if(elementNum > 0){
+    // more than one 
+    document.getElementById("community1default").hidden = true;
+    document.getElementById("community1NoRecord").hidden = true;
+  }else{
+    // less than one 
+    document.getElementById("community1default").hidden = true;
+    document.getElementById("community1NoRecord").hidden = false;
+  }
 
+  elementNum = 0;
   flag = 1;
   for(booking of Object.assign([], tempBookings["hostel"]).reverse()){
     //console.log(booking);
@@ -159,6 +237,7 @@ async function getConfirmedBookings () {
     };
     let card = oneHostelCard(flag); 
     document.getElementById("hostel1").appendChild(card);
+    elementNum ++;
 
     // prepare time (早为小，晚为大
     startTime = new Date(booking["startDate"]);
@@ -202,8 +281,17 @@ async function getConfirmedBookings () {
 
     flag++;    
   }
-}
-// in process
+  if(elementNum > 0){
+    // more than one 
+    document.getElementById("hostel1default").hidden = true;
+    document.getElementById("hostel1NoRecord").hidden = true;
+  }else{
+    // less than one 
+    document.getElementById("hostel1default").hidden = true;
+    document.getElementById("hostel1NoRecord").hidden = false;
+  }
+};
+
 async function getBookingRequests () {
   let response = await fetch('http://' + hostAddr + ":" + hostPort + '/mybookingrequests', {
     method: "GET",
@@ -211,8 +299,24 @@ async function getBookingRequests () {
       "Content-Type": "application/json"
     }
   });
-  let tempBookings = await response.json();
 
+  // when no booking record
+  let temp = await response.text();
+  if (temp == '0bookings'){
+    // no booking record
+    document.getElementById("activity2default").hidden = true;
+    document.getElementById("activity2NoRecord").hidden = false;
+    document.getElementById("community2default").hidden = true;
+    document.getElementById("community2NoRecord").hidden = false;
+    document.getElementById("hostel2default").hidden = true;
+    document.getElementById("hostel2NoRecord").hidden = false;
+    return
+  }
+
+  // have booking record
+  let tempBookings = JSON.parse(temp);
+
+  let elementNum = 0;
   let flag = 1;
   for(booking of Object.assign([], tempBookings["activity"]).reverse()){
     //console.log(booking);
@@ -221,6 +325,7 @@ async function getBookingRequests () {
     };
     let card = twoActivityCard(flag);
     document.getElementById("activity2").appendChild(card);
+    elementNum++;
 
     // prepare time (早为小，晚为大
     startTime = new Date(booking["dateTime"]);
@@ -256,7 +361,17 @@ async function getBookingRequests () {
     
     flag++;
   }
+  if(elementNum > 0){
+    // more than one 
+    document.getElementById("activity2default").hidden = true;
+    document.getElementById("activity2NoRecord").hidden = true;
+  }else{
+    // less than one 
+    document.getElementById("activity2default").hidden = true;
+    document.getElementById("activity2NoRecord").hidden = false;
+  }
 
+  elementNum = 0;
   flag = 1;
   for(booking of Object.assign([], tempBookings["community"]).reverse()){
     //console.log(booking);
@@ -265,6 +380,7 @@ async function getBookingRequests () {
     };
     let card = twoCommunityCard(flag); 
     document.getElementById("community2").appendChild(card);
+    elementNum++;
 
     // prepare time (早为小，晚为大
     startTime = new Date(booking["start"]);
@@ -306,7 +422,17 @@ async function getBookingRequests () {
     document.getElementById("two-community-id-" +String(flag)).innerHTML = booking["requestID"];
     flag++;
   }
+  if(elementNum > 0){
+    // more than one 
+    document.getElementById("community2default").hidden = true;
+    document.getElementById("community2NoRecord").hidden = true;
+  }else{
+    // less than one 
+    document.getElementById("community2default").hidden = true;
+    document.getElementById("community2NoRecord").hidden = false;
+  }
 
+  elementNum = 0;
   flag = 1;
   for(booking of Object.assign([], tempBookings["hostel"]).reverse()){
     //console.log(booking);
@@ -315,6 +441,7 @@ async function getBookingRequests () {
     };
     let card = twoHostelCard(flag); 
     document.getElementById("hostel2").appendChild(card);
+    elementNum++;
 
     // prepare time (早为小，晚为大
     startTime = new Date(booking["startDate"]);
@@ -357,8 +484,18 @@ async function getBookingRequests () {
 
     flag++;
   }
+  if(elementNum > 0){
+    // more than one 
+    document.getElementById("hostel2default").hidden = true;
+    document.getElementById("hostel2NoRecord").hidden = true;
+  }else{
+    // less than one 
+    document.getElementById("hostel2default").hidden = true;
+    document.getElementById("hostel2NoRecord").hidden = false;
+  }
 
 }
+
 
 ///// make the card functions /////
 // booking1 activity
@@ -649,7 +786,6 @@ function oneHostelCard(number){
   card.appendChild(text);
   return card
 }
-
 // booking2 activity
 function twoActivityCard(number){
   let head = document.createElement('div');
@@ -906,6 +1042,7 @@ function twoHostelCard(number){
   return card
 }
 
+
 /////  load the page functions /////
 const updateName = async() =>{
   const names = await getUserInfo();
@@ -916,18 +1053,25 @@ const updateName = async() =>{
 ////// Action /////
 // load the page
 //  update
-updateName();
-
+updateName(); // username
 getConfirmedBookings();
+// show the navigation1
+showNav1();
 
 window.onload = function() {
   // paging buttons
   booking1.addEventListener("click",function(){
+    eraseFields();
     getConfirmedBookings();
+    // show the navigation1
+    showNav1();
   });
 
   booking2.addEventListener("click",function(){
+    eraseFields();
     getBookingRequests();
+    // show the navigation2
+    showNav2();
   });
 };
 
