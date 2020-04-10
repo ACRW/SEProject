@@ -15,7 +15,7 @@ async function createCards () { // Get the card information and create them
       }
     });
   let tempActs = await response.json();
-  
+
   for (activity of tempActs) {
     actCards[activity["id"]] = new ActivityCard(activity);
     activities[activity["id"]] = activity;
@@ -26,7 +26,7 @@ function ActivityCard (activity) { // Activity card class, each instantiated cla
   let title = document.createElement('h4');
   title.className="card-title";
   title.innerHTML = activity["name"];
-  
+
   let desc = document.createElement('p');
   desc.className = "card-text";
   desc.innerHTML = activity["description"];
@@ -38,26 +38,26 @@ function ActivityCard (activity) { // Activity card class, each instantiated cla
   button.onclick= function(){modifyPopUp();};//function () {console.log("test");};
   button.setAttribute("data-toggle", "modal");
   button.setAttribute("data-target", "#popUp");
-  
+
   let body = document.createElement('div');
   body.className = "card-body";
   body.appendChild(title);
   body.appendChild(desc);
   body.appendChild(button);
-  
+
   let img = document.createElement('img');
   img.className = "card-img-top";
   if (!activity["imagePath"]) img.src = "webimage/default.jpg"; // Select a default image if there is no image.
   else img.src = activity["imagePath"];
-  
+
   let card = document.createElement('div');
   card.className = "card";
   card.appendChild(img);
   card.appendChild(body);
   card.style.display = "display: inline-block";
-  
+
   document.getElementById("activityCards").appendChild(card);
-  
+
   function modifyPopUp() {
     document.getElementById("popUpTitle").innerHTML = activity["name"];
     document.getElementById("popUpDesc").innerHTML = activity["description"];
@@ -74,7 +74,7 @@ function ActivityCard (activity) { // Activity card class, each instantiated cla
 function monthCalender(calTable, monthTitle, objName) {
   const dateRows = 6; // This is the number of rows that dates appear in, it does not include the header
   const selCol = "#CCCCFF";
-  
+
   let body = calTable.getElementsByTagName('tbody')[0];
   let head = calTable.getElementsByTagName('thead')[0];
   let cellColor = head.rows[0].cells[0].getAttribute("background-color");
@@ -87,7 +87,7 @@ function monthCalender(calTable, monthTitle, objName) {
   let booking = {
     "date": -1
   };
-  
+
   let genCells = function() {
     for (let y = 0; y < dateRows; y++) {
       let row = document.createElement('tr');
@@ -99,7 +99,7 @@ function monthCalender(calTable, monthTitle, objName) {
       body.appendChild(row);
     }
   };
-  
+
   let popCells = function() {
     monthTitle.innerHTML = monthNames[soMonth.getMonth()] + " " + String(soMonth.getYear() + 1900);
     for (let y = 0; y < dateRows; y++) {
@@ -108,10 +108,10 @@ function monthCalender(calTable, monthTitle, objName) {
         let tempDate = new Date();
         tempDate.setTime(soMonth.getTime());
         tempDate.setDate(tempDate.getDate() + datDif);
-        
+
         let cell = body.rows[y].cells[x];
         cell.innerHTML = "<p>" + tempDate.getDate() + "<\p>";
-        
+
         if (tempDate < today) {
           cell.style.backgroundColor = outRangeColor;
         } else if (booking["date"] != -1 && tempDate.getTime() === booking["date"].getTime()) { // Selects the cell that has been booked
@@ -125,7 +125,7 @@ function monthCalender(calTable, monthTitle, objName) {
       }
     }
   };
-  
+
   let clearSel = function() {
     for (let y = 0; y < dateRows; y++) {
       for (let x = 0; x < 7; x++) {
@@ -138,26 +138,26 @@ function monthCalender(calTable, monthTitle, objName) {
       }
     }
   };
-  
+
   this.getBookingDate = function () {
     return booking["date"];
   };
-  
+
   this.iniatiate = function () {
     genCells();
     popCells();
   };
-  
+
   this.prev = function () {
     soMonth.setMonth(soMonth.getMonth() - 1);
     popCells();
   };
-  
+
   this.next = function () {
     soMonth.setMonth(soMonth.getMonth() + 1);
     popCells();
   };
-  
+
   this.reset = function() {
     booking = {
     "date": -1
@@ -167,15 +167,15 @@ function monthCalender(calTable, monthTitle, objName) {
     soMonth.setHours(0, 0, 0, 0);
     popCells();
   };
-  
+
   this.bookDate = function (x, y) {
     let datDif = (y * 7) + x - soMonth.getDay();
     let tempDate = new Date();
     tempDate.setTime(soMonth.getTime());
     tempDate.setDate(tempDate.getDate() + datDif); // Set tempdate to be the date of the selection.
-    
+
     if (tempDate < today) return; // Return if old date;
-    
+
     let tarCell = body.rows[y].cells[x];
     clearSel();
     booking["date"] = tempDate;
@@ -187,7 +187,7 @@ function monthCalender(calTable, monthTitle, objName) {
 function groupSizeChange(size) {
   groupSize = size;
   document.getElementById("numOfPeople").innerHTML = groupSize;
-  document.getElementById("totalPrice").innerHTML = "£" + groupSize * activity["price"]; 
+  document.getElementById("totalPrice").innerHTML = "£" + groupSize * activity["price"];
 };
 
 async function submit() {
@@ -214,11 +214,40 @@ async function submit() {
   }
 };
 
+window.addEventListener('DOMContentLoaded', async function() {
+    // make call to API
+    let response = await fetch('/currentuser',
+    {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        }
+    });
+
+    // if not signed in
+    if (response.status == 403) {
+        // alert user
+        alert('Oh hello there! We\'ve noticed you\'re not currently signed in, so do close this message to be redirected to the Customer Sign In page.');
+        // redirect to sign in page
+        window.location.pathname = '/customersignin.html';
+
+    } else {
+        // parse response body
+        const body = JSON.parse(await response.text());
+
+        // if signed in as staff member
+        if (body.type == 'staff') {
+            // alert user
+            alert('Oh hello there! We\'ve noticed a staff member is currently signed in on your computer, so do ask them to sign out, then close this message to be redirected to the Customer Sign In page.');
+            // redirect to sign in page
+            window.location.pathname = '/customersignin.html';
+        }
+    }
+});
+
 createCards();
 calElement = document.getElementById("bookingCalender");
 cal = new monthCalender(calElement, document.getElementById("topDate"), "cal");
 cal.iniatiate();
 document.getElementById("left").setAttribute("onclick", "cal.prev()");
 document.getElementById("right").setAttribute("onclick", "cal.next()");
-
-

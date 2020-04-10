@@ -13,7 +13,7 @@ async function createCards () { // Get the card information and create them
       }
     });
   let tempRooms = await response.json();
-  /* what inside the json file 
+  /* what inside the json file
   {"hostel":[
     {"id":0,"roomNumber":"1","noOfPeople":4,"pricePerNight":"100","nights":"1111100","imagePath":"webimage/room1.jpg"},
     {"id":1,"roomNumber":"2","noOfPeople":5,"pricePerNight":"120","nights":"1111111","imagePath":"webimage/room2.jpg"},
@@ -21,7 +21,7 @@ async function createCards () { // Get the card information and create them
     {"id":3,"roomNumber":"4","noOfPeople":6,"pricePerNight":"150","nights":"1111100","imagePath":"webimage/room2.jpg"},
     {"id":4,"roomNumber":"5","noOfPeople":3,"pricePerNight":"80","nights":"1111111","imagePath":"webimage/room2.jpg"}]}
   */
-  
+
   for (room of tempRooms["hostel"]) { // for each {..}
     roomCards[room["id"]] = new RoomCard(room); //
     rooms[room["id"]] = room;
@@ -30,9 +30,9 @@ async function createCards () { // Get the card information and create them
 
 function RoomCard (room) { // room card class, each instantiated/具现化 class refers to a single card on the document.
   let title = document.createElement('h4'); // <h4></h4>
-  title.className="card-title"; 
+  title.className="card-title";
   title.innerHTML = "Room " + String(room["roomNumber"]); //<h4 className="card-title">Room1</h4>
-  
+
   /*let desc = document.createElement('p');
   desc.className = "card-text";
   desc.innerHTML = room["description"];*/
@@ -45,23 +45,23 @@ function RoomCard (room) { // room card class, each instantiated/具现化 class
   // these 2 are the core
   button.setAttribute("data-toggle", "modal");
   button.setAttribute("data-target", "#popUp"); // # point to the id
-  
+
   let body = document.createElement('div');
   body.className = "card-body";
   body.appendChild(title);
   //body.appendChild(desc);
   body.appendChild(button);
-  
+
   let img = document.createElement('img');
   img.className = "card-img-top";
   img.src = room["imagePath"];
-  
+
   let card = document.createElement('div');
   card.className = "card";
   card.appendChild(img);
   card.appendChild(body);
   card.style.display = "display: inline-block";
-  
+
   document.getElementById("roomCards").appendChild(card);
 }
 
@@ -70,7 +70,39 @@ function modifyPopUp(id) {
   //document.getElementById("popUpImg").src = room["imagePath"];
 }
 
-createCards();
+window.addEventListener('DOMContentLoaded', async function() {
+    // make call to API
+    let response = await fetch('/currentuser',
+    {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        }
+    });
+
+    // if not signed in
+    if (response.status == 403) {
+        // alert user
+        alert('Oh hello there! We\'ve noticed you\'re not currently signed in, so do close this message to be redirected to the Customer Sign In page.');
+        // redirect to sign in page
+        window.location.pathname = '/customersignin.html';
+
+    } else {
+        // parse response body
+        const body = JSON.parse(await response.text());
+
+        // if signed in as staff member
+        if (body.type == 'staff') {
+            // alert user
+            alert('Oh hello there! We\'ve noticed a staff member is currently signed in on your computer, so do ask them to sign out, then close this message to be redirected to the Customer Sign In page.');
+            // redirect to sign in page
+            window.location.pathname = '/customersignin.html';
+        }
+    }
+
+    createCards();
+
+});
 
 let flag = true;
 ////// Selecting page elements //////
@@ -80,9 +112,9 @@ const room3 = document.getElementById("room3");
 const room4 = document.getElementById("room4");
 const room5 = document.getElementById("room5");
 
-const responseField = document.getElementById("responseField");// error message place 
+const responseField = document.getElementById("responseField");// error message place
 
-const maxPeople = document.getElementById("maxPeople"); // input field 
+const maxPeople = document.getElementById("maxPeople"); // input field
 
 const wholeCalender = document.getElementById("cldFrame"); // whole calender
 const startDateCalender = document.getElementById("startDateCalender"); // start date of the calander
@@ -98,7 +130,6 @@ const durationTable=document.getElementById('duration');// table content 6
 const totalPrice = document.getElementById('totalPrice'); // table content 7
 
 const submitButton = document.getElementById("submitButton"); // the submittion button
-
 
 ////// All functions //////
 
@@ -122,7 +153,7 @@ function getWeekday(year,month){
 // addzero(11,4) returns 0011
 // addzero(4,11) returns 00000000004
 // addzero(123445677, 4) returns 5677
-function addzero(num, length) {    
+function addzero(num, length) {
   return (Array(length).join("0") + num).slice(-length);
 };
 
@@ -141,7 +172,7 @@ const getWeekInfo = async(roomid) =>{
 };
 
 // year= yyyy, month* = 0-11
-// return a proper calander. the already booked date colored grey 
+// return a proper calander. the already booked date colored grey
 async function roomRented(year,month,roomid){
   let i;
   let response = await fetch('http://' + hostAddr + ":" + hostPort + '/roomavailability?type=hostel&id=' + String(roomid - 1), {
@@ -168,7 +199,7 @@ async function roomRented(year,month,roomid){
     startlist.push(start.substring(0,10));// 2020-02-23
     endlist.push(end.substring(0,10));//2020-03-17
   }
-  
+
 
   for(i=0;i<startlist.length;i++) { // for each pair of date
     /*key is, we only need to calculte the not available day of the month*/
@@ -203,7 +234,7 @@ async function roomRented(year,month,roomid){
           cell.bgColor='gray';
         }
       }else{
-        //do nothing 
+        //do nothing
       };
     };
   };
@@ -213,7 +244,7 @@ async function roomRented(year,month,roomid){
 //calendar basic display
 // set calander，grey pastdays，roomstates？？
 // year= yyyy, month* = 0-11
-// firstDay =0-6(which weekday is first day in this month)0 =sun,6=sat| 
+// firstDay =0-6(which weekday is first day in this month)0 =sun,6=sat|
 // days=28~31 as number of days in this month
 // roomid = roomid stored in the database
 function showCld(year, month, firstDay, days, roomid,weekInfo){
@@ -228,8 +259,8 @@ function showCld(year, month, firstDay, days, roomid,weekInfo){
   //add current year and month to the top
   var topdateHtml = year  + '-'+ addzero(month,2);
   var topDate = document.getElementById('topDate');
-  topDate.innerHTML = topdateHtml;    
-  
+  topDate.innerHTML = topdateHtml;
+
   // add days html
   // a new row
   var tbodyHtml = '<tr>';
@@ -237,36 +268,36 @@ function showCld(year, month, firstDay, days, roomid,weekInfo){
   for(i=0; i<firstDay; i++){//fill before 1st of the month
       tbodyHtml += "<td></td>";
   }
- 
+
   var changLine = firstDay;
 
   for(i=1; i<=days; i++){
     // set class for current day and other days.
     if(year == nowDate.getFullYear() && month == nowDate.getMonth()+1 && i == today) {
       tagClass = "curDate"; // current date
-    } 
-    else{ 
+    }
+    else{
       tagClass = "isDate"; // other date, set class for future reference
-    }  
+    }
     //fill in the table, add class and id to each cell
     const fixedmonth=addzero(month,2)
     const fixedday=addzero(i,2)
     const idvalue=year+'-'+fixedmonth+'-'+fixedday// yyyy-mm-dd
-    
+
     tbodyHtml += "<td class=" + tagClass + " id="+idvalue +">" + i + "</td>";
     changLine = (changLine+1)%7;
 
     //whether change the line
     if(changLine == 0 && i != days){
         tbodyHtml += "</tr><tr>";
-    } 
+    }
   }
 
   if(changLine!=0){// after all days, fill the blank place
       for (i=changLine; i<7; i++) {
           tbodyHtml += "<td></td>";
       }
-  }   
+  }
 
   tbodyHtml +="</tr>";// end
   var tbody = document.getElementById('tbody');
@@ -312,7 +343,7 @@ function showCld(year, month, firstDay, days, roomid,weekInfo){
       };
     }
   }
-  
+
   // grey those days already be rented
   roomRented(year,month-1,roomid);
 }
@@ -323,7 +354,7 @@ async function nextMonth(roomid){
   var listTemp = topStr.match(pattern); //['2019', '02']
   var year = Number(listTemp[0]);
   var month = Number(listTemp[1]); // 02 -> 2
-  
+
   var nextMonth = month+1;
   if(nextMonth > 12){
       nextMonth = 1;
@@ -375,7 +406,7 @@ async function preMonth(roomid){
 }
 
 // update the date inside the calender and the table
-async function infor(e){ 
+async function infor(e){
   let color=e.target.bgColor;
   if (color=='gray'){
     alert('This day can not be book');
@@ -407,12 +438,12 @@ async function infor(e){
     let day2 = Number(idStart[2]);
     let startDate = new Date(year2,month2,day2); //start date
 
-    
+
     if(userDate>startDate){
       // put in enddate
       document.getElementById('endDateCalender').innerHTML=id;
       document.getElementById('endDayTable').innerHTML=id;
-      // calculte duration 
+      // calculte duration
       let duration = await calculateDuration(startDate,userDate);//start and end date
       if(duration=="Error"){
         alert("Error calculating duration");
@@ -458,14 +489,14 @@ async function infor(e){
     checkPrice();
     return;
   };
-  
+
 }
 
 //start and end date
 const calculateDuration=async(startDate,endDate)=>{
   // number of days in middle
-  let Difference_In_Time = endDate.getTime() - startDate.getTime();   
-  // To calculate the no. of days between two dates 
+  let Difference_In_Time = endDate.getTime() - startDate.getTime();
+  // To calculate the no. of days between two dates
   let Difference_In_Days = parseInt(Difference_In_Time / (1000 * 3600 * 24)+0.5);// time zone changes
   // get roomid
   const roomid = Number(roomNumTable.innerHTML)-1;
@@ -503,7 +534,7 @@ const calculateDuration=async(startDate,endDate)=>{
       //aug32 automatically becomes sep1
     }
   }
-  
+
 
 
 
@@ -575,7 +606,7 @@ const checkPrice =()=>{
 };
 
 /// load the page functions ///
-// erase the whole form 
+// erase the whole form
 const eraseFields = () =>{
   // error message place clean up
   responseField.innerHTML="";
@@ -600,7 +631,7 @@ const eraseFields = () =>{
   submitButton.hidden=true;
 }
 
-// update the whole form, room number now uses the actual id value, so must add one upon recieving it. 
+// update the whole form, room number now uses the actual id value, so must add one upon recieving it.
 const updateFields = async(roomNumber) =>{
     roomNumber += 1;
     const rooms = await getHostel();
@@ -609,7 +640,7 @@ const updateFields = async(roomNumber) =>{
     }else{
       // erase the page
       eraseFields();
-      
+
       //1. Number of people:
       //  change the max in the number of people label
       maxPeople.max = rooms[roomNumber-1]['noOfPeople'];
@@ -647,7 +678,7 @@ const updateFields = async(roomNumber) =>{
       // update payment table:Room number & Price
       roomNumTable.innerHTML = rooms[roomNumber-1]['roomNumber'];
       pricePerNight.innerHTML = rooms[roomNumber-1]['pricePerNight'];
-      
+
     }
 
 };
@@ -678,7 +709,7 @@ getHostel = async() => {
       //responseField.innerHTML = "<p>Sorry, hostel room Not available. </p><p>Response code =  "+ response.code +"</p>";
       return "Error"
       //throw new Error('Error getting hostel.' + response.code);
-    }catch(error){// did not receive anything 
+    }catch(error){// did not receive anything
       //alert ('Error: ' + error + ' Possible solution: check your internet connection');
       return "Error"
     }

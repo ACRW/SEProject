@@ -43,7 +43,7 @@ function ticketCard(ticket, ticketList, tarEvent, parentEventCard) { // Constuct
   let quantCounter;
   let rowElement; // HTML row element to which to add the different values;
   let rowDisplayed = false; // Keeps track of whether the row has been added to the table;
-  
+
   let createRow = function() {
     rowElement = document.createElement('tr');
     for (let i = 0; i < 5; i++) {
@@ -53,7 +53,7 @@ function ticketCard(ticket, ticketList, tarEvent, parentEventCard) { // Constuct
     rowElement.cells[1].innerHTML = tarEvent["datetime"].slice(0, 10); // Thoughts in the future that you could have each ticket with its own date?
     rowElement.cells[2].innerHTML = "£ " + ticket["ticketPrice"];
   }
-  
+
   let modifyRow = function() {
     if (!rowDisplayed) {
       table.appendChild(rowElement);
@@ -62,7 +62,7 @@ function ticketCard(ticket, ticketList, tarEvent, parentEventCard) { // Constuct
     rowElement.cells[3].innerHTML = quantity;
     rowElement.cells[4].innerHTML = "£ " + (quantity * ticket["ticketPrice"]);
   };
-  
+
   let changeQuantity = function(changeValue) {
     quantity += changeValue;
     if (quantity < 0) quantity = 0;
@@ -75,31 +75,31 @@ function ticketCard(ticket, ticketList, tarEvent, parentEventCard) { // Constuct
     cardTitle = document.createElement('div'); // Should call it card header really
     cardTitle.className = "card-header";
     cardTitle.innerHTML = "<h5>" + ticket["ticketType"] + "</h5>";
-    
+
     cardFooter = document.createElement('div');
     cardFooter.className = "card-footer";
     cardFooter.innerHTML = "<h5> £" + (Math.round(ticket["ticketPrice"] * 100) / 100).toFixed(2); + "</h5>";
-    
+
     let cardDate = document.createElement('div');
     cardDate.className = "card-text";
-    cardDate.innerHTML = "<h5>" 
+    cardDate.innerHTML = "<h5>"
       + dayNames[eventDate.getDay()] + " "
-      + eventDate.getDate() + "<sup>" + dateSuffix(eventDate.getDate()) + "</sup> " 
-      + monthNames[eventDate.getMonth()] + " " 
-      + (eventDate.getYear() + 1900) 
+      + eventDate.getDate() + "<sup>" + dateSuffix(eventDate.getDate()) + "</sup> "
+      + monthNames[eventDate.getMonth()] + " "
+      + (eventDate.getYear() + 1900)
       + "</h5>";
-    
+
     let addQuantBut = document.createElement('button');
     addQuantBut.setAttribute("type", "button");
     addQuantBut.className = "btn btn-secondary unselectable";
     addQuantBut.onclick = function(){changeQuantity(1);};
     addQuantBut.innerHTML = "+";
     addQuantBut.style = "width: 40px; font-size: 1.2rem;";
-    
+
     let subQuantBut = addQuantBut.cloneNode(false);
     subQuantBut.onclick = function(){changeQuantity(-1);};
     subQuantBut.innerHTML = "-";
-    
+
     quantCounter = document.createElement('p');
     quantCounter.innerHTML = quantity;
     quantCounter.style.margin="10px";
@@ -121,15 +121,15 @@ function ticketCard(ticket, ticketList, tarEvent, parentEventCard) { // Constuct
     quantRow.appendChild(quantCol);
     quantRow.appendChild(addCol);
     cardFooter.appendChild(quantRow);
-    
+
     cardBody = document.createElement('div');
     cardBody.className = "card-body";
     cardBody.appendChild(cardDate);
     cardBody.style.backgroundColor = greyCol;
     cardFooter.style.backgroundColor = greyCol;
-   
+
     newCard = document.createElement('div');
-    
+
     newCard.className = "card m-3 newColorHov unselectable";
     newCard.style.width="10rem";
     newCard.appendChild(cardTitle);
@@ -137,39 +137,39 @@ function ticketCard(ticket, ticketList, tarEvent, parentEventCard) { // Constuct
     newCard.appendChild(cardFooter);
     cardElement = newCard;
   };
-  
+
   this.redisplay = function() {
     if (rowDisplayed) { // Only if it has been previously displayed
       rowDisplayed = false;
       modifyRow();
     }
   };
-  
+
   this.getCost = function () {
     return quantity * ticket["ticketPrice"];
   };
-  
+
   this.getQuantity = function() {
     return quantity;
   };
-  
+
   this.unselect = function () { // Used for turning off
     selected = false;
     cardStatus.innerHTML = "";
   };
-  
+
   this.isSelected = function () {
     return selected;
   };
-  
+
   this.displayCard = function () {
     dateCards.appendChild(cardElement);
   };
-  
+
   this.getTicket = function() {
     return ticket;
   };
-  
+
   createCard();
   createRow();
 }
@@ -179,12 +179,12 @@ function eventCard (tarEvent) { // event card class, each instantiated class ref
   let imgSrc = "";
   let tickets = []; // List of ticket types fetched from server
   let totalCost = 0;
-  
+
   let createCard = function() {
     let title = document.createElement('h4');
     title.className="card-title";
     title.innerHTML = tarEvent["name"];
-    
+
     let desc = document.createElement('p');
     desc.className = "card-text";
     desc.innerHTML = tarEvent["description"];
@@ -196,7 +196,7 @@ function eventCard (tarEvent) { // event card class, each instantiated class ref
     button.onclick= function(){modifyPopUp();};//function () {console.log("test");};
     button.setAttribute("data-toggle", "modal");
     button.setAttribute("data-target", "#popUp");
-    
+
 
     let body = document.createElement('div');
     body.className = "card-body";
@@ -206,31 +206,31 @@ function eventCard (tarEvent) { // event card class, each instantiated class ref
     let bodyCol = document.createElement('div');
     bodyCol.className = "col-auto";
     bodyCol.appendChild(body);
-    
+
     let imgBox = document.createElement('div');
     imgBox.className="col-md-4";
-    
+
     let img = document.createElement('img');
     img.className = "card-img-top";
     if (!tarEvent["imagepath"]) imgSrc = "webimage/default.jpg"; // Select a default image if there is no image.
     else imgSrc = tarEvent["imagepath"];
     img.src = imgSrc;
     imgBox.appendChild(img);
-    
+
     let cardRow = document.createElement('div');
     cardRow.className = "row no-gutter";
     cardRow.appendChild(imgBox);
     cardRow.appendChild(bodyCol);
-    
+
     let card = document.createElement('div');
     card.appendChild(cardRow);
     card.className = "card mb-4";
 
     card.style.display = "display: inline-block";
-    
+
     document.getElementById("eventCards").appendChild(card);
   }
-  
+
   this.updateTotal = function() {
     totalCost = 0;
     for (ticket of ticketCardList) {
@@ -238,7 +238,7 @@ function eventCard (tarEvent) { // event card class, each instantiated class ref
     }
     totalCostElement.innerHTML = "Total Cost: £" + (Math.round(totalCost * 100) / 100).toFixed(2);
   };
-  
+
   async function modifyPopUp() { // Modify the modal popup
     curEvent = eventCards[tarEvent["id"]];
 
@@ -254,17 +254,17 @@ function eventCard (tarEvent) { // event card class, each instantiated class ref
     for (let i = table.rows.length - 1; i > 0; i--) {
       table.deleteRow(i);
     }
-    
+
     // display date cards
     dateCards.innerHTML = ""; // Remove previous stuff
     for (ticket of ticketCardList) {
       ticket.displayCard();
       ticket.redisplay();
     }
-    
+
     eventCards[tarEvent["id"]].updateTotal();
   }
-  
+
   this.getTickets = function() {
     let finalTickets = [];
     for (ticket of ticketCardList) {
@@ -275,15 +275,15 @@ function eventCard (tarEvent) { // event card class, each instantiated class ref
     }
     return finalTickets;
   }
-  
+
   this.getID = function () {
     return tarEvent["id"];
   };
-  
+
   this.getTotalCost = function() {
     return totalCost;
   };
-  
+
   createCard();
 }
 
@@ -299,7 +299,7 @@ function dateSuffix(day) {
 function groupSizeChange(size) {
   groupSize = size;
   document.getElementById("numOfPeople").innerHTML = groupSize;
-  document.getElementById("totalPrice").innerHTML = "£" + groupSize * curEvent["price"]; 
+  document.getElementById("totalPrice").innerHTML = "£" + groupSize * curEvent["price"];
 };
 
 async function submit() {
@@ -312,7 +312,7 @@ async function submit() {
     alert("Please select atleast one ticket");
     return;
   }
-  
+
   let response = await fetch('http://' + hostAddr + ":" + hostPort + '/eventbooking', {
       method: "POST",
       headers: {
@@ -329,6 +329,37 @@ async function submit() {
     alert("Error making booking.");
   }
 };
+
+window.addEventListener('DOMContentLoaded', async function() {
+    // make call to API
+    let response = await fetch('/currentuser',
+    {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        }
+    });
+
+    // if not signed in
+    if (response.status == 403) {
+        // alert user
+        alert('Oh hello there! We\'ve noticed you\'re not currently signed in, so do close this message to be redirected to the Customer Sign In page.');
+        // redirect to sign in page
+        window.location.pathname = '/customersignin.html';
+
+    } else {
+        // parse response body
+        const body = JSON.parse(await response.text());
+
+        // if signed in as staff member
+        if (body.type == 'staff') {
+            // alert user
+            alert('Oh hello there! We\'ve noticed a staff member is currently signed in on your computer, so do ask them to sign out, then close this message to be redirected to the Customer Sign In page.');
+            // redirect to sign in page
+            window.location.pathname = '/customersignin.html';
+        }
+    }
+});
 
 createCards();
 
@@ -359,7 +390,7 @@ getevent = async() => {
     if(response.ok){
       console.log('test')
       if(response.body === '0matches' || response.body === '0database'){
-        // get element do the replacement 
+        // get element do the replacement
         responseField.innerHTML = "<p>Sorry, No event available.</p><p>Please wait for release.</p>";
         paymentButton.disable = true;
         paymentTable.style.display = "none";
@@ -391,13 +422,13 @@ const renderResponse = (res) => {
     let structuredRes = JSON.stringify(res).replace(/,/g, ", \n");
     structuredRes = `<pre>${structuredRes}</pre>`;
     responseField.innerHTML = `${structuredRes}`;
-    
+
 
     // get the number of event and display the right picture in right place
     const eventNumber = res.id.length;
     // get description and display on screen
     let description = res.description;
-    // update the payment table 
+    // update the payment table
 
   }
 }
@@ -442,4 +473,3 @@ function showBookInfo() {
     bookInfo.hidden = true;
   }
 }*/
-

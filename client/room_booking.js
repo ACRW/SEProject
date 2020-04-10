@@ -32,7 +32,39 @@ async function updateRooms() {
   }
 }
 
-updateRooms();
+window.addEventListener('DOMContentLoaded', async function() {
+    // make call to API
+    let response = await fetch('/currentuser',
+    {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        }
+    });
+
+    // if not signed in
+    if (response.status == 403) {
+        // alert user
+        alert('Oh hello there! We\'ve noticed you\'re not currently signed in, so do close this message to be redirected to the Customer Sign In page.');
+        // redirect to sign in page
+        window.location.pathname = '/customersignin.html';
+
+    } else {
+        // parse response body
+        const body = JSON.parse(await response.text());
+
+        // if signed in as staff member
+        if (body.type == 'staff') {
+            // alert user
+            alert('Oh hello there! We\'ve noticed a staff member is currently signed in on your computer, so do ask them to sign out, then close this message to be redirected to the Customer Sign In page.');
+            // redirect to sign in page
+            window.location.pathname = '/customersignin.html';
+        }
+    }
+
+    updateRooms();
+});
+
 
 function Calender () { // Calender constructor/class
   const cellColor = "#F2F2F2";
@@ -41,7 +73,7 @@ function Calender () { // Calender constructor/class
   const oldColorOdd = "#EEEEEE";
   const snapHeight = 25; // Height of calender rows
   const cellHeight = 50;
-  
+
   let targetMon = new Date(); // Date of the monday of the week being looked at, date initilizes as current date
   let targetSun = new Date(); // Date of the sunday of the week being looked at (end of week)
   let prevBut = document.getElementById("prevBut");
@@ -64,7 +96,7 @@ function Calender () { // Calender constructor/class
     "bookingLength": 60,
     "price": -1
   }; // Bookings added by user.
-  
+
   // Set up everything
   peekElement.className = "peekGraphic newColor";
   peekElement.style.width = String(tableDims.width * 0.11) + "px"
@@ -83,7 +115,7 @@ function Calender () { // Calender constructor/class
 
   targetSun.setDate(targetMon.getDate() + 6); // Sets the sunday of the week (conveniant to have, also, actually sets the next monday to prevent issues with comparisons)
   firstSun.setTime(targetSun.getTime());
-  
+
   let displayDates = async function() { // Displays/updates the dates above the calender
     let tempDate = new Date(targetMon);
     tempDate.setDate(tempDate.getDate() + 6);
@@ -103,13 +135,13 @@ function Calender () { // Calender constructor/class
         target.removeChild(target.firstChild);
       }
     }
-    
+
     eTable.rows[0].cells[1].appendChild(peekElement); // Redisplay booking peek
   }
-  
+
   let hideOldColumns = async function () { // Greys out columns in the past
     for (let i = 1; i < table.rows[0].cells.length; i++) {
-      let tarDayDate = new Date(); // The ith day of the week from monday. 
+      let tarDayDate = new Date(); // The ith day of the week from monday.
       tarDayDate.setTime(targetMon.getTime());
       tarDayDate.setDate(tarDayDate.getDate() + i);
       if (tarDayDate < today){
@@ -146,28 +178,28 @@ function Calender () { // Calender constructor/class
         bookingGraphic.style.top = String(((bookings[i]["startTime"].getHours() - 9) * cellHeight) + cellHeight) + "px";
         bookingGraphic.style.height = String(bookings[i]["bookingLength"] * cellHeight) + "px";
         bookings[i]["element"] = bookingGraphic;
-        bookings[i]["element"].innerHTML = "<p>Booked <br>" + 
-          String(bookings[i]["startTime"].getHours()).padStart(2, '0') + ":" + 
-          String(bookings[i]["startTime"].getMinutes()).padStart(2, '0') + " - " + 
-          String(bookings[i]["endTime"].getHours()).padStart(2, '0') + ":" + 
+        bookings[i]["element"].innerHTML = "<p>Booked <br>" +
+          String(bookings[i]["startTime"].getHours()).padStart(2, '0') + ":" +
+          String(bookings[i]["startTime"].getMinutes()).padStart(2, '0') + " - " +
+          String(bookings[i]["endTime"].getHours()).padStart(2, '0') + ":" +
           String(bookings[i]["endTime"].getMinutes()).padStart(2, '0') + "</p>";
       }
       startCell.appendChild(bookings[i]["element"]);
     }
     if (userBooking["placed"]) bookings.pop(); // DOnt want to have a user booking get lost in the list of bookings.
   }
-  
+
   let hidePrev = async function() { // Hides the previous button if on the current week.
     if (targetMon < firstSun) {
       prevBut.style.visibility = "hidden";
       thisWeek = true;
-      
+
     } else {
       prevBut.style.visibility = "visible";
       thisWeek = false;
     }
   }
-  
+
   let updPayTable = async function() {
     if (curRoom != "-1") {
       if (userBooking["placed"]) {
@@ -181,7 +213,7 @@ function Calender () { // Calender constructor/class
       }
     }
   }
-  
+
   let getBookings = async function(roomID) { // Gets the bookings and formats them nicely
     if (roomID == -1) {
       return;
@@ -209,12 +241,12 @@ function Calender () { // Calender constructor/class
       });
     }
   }
-  
+
   let unplaceBooking = async function () {
     userBooking["placed"] = false;
     updPayTable(); // update the pay table to reflect that the booking is no long valid in the context
   }
-  
+
   this.changeRoom = async function () { // Called when the room is changed
     unplaceBooking();
     tableDims = table.getBoundingClientRect();
@@ -227,18 +259,18 @@ function Calender () { // Calender constructor/class
       document.getElementById("roomDesc").innerHTML = "";
     }
   }
-  
+
   this.leaveMouse = function () {
     //peekElement.style.visibility = "hidden";
   }
-  
+
   this.mouseEnter = function () {
     peekElement.style.visibility = "visible";
   }
 
   this.bookingPeek = async function (e) { // Displays a potential booking over where the mouse hovers.
     tableDims = table.getBoundingClientRect();
-    colWidth = tableDims.width * 0.13; 
+    colWidth = tableDims.width * 0.13;
     let calX = tableDims.left;
     let calY = tableDims.top; // Distance of top left corner of calender from the top left corner of the browser.
     let leftCol = eTable.rows[0].cells[0].offsetWidth + calX; // pos of left column
@@ -253,7 +285,7 @@ function Calender () { // Calender constructor/class
       peekElement.style.left = String((curColumn * colWidth)) + "px";
     }
   }
-  
+
   this.placeBooking = async function (e) {
     if (curRoom == -1) {
       alert("Please select a room first. ")
@@ -262,14 +294,14 @@ function Calender () { // Calender constructor/class
     let calX = tableDims.left;
     let calY = tableDims.top;
     let leftCol = eTable.rows[0].cells[0].offsetWidth + calX; // pos of left column
-    let topRow = table.rows[0].offsetHeight + calY; // pos of top 
+    let topRow = table.rows[0].offsetHeight + calY; // pos of top
     if (e.clientX > leftCol && e.clientY > topRow) {
       let curRow = Math.floor((e.clientY - topRow) / snapHeight);
       let lowestRow = (table.rows.length - 1 - userBooking["bookingLength"]/60) * cellHeight/snapHeight;
       let endTime = new Date();
       let curColumn = Math.floor((e.clientX - leftCol) / colWidth);
       let selectedDate = new Date(targetMon);
-      
+
       curRow = Math.min(lowestRow, curRow); // Prevents going below the lowest row, but still allows element to be placed when mouse below it.
       selectedDate.setDate(targetMon.getDate() + curColumn); // Calculate the date they the thing starts
       selectedDate.setHours(9 + Math.floor(curRow / (cellHeight/snapHeight)));
@@ -280,7 +312,7 @@ function Calender () { // Calender constructor/class
       }
       endTime.setTime(selectedDate.getTime()); // Calculate dat ethat the thing ends
       endTime.setMinutes(endTime.getMinutes() + parseInt(userBooking["bookingLength"]));
-      
+
       // Check user hasnt booked during another booking
       for (booking of bookings) {
         if (selectedDate < booking["startTime"] && endTime > booking["startTime"]
@@ -289,11 +321,11 @@ function Calender () { // Calender constructor/class
           return;
         }
       }
-      
+
       if (userBooking["element"].parentNode) {
-        userBooking["element"].parentNode.removeChild(userBooking["element"]); 
+        userBooking["element"].parentNode.removeChild(userBooking["element"]);
       }
-      
+
       userBooking["startTime"] = selectedDate;
       userBooking["element"].style.top = String(curRow * snapHeight + cellHeight) + "px";
       userBooking["endTime"] = endTime;
@@ -301,12 +333,12 @@ function Calender () { // Calender constructor/class
       userBooking["placed"] = true;
       userBooking["price"] = rooms[curRoom]["pricePerHour"] * userBooking["bookingLength"]/60
     }
-    
+
     // update payment table:
     updPayTable();
 
   }
-  
+
   this.submitBooking = async function () {
     if (curRoom == -1) {
       alert("Please select a room. ");
@@ -325,7 +357,7 @@ function Calender () { // Calender constructor/class
       + "&end=" + Math.floor(userBooking["endTime"].getTime()/1000)
       + "&price=" + String(userBooking["price"])
       });
-    
+
     if (response.status == 200) {
       let success = await response.json();
       alert("Booking sucessfully made. ");
@@ -333,7 +365,7 @@ function Calender () { // Calender constructor/class
       alert("There was an error making your booking. ");
     }
   }
-  
+
   this.setBookingLength = async function(e) { // Sets what the booking length should be
     let lengthDrop = document.getElementById("lengthDrop");
     userBooking["bookingLength"] = lengthDrop.value;
@@ -361,7 +393,7 @@ function Calender () { // Calender constructor/class
     hideOldColumns();
     hidePrev();
   }
-  
+
   // Run necessary functions;
   displayDates();
   hidePrev();
