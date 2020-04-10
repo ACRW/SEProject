@@ -106,7 +106,7 @@ function Calender () { // Calender constructor/class
   userBooking["element"].className = "peekGraphic newColor";
   userBooking["element"].style.width = String(tableDims.width * 0.11) + "px";
   userBooking["element"].style.height = String((userBooking["bookingLength"]/60) * 50) + "px";
-  userBooking["element"].innerHTML = "<p>Dom Newman </p>";
+  userBooking["element"].innerHTML = "<p>My Booking </p>";
   targetSun.setHours(23, 59, 59, 0);
   targetMon.setHours(0, 0, 0, 0);
   if (targetMon.getDay() != 1) { // Only changes date if not already a monday

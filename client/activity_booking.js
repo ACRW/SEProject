@@ -16,20 +16,20 @@ async function createCards () { // Get the card information and create them
     });
   let tempActs = await response.json();
 
-  for (activity of tempActs) {
-    actCards[activity["id"]] = new ActivityCard(activity);
-    activities[activity["id"]] = activity;
+  for (tempAct of tempActs) {
+    actCards[tempAct["id"]] = new ActivityCard(tempAct);
+    activities[tempAct["id"]] = tempAct;
   }
 }
 
-function ActivityCard (activity) { // Activity card class, each instantiated class refers to a single card on the document.
+function ActivityCard (curActivity) { // curActivity card class, each instantiated class refers to a single card on the document.
   let title = document.createElement('h4');
   title.className="card-title";
-  title.innerHTML = activity["name"];
+  title.innerHTML = curActivity["name"];
 
   let desc = document.createElement('p');
   desc.className = "card-text";
-  desc.innerHTML = activity["description"];
+  desc.innerHTML = curActivity["description"];
 
   let button = document.createElement('a');
   button.className = "btn btn-primary newColor";
@@ -47,8 +47,8 @@ function ActivityCard (activity) { // Activity card class, each instantiated cla
 
   let img = document.createElement('img');
   img.className = "card-img-top";
-  if (!activity["imagePath"]) img.src = "webimage/default.jpg"; // Select a default image if there is no image.
-  else img.src = activity["imagePath"];
+  if (!curActivity["imagePath"]) img.src = "webimage/default.jpg"; // Select a default image if there is no image.
+  else img.src = curActivity["imagePath"];
 
   let card = document.createElement('div');
   card.className = "card";
@@ -59,13 +59,14 @@ function ActivityCard (activity) { // Activity card class, each instantiated cla
   document.getElementById("activityCards").appendChild(card);
 
   function modifyPopUp() {
-    document.getElementById("popUpTitle").innerHTML = activity["name"];
-    document.getElementById("popUpDesc").innerHTML = activity["description"];
-    document.getElementById("popUpImg").src = activity["imagePath"];
-    document.getElementById("act").innerHTML = activity["name"];
-    document.getElementById("pricepp").innerHTML = "£" + activity["price"];
+    activity = curActivity
+    document.getElementById("popUpTitle").innerHTML = curActivity["name"];
+    document.getElementById("popUpDesc").innerHTML = curActivity["description"];
+    document.getElementById("popUpImg").src = curActivity["imagePath"];
+    document.getElementById("act").innerHTML = curActivity["name"];
+    document.getElementById("pricepp").innerHTML = "£" + curActivity["price"];
     document.getElementById("numOfPeople").innerHTML = "1";
-    document.getElementById("totalPrice").innerHTML = "£" + activity["price"];
+    document.getElementById("totalPrice").innerHTML = "£" + curActivity["price"];
     document.getElementById("maxPeople").value = 1;
     cal.reset();
   }
@@ -188,6 +189,7 @@ function groupSizeChange(size) {
   groupSize = size;
   document.getElementById("numOfPeople").innerHTML = groupSize;
   document.getElementById("totalPrice").innerHTML = "£" + groupSize * activity["price"];
+  console.log(activity);
 };
 
 async function submit() {
