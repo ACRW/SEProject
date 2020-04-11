@@ -403,7 +403,7 @@ function aforwardWeek(m){
 
 //changing the calender to the next week
 function forwardWeek(m){
-
+  m = parseInt(document.getElementById('cday' + 7).innerHTML.substring(3,5))
   overMonth = false
   for(var i = 1; i <8 ; i++){
       var x = parseInt(document.getElementById('cday' + i).innerHTML.substring(0,2)) + 7;
@@ -447,7 +447,7 @@ function forwardWeek(m){
 
 //changing the calender to the previous week
 function backWeek(m){
-
+    m = parseInt(document.getElementById('cday' + 7).innerHTML.substring(3,5))
     var monthSub = false;
     for(var i = 7; i > 0 ; i--){
         var x = parseInt(document.getElementById('cday' + i).innerHTML) - 7;
