@@ -1,12 +1,9 @@
-const hostAddr = "localhost";
-const hostPort = "8090";
-
 let roomCards = {} // Keeps track of all the activity card classes
 let rooms = {}
 
 async function createCards () { // Get the card information and create them
   // http://localhost:8090/rooms?types=hostel
-  let response = await fetch('http://' + hostAddr + ":" + hostPort + '/rooms?types=hostel', {
+  let response = await fetch('/rooms?types=hostel', {
       method: "GET",
       headers: {
         "Content-Type": "application/json"
@@ -175,7 +172,7 @@ const getWeekInfo = async(roomid) =>{
 // return a proper calander. the already booked date colored grey
 async function roomRented(year,month,roomid){
   let i;
-  let response = await fetch('http://' + hostAddr + ":" + hostPort + '/roomavailability?type=hostel&id=' + String(roomid - 1), {
+  let response = await fetch('/roomavailability?type=hostel&id=' + String(roomid - 1), {
     method: "GET",
     headers: {
         "Content-Type": "application/json"
@@ -718,7 +715,7 @@ getHostel = async() => {
 // get room availability
 async function roomAvailability(roomid){
   let i;
-  let response = await fetch('http://' + hostAddr + ":" + hostPort + '/roomavailability?type=hostel&id=' + roomid, {
+  let response = await fetch('/roomavailability?type=hostel&id=' + roomid, {
     method: "GET",
     headers: {
         "Content-Type": "application/json"
@@ -747,7 +744,7 @@ submitBooking = async(roomid,start,end,price,numOfPeople)=>{
   const temp ='roomid=' + roomid + '&start=' + start + '&end=' + end + '&prince=' + price + '&numberofpeople=' + numOfPeople
   console.log(temp)
   //create new hostel booking
-  let response = await fetch('http://' + hostAddr + ":" + hostPort + '/customerhostelbooking',
+  let response = await fetch('/customerhostelbooking',
   {
     method: 'POST',
     headers: {
