@@ -2,16 +2,20 @@
 <html lang="en">
 <head>
 	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-	<title>eventbooking</title>
-	<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-	<!-- <link href="assets/css/bootstrap-responsive.css" rel="stylesheet">-->
-
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-	<script src="event_page.js"></script>
+	<title>Event Booking</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 	<style type="text/css">
+    .cardBox {
+      float: left;
+      width: 20%;
+    }
+    
 		.carousel-item{
 			text-align: center;
 		}
@@ -96,10 +100,88 @@
 
 </head>
 <body>
+<div class="container">
+  <h2 style="color: #A5B686 ;">Book your events here.</h2>
+  <div class="container" id="eventCards">
+    
+  </div> 
+</div>
 
+<div class="modal fade" id="popUp">
+ <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header newColor">
+        <h5 class="modal-title">Book your activity</h5>
+        <button type="button" class="close" data-dismiss="modal">
+          <span aria-hidden="true">X</span>
+        </button>
+      </div>
+      
+      <div class="modal-body" >
+        <div class="container-fluid" style="padding-left: 0px";>
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <img id="popUpImg" style="width: 100%;"><img>
+            </div>
+            <div class="col-md-6">
+              <h4 id="popUpTitle">.</h4>
+              <p id="popUpDesc">.</p>
+            </div>
+          </div>
+          <div class="row" >
+            <div class="col-md-12" >
+              <div style="width: 100%; height: 42px; background-color: #EDEDED;  padding: 5px 5px 5px 10px;">
+                <h4> Book this event </h4>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col">
+              <div class="card-columns" id="dateCards">
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12">
+              <div class="form-group" style="padding-top: 20px;">
+                <table class="table" style="margin-top:30px; " id="checkoutTable">
+                  <tr>
+                    <td>Ticket Type</td>
+                    <td>Ticket Date</td>
+                    <td>Ticket Cost</td> 
+                    <td>Quantity</td>
+                    <td>Cost</td>
+                  </tr>
+                  <tr>
+                    <td>--</td>
+                    <td>--</td>
+                    <td>--</td>
+                    <td>--</td>
+                    <td>--</td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-8">
+            </div>
+            <div class="col-md-4">
+              <p id="totalCost"> Total Cost: £0.00</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary newColorHov" onclick="submit()">Book this date</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
 <!--top -->
 
-<div class="top">
+<!--<div class="top">
 
 
 		<div class="top_c">
@@ -135,7 +217,7 @@
 </div>
 
 
-<!-- carousel-->
+<!-- carousel
 
 <div  id ='demo' class="carousel slide" data-ride="carousel">
 
@@ -165,7 +247,7 @@
  
 </div>
 
-<!-- bookevent -->
+<!-- bookevent
 <div id="responseField">
 
 </div>
@@ -205,9 +287,8 @@
   </table>
 
   <button id="fat-btn" class="btn btn-success"  type="button" style="text-align: right;"> make payment</button>
-</div>
-
-	
+</div>-->
+<script src="event_page.js"></script>
 </body>
 
 </html>

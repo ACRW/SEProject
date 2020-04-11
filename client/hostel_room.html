@@ -66,6 +66,7 @@
   </style>
 	
 </head>
+
 <body>
 
 <br>
@@ -191,9 +192,10 @@
   </div>-->
 </div>
 
-
+<!-- Modal -->
 <div class="modal fade" id="popUp">
  <div class="modal-dialog modal-lg">
+    <!-- Modal content-->
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">Book your room</h5>
@@ -206,9 +208,6 @@
             Please fill in the following information
             <small class="text-muted">To book</small>
           </h3>
-          <!-- response Message -->
-          <div ><h4 id="responseField"></h4>
-          </div>
 
           <!-- number of people-->
           <div class="form-group">
@@ -288,6 +287,10 @@
               <div class="col-sm-2"><a class="btn btn-primary newColor" href="#" role="button" id='submitButton' hidden="true">Book and pay now</a></div>
             </div>
 
+          <!-- response Message -->
+          <div ><h4 id="responseField"></h4>
+          </div>
+
             <!--submittion response-->
             <div name="SubmittionResponse">
             </div>
@@ -296,7 +299,6 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-primary newColor" id="submitButton">Book these dates</button>
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
       </div>
     </div>

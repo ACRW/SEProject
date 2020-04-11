@@ -502,7 +502,7 @@ async function bookings(customerID, resp) {
     // community room bookings
     const community = await performQuery('SELECT b.id AS bookingID, b.start, b.end, b.priceOfBooking, b.paid, r.id AS roomID, r.name, r.description FROM communityBookings b INNER JOIN communityRooms r ON b.roomId = r.id WHERE b.userId = ' + customerID + ' ORDER BY b.start');
     // hostel room bookings
-    const hostel = await performQuery('SELECT b.id AS bookingID, b.startDate, b.endDate, r.id AS roomID, r.noOfPeople, r.pricePerNight FROM hostelBookings b INNER JOIN hostelRooms r ON b.roomId = r.id WHERE b.userId = ' + customerID + ' ORDER BY b.startDate');
+    const hostel = await performQuery('SELECT b.id AS bookingID, b.startDate, b.endDate, b.price, b.paid, r.id AS roomID, r.noOfPeople, r.pricePerNight FROM hostelBookings b INNER JOIN hostelRooms r ON b.roomId = r.id WHERE b.userId = ' + customerID + ' ORDER BY b.startDate');
 
     // if no database errors
     if (processQueryResult(activity, resp) && processQueryResult(community, resp) && processQueryResult(hostel, resp)) {
@@ -545,7 +545,7 @@ async function bookingRequests(customerID, resp) {
     // community room booking requests
     const community = await performQuery('SELECT b.id AS requestID, b.start, b.end, b.priceOfBooking, r.id AS roomID, r.name, r.description FROM communityRequests b INNER JOIN communityRooms r ON b.roomId = r.id WHERE b.userId = ' + customerID + ' ORDER BY b.start');
     // hostel room booking requests
-    const hostel = await performQuery('SELECT b.id AS requestID, b.startDate, b.endDate, r.id AS roomID, r.noOfPeople, r.pricePerNight FROM hostelRequests b INNER JOIN hostelRooms r ON b.roomId = r.id WHERE b.userId = ' + customerID + ' ORDER BY b.startDate');
+    const hostel = await performQuery('SELECT b.id AS requestID, b.startDate, b.endDate, b.price, r.id AS roomID, r.noOfPeople, r.pricePerNight FROM hostelRequests b INNER JOIN hostelRooms r ON b.roomId = r.id WHERE b.userId = ' + customerID + ' ORDER BY b.startDate');
 
     // if no database errors
     if (processQueryResult(activity, resp) && processQueryResult(community, resp) && processQueryResult(hostel, resp)) {
@@ -898,7 +898,7 @@ app.post('/customerhostelbooking', async function(req, resp) {
         const numberOfPeople = req.body.numberofpeople;
 
         // if all parameters specified
-        if (roomID && start && end && price && paid && numberOfPeople) {
+        if (roomID && start && end && price && numberOfPeople) {
             // check for clashing bookings
             const clashes = await performQuery('(SELECT startDate, endDate FROM hostelBookings WHERE startDate < FROM_UNIXTIME(' + end + ') AND endDate > FROM_UNIXTIME(' + start + ')) UNION (SELECT startDate, endDate FROM hostelRequests WHERE startDate < FROM_UNIXTIME(' + end + ') AND endDate > FROM_UNIXTIME(' + start + '))');
 
@@ -937,8 +937,8 @@ app.post('/customerhostelbooking', async function(req, resp) {
 
 // update activity booking (request)
 app.post('/updateactivitybooking', async function(req, resp) {
-    // if valid session
-    if (validateGeneralSession(req, resp)) {
+    // if valid staff session
+    if (validateSession('staff', req, resp)) {
         // booking ID
         const bookingID = req.body.bookingid;
 
@@ -1001,8 +1001,8 @@ app.post('/updateactivitybooking', async function(req, resp) {
 
 // update community booking (request)
 app.post('/updatecommunitybooking', async function(req, resp) {
-    // if valid session
-    if (validateGeneralSession(req, resp)) {
+    // if valid staff session
+    if (validateSession('staff', req, resp)) {
         // booking ID
         const bookingID = req.body.bookingid;
 
@@ -1077,8 +1077,8 @@ app.post('/updatecommunitybooking', async function(req, resp) {
 
 // update hostel booking (request)
 app.post('/updatehostelbooking', async function(req, resp) {
-    // if valid session
-    if (validateGeneralSession(req, resp)) {
+    // if valid staff session
+    if (validateSession('staff', req, resp)) {
         // booking ID
         const bookingID = req.body.bookingid;
 

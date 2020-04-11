@@ -8,17 +8,15 @@ var d = n.getDate();
 var day = n.getDay();
 
 //on loading of content
-document.addEventListener("DOMContentLoaded", function () {
-
-  //sets up the calender dates to the current week
-  for(var i = 1; i <8 ; i++){
-        var x = day-i;
-        document.getElementById('cday' + i).innerHTML = (d-x).toString().padStart(2,'0') + '/' + m.toString().padStart(2,'0');
-
-        //dealing with weeks that wrap over months
-        if(isValidDate(d-x,m,y) == false){
-            document.getElementById('cday' + i).innerHTML = (d-x  + daysInMonth(y,m-1) ).toString().padStart(2,'0')+ '/' + (m -1).toString().padStart(2,'0');
+document.addEventListener("DOMContentLoaded", async function () {
+    // make call to API
+    let response = await fetch('/currentuser',
+    {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
         }
+
     }
 
   //hide submit button
@@ -83,53 +81,91 @@ document.addEventListener("DOMContentLoaded", function () {
   document.getElementById("monthEventSearch").addEventListener("change", function(){
     document.getElementById("dayEventSearchLabel").hidden = false;
     document.getElementById("dayEventSearch").hidden = false;
+    });
 
-    //fill day drop with correct amount of days
-    year = document.getElementById("yearEventSearch").value;
-    month = document.getElementById("monthEventSearch").value;
-    fillDayDrop(year,month,"EventSearch")
-  });
 
-  //on choosing year reveal months
-  document.getElementById("yearEventNew").addEventListener("change", function(){
-    document.getElementById("monthEventNewLabel").hidden = false;
-    document.getElementById("monthEventNew").hidden = false;
-  });
+    // if not signed in
+    if (response.status == 403) {
+        // error message
+        alert('Oh hello there! You\'re not currently signed in, so do close this message to be redirected to the Staff Sign In page.');
+        // redirect to sign in page
+        window.location.pathname = '/staffsignin.html';
 
-  //on choosing month reveal days and fill day drop down
-  document.getElementById("monthEventNew").addEventListener("change", function(){
-    document.getElementById("dayEventNewLabel").hidden = false;
-    document.getElementById("dayEventNew").hidden = false;
+    } else {
+        // fetch response body
+        const body = JSON.parse(await response.text());
 
-    //fill day drop with correct amount of days
-    year = document.getElementById("yearEventNew").value;
-    month = document.getElementById("monthEventNew").value;
-    fillDayDrop(year,month,"EventNew")
-  });
+        // if customer signed in
+        if (body.type == 'customer') {
+            // error message
+            alert('Oh hello there! We\'ve noticed a customer is currently signed in on your computer. Do sign out of that account, and then close this message to be redirected to the Staff Sign In page.');
+            // redirect to sign in page
+            window.location.pathname = '/staffsignin.html';
 
-  //on choosing year reveal months
-  document.getElementById("yearActivityNew").addEventListener("change", function(){
-    document.getElementById("monthActivityNewLabel").hidden = false;
-    document.getElementById("monthActivityNew").hidden = false;
-  });
+        } else {
+            //sets up the calender dates to the current week
+            for(var i = 1; i <8 ; i++){
+                  var x = day-i;
+                  document.getElementById('cday' + i).innerHTML = (d-x).toString().padStart(2,'0') + '/' + m.toString().padStart(2,'0');
 
-  //on choosing month reveal days and fill day drop down
-  document.getElementById("monthActivityNew").addEventListener("change", function(){
-    document.getElementById("dayActivityNewLabel").hidden = false;
-    document.getElementById("dayActivityNew").hidden = false;
+                  //dealing with weeks that wrap over months
+                  if(isValidDate(d-x,m,y) == false){
+                      document.getElementById('cday' + i).innerHTML = (d-x  + daysInMonth(y,m-1) ).toString().padStart(2,'0')+ '/' + (m -1).toString().padStart(2,'0');
+                  }
+              }
 
-    //fill day drop with correct amount of days
-    year = document.getElementById("yearActivityNew").value;
-    month = document.getElementById("monthActivityNew").value;
-    fillDayDrop(year,month,"ActivityNew")
-  });
+            //hide submit button
+            document.getElementById("searchModalFooter").hidden = true;
 
-  //when new booking button clicked reset form, hide parts and reveal others
-  document.getElementById("newBookingButton").addEventListener('click',function(){
-    document.getElementById("findBy").hidden = false;
-    document.getElementById("makeBooking").hidden = true;
+            //on submit on search modal
+            document.getElementById("searchSubmit").addEventListener("click", function(){
+              switch(submitAction) {
+                case 1:
+                  searchForUser()
+                  break;
+                case 2:
+                  searchForEvents()
+                  break;
+                case 3:
+                  searchForAvaliability()
+                  break;
+                default:
+                // code block
+              }
+            });
 
-  })
+            //change submit action on selection of type of search
+            document.getElementById("searchUser").addEventListener("click", function(){
+              submitAction = 1;
+            });
+
+            //change submit action on selection of type of search
+            document.getElementById("searchEvent").addEventListener("click", function(){
+              submitAction = 2;
+            });
+
+            //change submit action on selection of type of search
+            document.getElementById("searchAvaliability").addEventListener("click", function(){
+              submitAction = 3;
+            });
+
+            //on choosing year reveal months
+            document.getElementById("yearAvaliableSearch").addEventListener("change", function(){
+              document.getElementById("monthAvaliableSearchLabel").hidden = false;
+              document.getElementById("monthAvaliableSearch").hidden = false;
+            });
+
+            //on choosing month reveal day and fill day drop down
+            document.getElementById("monthAvaliableSearch").addEventListener("change", function(){
+              document.getElementById("dayAvaliableSearchLabel").hidden = false;
+              document.getElementById("dayAvaliableSearch").hidden = false;
+
+              //fill day drop with correct amount of days
+              year = document.getElementById("yearAvaliableSearch").value;
+              month = document.getElementById("monthAvaliableSearch").value;
+              fillDayDrop(year,month,"AvaliableSearch")
+            });
+
 
   //once a room selected fill price and availabilty table
   document.getElementById('bookingRoomDropdown').addEventListener('change',function(){
@@ -140,30 +176,53 @@ document.addEventListener("DOMContentLoaded", function () {
     fillBookingTable()
   });
 
-  //once number of guests entered
-  document.getElementById('numberOfGuests').addEventListener('change',function(){
-    //selects all rooms that can fit the correct number of guests
-    fillHostelDropdown()
-  });
+            //on choosing year reveal months
+            document.getElementById("yearEventSearch").addEventListener("change", function(){
+              document.getElementById("monthEventSearchLabel").hidden = false;
+              document.getElementById("monthEventSearch").hidden = false;
+            });
 
-  //once room selected
-  document.getElementById('hostelRoomsLargeEnough').addEventListener('change',function(){
-    //fill price
-    fillHostelPrice()
+            //on choosing month reveal days and fill day drop down
+            document.getElementById("monthEventSearch").addEventListener("change", function(){
+              document.getElementById("dayEventSearchLabel").hidden = false;
+              document.getElementById("dayEventSearch").hidden = false;
+
+
+              //fill day drop with correct amount of days
+              year = document.getElementById("yearEventSearch").value;
+              month = document.getElementById("monthEventSearch").value;
+              fillDayDrop(year,month,"EventSearch")
+            });
+
+            //on choosing year reveal months
+            document.getElementById("yearEventNew").addEventListener("change", function(){
+              document.getElementById("monthEventNewLabel").hidden = false;
+              document.getElementById("monthEventNew").hidden = false;
+            });
+
 
     //fill availabilty of room
     fillHostelBookingTable()
   });
 
-  document.getElementById('numOfPeopleActivity').addEventListener('change',function(){
-    fillActivityPrice()
-  })
+            //on choosing month reveal days and fill day drop down
+            document.getElementById("monthEventNew").addEventListener("change", function(){
+              document.getElementById("dayEventNewLabel").hidden = false;
+              document.getElementById("dayEventNew").hidden = false;
 
-  //once booking duration is selected
-  document.getElementById('bookingDurationTime').addEventListener('change',function(){
-    //calculate and display the final price
-    calculatePrice()
-  });
+
+              //fill day drop with correct amount of days
+              year = document.getElementById("yearEventNew").value;
+              month = document.getElementById("monthEventNew").value;
+              fillDayDrop(year,month,"EventNew")
+            });
+
+            //on choosing year reveal months
+            document.getElementById("yearActivityNew").addEventListener("change", function(){
+              document.getElementById("monthActivityNewLabel").hidden = false;
+              document.getElementById("monthActivityNew").hidden = false;
+            });
+
 
   //on next button
   document.getElementById('calenderNext').addEventListener('click',function(){
@@ -210,149 +269,249 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById('chosenDate').innerHTML = document.getElementById('day2').innerHTML
   })
 
-  //on click of day header set chosen date
-  document.getElementById('day3').addEventListener('click',function(){
-    if(document.getElementById('day3').innerHTML.substring(4) == 1){
-      document.getElementById('chosenDate').value = document.getElementById('chosenDate').value + 1
+            //on choosing month reveal days and fill day drop down
+            document.getElementById("monthActivityNew").addEventListener("change", function(){
+              document.getElementById("dayActivityNewLabel").hidden = false;
+              document.getElementById("dayActivityNew").hidden = false;
+
+
+              //fill day drop with correct amount of days
+              year = document.getElementById("yearActivityNew").value;
+              month = document.getElementById("monthActivityNew").value;
+              fillDayDrop(year,month,"ActivityNew")
+            });
+
+            //when new booking button clicked reset form, hide parts and reveal others
+            document.getElementById("newBookingButton").addEventListener('click',function(){
+              document.getElementById("findBy").hidden = false;
+              document.getElementById("makeBooking").hidden = true;
+
+            })
+
+            //once a room selected fill price and avaliabilty table
+            document.getElementById('bookingRoomDropdown').addEventListener('change',function(){
+              //gets price
+              fillPrice()
+
+              //fills table with avaliabilty of room
+              fillBookingTable()
+            });
+
+            //once number of guests entered
+            document.getElementById('numberOfGuests').addEventListener('change',function(){
+              //selects all rooms that can fit the correct number of guests
+              fillHostelDropdown()
+            });
+
+            //once room selected
+            document.getElementById('hostelRoomsLargeEnough').addEventListener('change',function(){
+              //fill price
+              fillHostelPrice()
+
+              //fill avaliabilty of room
+              fillHostelBookingTable()
+            });
+
+            document.getElementById('numOfPeopleActivity').addEventListener('change',function(){
+              fillActivityPrice()
+            })
+
+            //once booking duration is selected
+            document.getElementById('bookingDurationTime').addEventListener('change',function(){
+              //calculate and display the final price
+              calculatePrice()
+            });
+
+            //on next button
+            document.getElementById('calenderNext').addEventListener('click',function(){
+              //update avaliabilty table
+              fillBookingTable()
+            })
+
+            //on prev button
+            document.getElementById('calenderPrev').addEventListener('click',function(){
+              //update avaliabilty table
+              fillBookingTable()
+            })
+
+            //on next button
+            document.getElementById('hostelCalenderNext').addEventListener('click',function(){
+              //update avaliabilty table
+              fillHostelBookingTable()
+            })
+
+            //on prev button
+            document.getElementById('hostelCalenderPrev').addEventListener('click',function(){
+              //update avaliabilty table
+              fillHostelBookingTable()
+            })
+
+            //update list of rooms
+            updateRooms();
+
+            //fill search dropdowns
+            fillFindBy();
+
+            fillActivities();
+
+            //on click of day header set chosen date
+            document.getElementById('day1').addEventListener('click',function(){
+              document.getElementById('chosenDate').innerHTML = document.getElementById('day1').innerHTML
+            })
+
+            //on click of day header set chosen date
+            document.getElementById('day2').addEventListener('click',function(){
+              if(document.getElementById('day2').innerHTML.substring(4) == 1){
+                document.getElementById('chosenDate').value = document.getElementById('chosenDate').value + 1
+              }
+              document.getElementById('chosenDate').innerHTML = document.getElementById('day2').innerHTML
+            })
+
+            //on click of day header set chosen date
+            document.getElementById('day3').addEventListener('click',function(){
+              if(document.getElementById('day3').innerHTML.substring(4) == 1){
+                document.getElementById('chosenDate').value = document.getElementById('chosenDate').value + 1
+              }
+              document.getElementById('chosenDate').innerHTML = document.getElementById('day3').innerHTML
+            })
+
+            //on click of day header set chosen date
+            document.getElementById('day4').addEventListener('click',function(){
+              if(document.getElementById('day4').innerHTML.substring(4) == 1){
+                document.getElementById('chosenDate').value = document.getElementById('chosenDate').value + 1
+              }
+              document.getElementById('chosenDate').innerHTML = document.getElementById('day4').innerHTML
+            })
+
+            //on click of day header set chosen date
+            document.getElementById('day5').addEventListener('click',function(){
+              if(document.getElementById('day5').innerHTML.substring(4) == 1){
+                document.getElementById('chosenDate').value = document.getElementById('chosenDate').value + 1
+              }
+              document.getElementById('chosenDate').innerHTML = document.getElementById('day5').innerHTML
+            })
+
+            //on click of day header set chosen date
+            document.getElementById('day6').addEventListener('click',function(){
+              if(document.getElementById('day6').innerHTML.substring(4) == 1){
+                document.getElementById('chosenDate').value = document.getElementById('chosenDate').value + 1
+              }
+              document.getElementById('chosenDate').innerHTML = document.getElementById('day6').innerHTML
+            })
+
+            //on click of day header set chosen date
+            document.getElementById('day7').addEventListener('click',function(){
+              if(document.getElementById('day7').innerHTML.substring(4) == 1){
+                document.getElementById('chosenDate').value = document.getElementById('chosenDate').value + 1
+              }
+              document.getElementById('chosenDate').innerHTML = document.getElementById('day7').innerHTML
+            })
+
+            //on click of day header set chosen date
+            document.getElementById('hday1').addEventListener('click',function(){
+              document.getElementById('chosenHostelDate').innerHTML = document.getElementById('hday1').innerHTML
+            })
+
+            //on click of day header set chosen date
+            document.getElementById('hday2').addEventListener('click',function(){
+              if(document.getElementById('hday2').innerHTML.substring(4) == 1){
+                document.getElementById('chosenHostelDate').value = document.getElementById('chosenHostelDate').value + 1
+              }
+              document.getElementById('chosenHostelDate').innerHTML = document.getElementById('hday2').innerHTML
+            })
+
+            //on click of day header set chosen date
+            document.getElementById('hday3').addEventListener('click',function(){
+              if(document.getElementById('hday3').innerHTML.substring(4) == 1){
+                document.getElementById('chosenHostelDate').value = document.getElementById('chosenHostelDate').value + 1
+              }
+              document.getElementById('chosenHostelDate').innerHTML = document.getElementById('hday3').innerHTML
+            })
+
+            //on click of day header set chosen date
+            document.getElementById('hday4').addEventListener('click',function(){
+              if(document.getElementById('hday4').innerHTML.substring(4) == 1){
+                document.getElementById('chosenHostelDate').value = document.getElementById('chosenHostelDate').value + 1
+              }
+              document.getElementById('chosenHostelDate').innerHTML = document.getElementById('hday4').innerHTML
+            })
+
+            //on click of day header set chosen date
+            document.getElementById('hday5').addEventListener('click',function(){
+              if(document.getElementById('hday5').innerHTML.substring(4) == 1){
+                document.getElementById('chosenHostelDate').value = document.getElementById('chosenHostelDate').value + 1
+              }
+              document.getElementById('chosenHostelDate').innerHTML = document.getElementById('hday5').innerHTML
+            })
+
+            //on click of day header set chosen date
+            document.getElementById('hday6').addEventListener('click',function(){
+              if(document.getElementById('hday6').innerHTML.substring(4) == 1){
+                document.getElementById('chosenHostelDate').value = document.getElementById('chosenHostelDate').value + 1
+              }
+              document.getElementById('chosenHostelDate').innerHTML = document.getElementById('hday6').innerHTML
+            })
+
+            //on click of day header set chosen date
+            document.getElementById('hday7').addEventListener('click',function(){
+              if(document.getElementById('hday7').innerHTML.substring(4) == 1){
+                document.getElementById('chosenHostelDate').value = document.getElementById('chosenHostelDate').value + 1
+              }
+              document.getElementById('chosenHostelDate').innerHTML = document.getElementById('hday7').innerHTML
+            })
+
+            //on entering number of guests
+            document.getElementById('numberOfGuests').addEventListener('change',function(){
+              //check if integer
+              if(Number.isInteger(parseInt(document.getElementById('numberOfGuests').value)) == false){
+
+                //print error message
+                document.getElementById('newHostelBookingError').innerHTML = 'Please enter an integer for number of guests'
+              }else{
+
+              //show form for booking hostel room
+              document.getElementById('afterNumOfGuest').hidden = false
+            }})
+
+            //create new ticket type
+            document.getElementById('newTicketType').addEventListener('click',function(){
+              addTicketType()
+            })
+
+            //creates new event on enter
+            document.getElementById('createNewEvent').addEventListener('click',function(){
+              createNewEvent()
+            })
+
+            //when customer id div changed get the user bookings
+            document.getElementById('customerId').addEventListener('change',function(){
+              getUserBookings()
+            })
+
+            //when notifications selected
+            document.getElementById('notificationButton').addEventListener('click',function(){
+              getNotifications()
+            })
+
+            //moves the calender forward a week
+            document.getElementById('nextWeek').addEventListener('click', function(){
+              m = forwardWeek(m)
+            })
+
+            //moves the calender back a week
+            document.getElementById('prevWeek').addEventListener('click', function(){
+              m = backWeek(m)
+            })
+
+            //on click trys to mkae payment in database
+            document.getElementById('makePaymentButton').addEventListener('click', function(){
+              makePayment()
+            })
+
+            //fills the calender with bookings for that week
+            fillCalender()
+        }
     }
-    document.getElementById('chosenDate').innerHTML = document.getElementById('day3').innerHTML
-  })
-
-  //on click of day header set chosen date
-  document.getElementById('day4').addEventListener('click',function(){
-    if(document.getElementById('day4').innerHTML.substring(4) == 1){
-      document.getElementById('chosenDate').value = document.getElementById('chosenDate').value + 1
-    }
-    document.getElementById('chosenDate').innerHTML = document.getElementById('day4').innerHTML
-  })
-
-  //on click of day header set chosen date
-  document.getElementById('day5').addEventListener('click',function(){
-    if(document.getElementById('day5').innerHTML.substring(4) == 1){
-      document.getElementById('chosenDate').value = document.getElementById('chosenDate').value + 1
-    }
-    document.getElementById('chosenDate').innerHTML = document.getElementById('day5').innerHTML
-  })
-
-  //on click of day header set chosen date
-  document.getElementById('day6').addEventListener('click',function(){
-    if(document.getElementById('day6').innerHTML.substring(4) == 1){
-      document.getElementById('chosenDate').value = document.getElementById('chosenDate').value + 1
-    }
-    document.getElementById('chosenDate').innerHTML = document.getElementById('day6').innerHTML
-  })
-
-  //on click of day header set chosen date
-  document.getElementById('day7').addEventListener('click',function(){
-    if(document.getElementById('day7').innerHTML.substring(4) == 1){
-      document.getElementById('chosenDate').value = document.getElementById('chosenDate').value + 1
-    }
-    document.getElementById('chosenDate').innerHTML = document.getElementById('day7').innerHTML
-  })
-
-  //on click of day header set chosen date
-  document.getElementById('hday1').addEventListener('click',function(){
-    document.getElementById('chosenHostelDate').innerHTML = document.getElementById('hday1').innerHTML
-  })
-
-  //on click of day header set chosen date
-  document.getElementById('hday2').addEventListener('click',function(){
-    if(document.getElementById('hday2').innerHTML.substring(4) == 1){
-      document.getElementById('chosenHostelDate').value = document.getElementById('chosenHostelDate').value + 1
-    }
-    document.getElementById('chosenHostelDate').innerHTML = document.getElementById('hday2').innerHTML
-  })
-
-  //on click of day header set chosen date
-  document.getElementById('hday3').addEventListener('click',function(){
-    if(document.getElementById('hday3').innerHTML.substring(4) == 1){
-      document.getElementById('chosenHostelDate').value = document.getElementById('chosenHostelDate').value + 1
-    }
-    document.getElementById('chosenHostelDate').innerHTML = document.getElementById('hday3').innerHTML
-  })
-
-  //on click of day header set chosen date
-  document.getElementById('hday4').addEventListener('click',function(){
-    if(document.getElementById('hday4').innerHTML.substring(4) == 1){
-      document.getElementById('chosenHostelDate').value = document.getElementById('chosenHostelDate').value + 1
-    }
-    document.getElementById('chosenHostelDate').innerHTML = document.getElementById('hday4').innerHTML
-  })
-
-  //on click of day header set chosen date
-  document.getElementById('hday5').addEventListener('click',function(){
-    if(document.getElementById('hday5').innerHTML.substring(4) == 1){
-      document.getElementById('chosenHostelDate').value = document.getElementById('chosenHostelDate').value + 1
-    }
-    document.getElementById('chosenHostelDate').innerHTML = document.getElementById('hday5').innerHTML
-  })
-
-  //on click of day header set chosen date
-  document.getElementById('hday6').addEventListener('click',function(){
-    if(document.getElementById('hday6').innerHTML.substring(4) == 1){
-      document.getElementById('chosenHostelDate').value = document.getElementById('chosenHostelDate').value + 1
-    }
-    document.getElementById('chosenHostelDate').innerHTML = document.getElementById('hday6').innerHTML
-  })
-
-  //on click of day header set chosen date
-  document.getElementById('hday7').addEventListener('click',function(){
-    if(document.getElementById('hday7').innerHTML.substring(4) == 1){
-      document.getElementById('chosenHostelDate').value = document.getElementById('chosenHostelDate').value + 1
-    }
-    document.getElementById('chosenHostelDate').innerHTML = document.getElementById('hday7').innerHTML
-  })
-
-  //on entering number of guests
-  document.getElementById('numberOfGuests').addEventListener('change',function(){
-    //check if integer
-    if(Number.isInteger(parseInt(document.getElementById('numberOfGuests').value)) == false){
-
-      //print error message
-      document.getElementById('newHostelBookingError').innerHTML = 'Please enter an integer for number of guests'
-    }else{
-
-    //show form for booking hostel room
-    document.getElementById('afterNumOfGuest').hidden = false
-  }})
-
-  //create new ticket type
-  document.getElementById('newTicketType').addEventListener('click',function(){
-    addTicketType()
-  })
-
-  //creates new event on enter
-  document.getElementById('createNewEvent').addEventListener('click',function(){
-    createNewEvent()
-  })
-
-  //when customer id div changed get the user bookings
-  document.getElementById('customerId').addEventListener('change',function(){
-    getUserBookings()
-  })
-
-  //when notifications selected
-  document.getElementById('notificationButton').addEventListener('click',function(){
-    getNotifications()
-  })
-
-  //moves the calender forward a week
-  document.getElementById('nextWeek').addEventListener('click', function(){
-    m = forwardWeek(m)
-  })
-
-  //moves the calender back a week
-  document.getElementById('prevWeek').addEventListener('click', function(){
-    m = backWeek(m)
-  })
-
-  //on click trys to mkae payment in database
-  document.getElementById('makePaymentButton').addEventListener('click', function(){
-    makePayment()
-  })
-
-  //fills the calender with bookings for that week
-  fillCalender()
 });
 
 //checks if date is valid ie 30th Feb not valid
