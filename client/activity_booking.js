@@ -1,5 +1,3 @@
-const hostAddr = "localhost";
-const hostPort = "8090";
 const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
 let actCards = {} // Keeps track of all the activity card classes, id matches position
@@ -8,7 +6,7 @@ let activity; // Current activity being looked at
 let groupSize = 1;
 
 async function createCards () { // Get the card information and create them
-  let response = await fetch('http://' + hostAddr + ":" + hostPort + '/activities', {
+  let response = await fetch('/activities', {
       method: "GET",
       headers: {
         "Content-Type": "application/json"
@@ -196,7 +194,7 @@ async function submit() {
     alert("Please select a booking date.");
     return;
   }
-  let response = await fetch('http://' + hostAddr + ":" + hostPort + '/customeractivitybooking', {
+  let response = await fetch('/customeractivitybooking', {
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded"
