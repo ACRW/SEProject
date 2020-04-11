@@ -24,7 +24,7 @@
     function byUser (){
       document.getElementById("byUser").hidden = false;
       document.getElementById("byEvent").hidden = true;
-      document.getElementById("byAvaliability").hidden = true;
+      document.getElementById("byAvailability").hidden = true;
       document.getElementById('searchResults').innerHTML = '';
       document.getElementById("searchModalFooter").hidden = false;
       document.getElementById("roomAvailabilityTable").hidden = true;
@@ -36,7 +36,7 @@
     function byEvent (){
       document.getElementById("byEvent").hidden = false;
       document.getElementById("byUser").hidden = true;
-      document.getElementById("byAvaliability").hidden = true;
+      document.getElementById("byAvailability").hidden = true;
       document.getElementById('searchResults').innerHTML = '';
       document.getElementById("searchModalFooter").hidden = false;
       document.getElementById("roomAvailabilityTable").hidden = true;
@@ -45,10 +45,10 @@
     }
 
     //unhides the correct form
-    function byAvaliability (){
+    function byAvailability (){
       document.getElementById("byEvent").hidden = true;
       document.getElementById("byUser").hidden = true;
-      document.getElementById("byAvaliability").hidden = false;
+      document.getElementById("byAvailability").hidden = false;
       document.getElementById('searchResults').innerHTML = '';
       document.getElementById("searchModalFooter").hidden = false;
       document.getElementById("roomAvailabilityTable").hidden = true;
@@ -81,7 +81,7 @@
             tempDate.setDate(tempDate.getDate() + 6);
             document.getElementById("tableDate").innerHTML = monthNames[targetMon.getMonth()] + " " + targetMon.getDate() + " - " + monthNames[tempDate.getMonth()] + " " + tempDate.getDate();
 
-            //find headers of avaliabilty tables
+            //find headers of availabilty tables
             headers = document.getElementById("calTable").rows[0];
             headers2 = document.getElementById('hostelTable').rows[0];
             month= targetMon.getMonth()
@@ -290,7 +290,7 @@
           <h5>Select a button to search for a specific user, a specific event or to find out if a room is avaliable.</h5>
           <button type="button" class="btn btn-primary newColor" onclick="byUser()" id='searchUser'>Find User</button>
           <button type="button" class="btn btn-primary newColor" onclick="byEvent()" id ='searchEvent'>Find Event</button>
-          <button type="button" class="btn btn-primary newColor" onclick="byAvaliability()" id='searchAvaliability'>Check Avaliabilty</button>
+          <button type="button" class="btn btn-primary newColor" onclick="byAvailability()" id='searchAvailability'>Check Availability</button>
           <div id='searchResults'></div>
           <form id='byUser' hidden=true>
             <h5>Enter any information you have about the user. Leave inputs blank if you're unsure.</h5>
@@ -349,10 +349,10 @@
               </select>
             </div>
           </form>
-          <form id='byAvaliability' hidden=true>
+          <form id='byAvailability' hidden=true>
             <div class="form-group">
-              <h5>Choose a room and date to check room avaliabilty </h5>
-              <p id='avaliabiltySearchError'></p>
+              <h5>Choose a room and date to check room availabilty </h5>
+              <p id='availabiltySearchError'></p>
               <label>Room</label>
               <select class="browser-default custom-select newDropdown" id="roomSelectDrop">
                   <option selected>Select Room... </option> <!--check valid -->

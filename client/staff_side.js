@@ -16,7 +16,73 @@ document.addEventListener("DOMContentLoaded", async function () {
         headers: {
             "Content-Type": "application/x-www-form-urlencoded"
         }
+
+    }
+
+  //hide submit button
+  document.getElementById("searchModalFooter").hidden = true;
+
+  //on submit on search modal
+  document.getElementById("searchSubmit").addEventListener("click", function(){
+    switch(submitAction) {
+      case 1:
+        searchForUser()
+        break;
+      case 2:
+        searchForEvents()
+        break;
+      case 3:
+        searchForAvailability()
+        break;
+      default:
+      // code block
+    }
+  });
+
+  //change submit action on selection of type of search
+  document.getElementById("searchUser").addEventListener("click", function(){
+    submitAction = 1;
+  });
+
+  //change submit action on selection of type of search
+  document.getElementById("searchEvent").addEventListener("click", function(){
+    submitAction = 2;
+  });
+
+  //change submit action on selection of type of search
+  document.getElementById("searchAvailability").addEventListener("click", function(){
+    submitAction = 3;
+  });
+
+  //on choosing year reveal months
+  document.getElementById("yearAvaliableSearch").addEventListener("change", function(){
+    document.getElementById("monthAvaliableSearchLabel").hidden = false;
+    document.getElementById("monthAvaliableSearch").hidden = false;
+  });
+
+  //on choosing month reveal day and fill day drop down
+  document.getElementById("monthAvaliableSearch").addEventListener("change", function(){
+    document.getElementById("dayAvaliableSearchLabel").hidden = false;
+    document.getElementById("dayAvaliableSearch").hidden = false;
+
+    //fill day drop with correct amount of days
+    year = document.getElementById("yearAvaliableSearch").value;
+    month = document.getElementById("monthAvaliableSearch").value;
+    fillDayDrop(year,month,"AvaliableSearch")
+  });
+
+  //on choosing year reveal months
+  document.getElementById("yearEventSearch").addEventListener("change", function(){
+    document.getElementById("monthEventSearchLabel").hidden = false;
+    document.getElementById("monthEventSearch").hidden = false;
+  });
+
+  //on choosing month reveal days and fill day drop down
+  document.getElementById("monthEventSearch").addEventListener("change", function(){
+    document.getElementById("dayEventSearchLabel").hidden = false;
+    document.getElementById("dayEventSearch").hidden = false;
     });
+
 
     // if not signed in
     if (response.status == 403) {
@@ -100,6 +166,16 @@ document.addEventListener("DOMContentLoaded", async function () {
               fillDayDrop(year,month,"AvaliableSearch")
             });
 
+
+  //once a room selected fill price and availabilty table
+  document.getElementById('bookingRoomDropdown').addEventListener('change',function(){
+    //gets price
+    fillPrice()
+
+    //fills table with availabilty of room
+    fillBookingTable()
+  });
+
             //on choosing year reveal months
             document.getElementById("yearEventSearch").addEventListener("change", function(){
               document.getElementById("monthEventSearchLabel").hidden = false;
@@ -110,6 +186,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             document.getElementById("monthEventSearch").addEventListener("change", function(){
               document.getElementById("dayEventSearchLabel").hidden = false;
               document.getElementById("dayEventSearch").hidden = false;
+
 
               //fill day drop with correct amount of days
               year = document.getElementById("yearEventSearch").value;
@@ -123,10 +200,16 @@ document.addEventListener("DOMContentLoaded", async function () {
               document.getElementById("monthEventNew").hidden = false;
             });
 
+
+    //fill availabilty of room
+    fillHostelBookingTable()
+  });
+
             //on choosing month reveal days and fill day drop down
             document.getElementById("monthEventNew").addEventListener("change", function(){
               document.getElementById("dayEventNewLabel").hidden = false;
               document.getElementById("dayEventNew").hidden = false;
+
 
               //fill day drop with correct amount of days
               year = document.getElementById("yearEventNew").value;
@@ -140,10 +223,57 @@ document.addEventListener("DOMContentLoaded", async function () {
               document.getElementById("monthActivityNew").hidden = false;
             });
 
+
+  //on next button
+  document.getElementById('calenderNext').addEventListener('click',function(){
+    //update availabilty table
+    fillBookingTable()
+  })
+
+  //on prev button
+  document.getElementById('calenderPrev').addEventListener('click',function(){
+    //update availabilty table
+    fillBookingTable()
+  })
+
+  //on next button
+  document.getElementById('hostelCalenderNext').addEventListener('click',function(){
+    //update availabilty table
+    fillHostelBookingTable()
+  })
+
+  //on prev button
+  document.getElementById('hostelCalenderPrev').addEventListener('click',function(){
+    //update availabilty table
+    fillHostelBookingTable()
+  })
+
+  //update list of rooms
+  updateRooms();
+
+  //fill search dropdowns
+  fillFindBy();
+
+  fillActivities();
+
+  //on click of day header set chosen date
+  document.getElementById('day1').addEventListener('click',function(){
+    document.getElementById('chosenDate').innerHTML = document.getElementById('day1').innerHTML
+  })
+
+  //on click of day header set chosen date
+  document.getElementById('day2').addEventListener('click',function(){
+    if(document.getElementById('day2').innerHTML.substring(4) == 1){
+      document.getElementById('chosenDate').value = document.getElementById('chosenDate').value + 1
+    }
+    document.getElementById('chosenDate').innerHTML = document.getElementById('day2').innerHTML
+  })
+
             //on choosing month reveal days and fill day drop down
             document.getElementById("monthActivityNew").addEventListener("change", function(){
               document.getElementById("dayActivityNewLabel").hidden = false;
               document.getElementById("dayActivityNew").hidden = false;
+
 
               //fill day drop with correct amount of days
               year = document.getElementById("yearActivityNew").value;
@@ -439,6 +569,7 @@ function forwardWeek(m){
     }else{
         document.getElementById('prevWeek').style.visibility = 'visible';
     }
+
   //updates calender
   fillCalender()
   return m
@@ -446,19 +577,29 @@ function forwardWeek(m){
 
 //changing the calender to the previous week
 function backWeek(m){
+
     var monthSub = false;
     for(var i = 7; i > 0 ; i--){
         var x = parseInt(document.getElementById('cday' + i).innerHTML) - 7;
         document.getElementById('cday' + i).innerHTML = x.toString().padStart(2,'0') + '/' + m.toString().padStart(2,'0');
         if(isValidDate(x,m-1,y) == false){
-            console.log(x)
+
             if(x == 0 && monthSub == false){
-                document.getElementById('cday' + i).innerHTML = (x + daysInMonth(y,m)).toString().padStart(2,'0') + '/' + (m).toString().padStart(2,'0');
 
                 m = m-1;
                 monthSub = true;
+                document.getElementById('cday' + i).innerHTML = (x + daysInMonth(y,m)).toString().padStart(2,'0') + '/' + (m).toString().padStart(2,'0');
+
+              }else if(x < 0 && monthSub == false ){
+
+
+                m = m-1;
+                monthSub = true
+                document.getElementById('cday' + i).innerHTML = (x + daysInMonth(y,m)).toString().padStart(2,'0') + '/' + (m).toString().padStart(2,'0');
+
+
             }else{
-                document.getElementById('cday' + i).innerHTML =  (daysInMonth(y,m-1) + x).toString().padStart(2,'0') + '/' + (m).toString().padStart(2,'0');
+                document.getElementById('cday' + i).innerHTML =  (daysInMonth(y,m) + x).toString().padStart(2,'0') + '/' + (m).toString().padStart(2,'0');
             }
         }
     }
@@ -468,6 +609,7 @@ function backWeek(m){
     }else{
         document.getElementById('nextWeek').style.visibility = 'visible';
     }
+
   //update calender
   fillCalender()
   return m
@@ -768,8 +910,8 @@ async function getCommunityRooms(startDate, endDate) { // Need to add error hand
     }
 
 
-//find avaliabilty for community room
-async function searchForAvaliability(){
+//find availabilty for community room
+async function searchForAvailability(){
 
   //get parameters
   roomName = document.getElementById("roomSelectDrop").value;
@@ -782,7 +924,7 @@ async function searchForAvaliability(){
   if(roomName == '' || dateCombined== '--'){
 
     //print error message
-    document.getElementById(avaliabiltySearchError).innerHTML = 'Please fill all parameters for the search'
+    document.getElementById(availabiltySearchError).innerHTML = 'Please fill all parameters for the search'
   }else{
   try{
     let response = await fetch('http://localhost:8090/rooms?types=community', {
@@ -802,7 +944,7 @@ async function searchForAvaliability(){
         if(rooms['community'].length == 0){
 
           //print error message
-          document.getElementById(avaliabiltySearchError).innerHTML = 'No rooms found in the database'
+          document.getElementById(availabiltySearchError).innerHTML = 'No rooms found in the database'
         }else{
 
           //for each room
@@ -816,7 +958,7 @@ async function searchForAvaliability(){
             }
           }
 
-  //fetch room avaliabilty for specified room
+  //fetch room availabilty for specified room
   let response2 = await fetch('http://localhost:8090/roomavailability?type=community&id='+roomID, {
       method: "GET",
       headers: {
@@ -851,13 +993,13 @@ async function searchForAvaliability(){
 
   //make form avaliable
   document.getElementById("roomAvailabilityTable").hidden = false;
-  document.getElementById("byAvaliability").hidden = true;
+  document.getElementById("byAvailability").hidden = true;
   document.getElementById("searchModalFooter").hidden = true;
   }else{
 
   //if error throw response
   throw new Error('Error getting Rooms' + response.code);
-  document.getElementById(avaliabiltySearchError).innerHTML = 'Error checking avaliabilty of room'
+  document.getElementById(availabiltySearchError).innerHTML = 'Error checking availabilty of room'
 
   }
 }
@@ -865,7 +1007,7 @@ async function searchForAvaliability(){
 
     //if error throw response
     throw new Error('Error getting Rooms' + response.code);
-    document.getElementById(avaliabiltySearchError).innerHTML = 'Error fetching rooms from the database'
+    document.getElementById(availabiltySearchError).innerHTML = 'Error fetching rooms from the database'
     }
   }catch(error){
   alert ('Error: ' + error);
@@ -1373,7 +1515,7 @@ async function newHostelBooking(id){
   roomId = document.getElementById('hostelRoomsLargeEnough').value;
   free = true
 
-  //check room avaliabilty
+  //check room availabilty
     try{
       let response = await fetch('http://localhost:8090/roomavailability?type=hostel&id='+roomId,
         {
@@ -1403,7 +1545,7 @@ async function newHostelBooking(id){
           }
         }
       }else{
-        throw new Error('Error getting room avaliabilty' + response.code);
+        throw new Error('Error getting room availabilty' + response.code);
       }
       } catch (error) {
         alert ('Error: ' + error);
@@ -1590,7 +1732,7 @@ function calculatePrice(){
   document.getElementById('totalBookingPrice').innerText = price
 }
 
-//fill room avaliabilty calender
+//fill room availabilty calender
 async function fillBookingTable(){
 
   //get room id
@@ -1603,7 +1745,7 @@ async function fillBookingTable(){
     document.getElementById('newBookingError').innerHTML='Room id not supplied'
   }else{
 
-    //get room avaliabilty
+    //get room availabilty
     try{
       let response = await fetch('http://localhost:8090/roomavailability?type=community&id='+roomId,
         {
@@ -1641,7 +1783,7 @@ async function fillBookingTable(){
   }
 }
 
-//fill hostel avaliabilty calender
+//fill hostel availabilty calender
 async function fillHostelBookingTable(){
 
   //get room id
@@ -1662,7 +1804,7 @@ async function fillHostelBookingTable(){
     }else{
       month =  document.getElementById('chosenHostelDate').value
 
-      //get room avaliabilty
+      //get room availabilty
       try{
         let response = await fetch('http://localhost:8090/roomavailability?type=hostel&id='+roomId,
         {
@@ -1724,7 +1866,7 @@ async function fillHostelBookingTable(){
           }
         }
       }else{
-        throw new Error('Error getting room avaliabilty' + response.code);
+        throw new Error('Error getting room availabilty' + response.code);
       }
       } catch (error) {
         alert ('Error: ' + error);
@@ -1859,6 +2001,7 @@ async function getNotifications(){
     //if response is ok
     if(response.ok){
       var body = await response.text();
+      console.log(body)
       var requests = JSON.parse(body)
 
       //display information
@@ -2146,10 +2289,11 @@ async function fillCalender(){
 
       //go through activity bookings
       for(var i = 0; i<bookings['activity'].length; i++){
-        console.log(bookings)
+
             for(var j = 1; j< 8; j++){
 
-               if((bookings['activity'][i].dateTime.substring(8,10)+'/'+bookings['activity'][i].dateTime.substring(5,7)).toString()==document.getElementById('day' + j).textContent.toString()){
+               if((bookings['activity'][i].dateTime.substring(8,10)+'/'+bookings['activity'][i].dateTime.substring(5,7)).toString()==document.getElementById('cday' + j).textContent.toString()){
+
                     document.getElementById('day' + j + 'A').innerHTML += 'Start Time: ' + bookings['activity'][i].datetime.substring(11,16) + '\n'
                     document.getElementById('day' + j + 'A').innerHTML += '  Number of People: ' + bookings['activity'].numberOfPeople
 
@@ -2162,15 +2306,13 @@ async function fillCalender(){
             for(var j = 1; j< 8; j++){
 
               //put start date in calender
-               if((bookings['hostel'][i].startDate.substring(8,10)+'/'+bookings['hostel'][i].startDate.substring(5,7)).toString()==document.getElementById('day' + j).textContent.toString()){
+               if((bookings['hostel'][i].startDate.substring(8,10)+'/'+bookings['hostel'][i].startDate.substring(5,7)).toString()==document.getElementById('cday' + j).textContent.toString()){
                     document.getElementById('day' + j + 'H').innerHTML += ' Start of Booking for ' + bookings['activity'].noOfPeople + ' people'
-
               }
 
               //put end date in calender
-              if((bookings['hostel'][i].endDate.substring(8,10)+'/'+bookings['hostel'][i].endDate.substring(5,7)).toString()==document.getElementById('day' + j).textContent.toString()){
+              if((bookings['hostel'][i].endDate.substring(8,10)+'/'+bookings['hostel'][i].endDate.substring(5,7)).toString()==document.getElementById('cday' + j).textContent.toString()){
                    document.getElementById('day' + j + 'H').innerHTML += ' End of Booking for ' + bookings['hostel'].noOfPeople + ' people'
-
                }
 
             }
@@ -2179,7 +2321,8 @@ async function fillCalender(){
       //go through community bookings
       for(var i = 0; i<bookings['community'].length; i++){
             for(var j = 1; j< 8; j++){
-               if((bookings['community'][i].start.substring(8,10)+'/'+bookings['community'][i].start.substring(5,7)).toString()==document.getElementById('day' + j).textContent.toString()){
+               if((bookings['community'][i].start.substring(8,10)+'/'+bookings['community'][i].start.substring(5,7)).toString()==document.getElementById('cday' + j).textContent.toString()){
+
                     document.getElementById('day' + j + 'C').innerHTML += 'Start Time: ' + bookings['community'][i].start.substring(11,16) + '\n'
                     document.getElementById('day' + j + 'C').innerHTML += '  End Time: ' + bookings['community'][i].end.substring(11,16)
 
@@ -2193,7 +2336,7 @@ async function fillCalender(){
   }
 }
 
-//fill dropdown with activities avaliable to be booked
+//fill dropdown with activities availiable to be booked
 async function fillActivities(){
 
   //get dropdown
