@@ -147,6 +147,15 @@ function addToValuesStatement(parameter, field, valuesStatement) {
     return valuesStatement;
 }
 
+// root
+app.get('/', async function(req, resp) {
+    // redirect to customer sign in page
+    resp.writeHead(302, {
+        'Location': 'customersignin.html'
+    });
+    resp.end();
+});
+
 // rooms
 
 // get rooms
