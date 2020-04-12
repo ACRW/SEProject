@@ -1,5 +1,3 @@
-const hostAddr = "localhost";
-const hostPort = "8090";
 const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const dayNames = ["Mon", "Tues", "Wed", "Thur", "Fri", "Sat", "Sun"];
 const greyCol = "#EDEDED";
@@ -12,7 +10,7 @@ let table = document.getElementById("checkoutTable");
 let totalCostElement = document.getElementById("totalCost");
 
 async function createCards () { // Get the card information and create them
-  let response = await fetch('http://' + hostAddr + ":" + hostPort + '/events', {
+  let response = await fetch('/events', {
       method: "GET",
       headers: {
         "Content-Type": "application/json"
@@ -25,7 +23,7 @@ async function createCards () { // Get the card information and create them
 }
 
 async function getTicketTypes(id) {
-  let response = await fetch('http://' + hostAddr + ":" + hostPort + '/tickets?eventid=' + id, {
+  let response = await fetch('/tickets?eventid=' + id, {
       method: "GET",
       headers: {
         "Content-Type": "application/json"
@@ -313,7 +311,7 @@ async function submit() {
     return;
   }
 
-  let response = await fetch('http://' + hostAddr + ":" + hostPort + '/eventbooking', {
+  let response = await fetch('/eventbooking', {
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded"

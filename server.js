@@ -1,4 +1,4 @@
 // import app
 const app = require('./app');
-// listen on port 8090
-app.listen(8090);
+// listen (default port 8090)
+app.listen(process.env.PORT | 8090);

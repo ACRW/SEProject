@@ -147,6 +147,15 @@ function addToValuesStatement(parameter, field, valuesStatement) {
     return valuesStatement;
 }
 
+// root
+app.get('/', async function(req, resp) {
+    // redirect to customer sign in page
+    resp.writeHead(302, {
+        'Location': 'customersignin.html'
+    });
+    resp.end();
+});
+
 // rooms
 
 // get rooms
@@ -1634,13 +1643,14 @@ app.get('/bookingrequests', async function(req, resp) {
         let requests = {}
 
         // activity requests
-        const activityRequests = await performQuery('SELECT r.id, r.dateTime, a.name, a.description, a.price, a.roomNeeded, c.fName, c.lName, c.email, c.phone FROM activityRequests AS r INNER JOIN customers AS c ON r.userId = c.id INNER JOIN activities AS a ON r.activityId = a.id');
+        const activityRequests = await performQuery('SELECT r.id, r.dateTime, a.name, a.description, a.price, c.fName, c.lName, c.email, c.phone FROM activityRequests AS r INNER JOIN customers AS c ON r.userId = c.id INNER JOIN activities AS a ON r.activityId = a.id');
 
         // community requests
         const communityRequests = await performQuery('SELECT r.id, r.start, r.end, r.priceOfBooking, co.name, co.description, cu.fName, cu.lName, cu.email, cu.phone  FROM communityRequests AS r INNER JOIN customers AS cu ON r.userId = cu.id INNER JOIN communityRooms AS co ON r.roomId = co.id');
 
         // hostel requests
         const hostelRequests = await performQuery('SELECT r.id, r.startDate, r.endDate, r.price, r.noOfPeople, hr.roomNumber, c.fName, c.lName, c.email, c.phone  FROM hostelRequests AS r INNER JOIN customers AS c ON r.userId = c.id INNER JOIN hostelRooms AS hr ON r.roomId = hr.id');
+
 
         // if no database errors
         if (processQueryResult(activityRequests, resp) && processQueryResult(communityRequests, resp) && processQueryResult(hostelRequests, resp)) {

@@ -1,6 +1,3 @@
-const hostAddr = "localhost";
-const hostPort = "8090";
-
 ////// Selecting page elements //////
 const usernameF = document.getElementById("username");
 const booking1 = document.getElementById("booking1");
@@ -66,7 +63,7 @@ function showNav2(){
 // return [firstname, lastname]
 async function getUserInfo () {
   // get current user name
-  let response = await fetch('http://' + hostAddr + ":" + hostPort + '/currentusername', {
+  let response = await fetch('/currentusername', {
       method: "GET",
       headers: {
         "Content-Type": "application/json"
@@ -81,7 +78,7 @@ async function getUserInfo () {
 }
 
 async function getConfirmedBookings () {
-  let response = await fetch('http://' + hostAddr + ":" + hostPort + '/mybookings', {
+  let response = await fetch('/mybookings', {
     method: "GET",
     headers: {
       "Content-Type": "application/json"
@@ -293,7 +290,7 @@ async function getConfirmedBookings () {
 };
 
 async function getBookingRequests () {
-  let response = await fetch('http://' + hostAddr + ":" + hostPort + '/mybookingrequests', {
+  let response = await fetch('/mybookingrequests', {
     method: "GET",
     headers: {
       "Content-Type": "application/json"

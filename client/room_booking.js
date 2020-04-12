@@ -1,7 +1,5 @@
 const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const dayNames = ["Mon", "Tues", "Wed", "Thur", "Fri", "Sat", "Sun"];
-const hostAddr = "localhost";
-const hostPort = "8090";
 let rooms = {};
 
 function mod(n, m) { // Because javascript mod % is broken
@@ -9,7 +7,7 @@ function mod(n, m) { // Because javascript mod % is broken
 }
 
 async function getRooms(startDate, endDate) { // Need to add error handling at some point.
-  let response = await fetch('http://' + hostAddr + ":" + hostPort + '/rooms?types=community', {
+  let response = await fetch('/rooms?types=community', {
     method: "GET",
     headers: {
       "Content-Type": "application/json"
@@ -218,7 +216,7 @@ function Calender () { // Calender constructor/class
     if (roomID == -1) {
       return;
     }
-    let response = await fetch('http://' + hostAddr + ":" + hostPort + '/roomavailability?type=community&id=' + roomID, {
+    let response = await fetch('/roomavailability?type=community&id=' + roomID, {
       method: "GET",
       headers: {
         "Content-Type": "application/json"
@@ -347,7 +345,7 @@ function Calender () { // Calender constructor/class
       alert("Please put down a booking. ");
       return;
     }
-    let response = await fetch('http://' + hostAddr + ":" + hostPort + '/customercommunitybooking', {
+    let response = await fetch('/customercommunitybooking', {
       method: "POST",
       headers: {
       "Content-Type": "application/x-www-form-urlencoded",
