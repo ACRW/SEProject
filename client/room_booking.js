@@ -108,7 +108,7 @@ function Calender () { // Calender constructor/class
   targetSun.setHours(23, 59, 59, 0);
   targetMon.setHours(0, 0, 0, 0);
   if (targetMon.getDay() != 1) { // Only changes date if not already a monday
-    targetMon.setDate(targetMon.getDate() - ((targetMon.getDay() - 1) % 7)); // Changes to last monday
+    targetMon.setDate(targetMon.getDate() - mod((targetMon.getDay() - 1), 7)); // Changes to last monday
   }
 
   targetSun.setDate(targetMon.getDate() + 6); // Sets the sunday of the week (conveniant to have, also, actually sets the next monday to prevent issues with comparisons)
@@ -223,6 +223,7 @@ function Calender () { // Calender constructor/class
       }
     });
     let availability = await response.json();
+    console.log(availability);
     rawBookings = availability["busy"];
     bookings = []; // Reset bookings
     for (i = 0; i < rawBookings.length; i++) {
@@ -345,6 +346,8 @@ function Calender () { // Calender constructor/class
       alert("Please put down a booking. ");
       return;
     }
+    console.log(String(curRoom));
+    console.log(Math.floor(userBooking["startTime"].getTime()/1000));
     let response = await fetch('/customercommunitybooking', {
       method: "POST",
       headers: {
@@ -355,9 +358,8 @@ function Calender () { // Calender constructor/class
       + "&end=" + Math.floor(userBooking["endTime"].getTime()/1000)
       + "&price=" + String(userBooking["price"])
       });
-
+    console.log(response);
     if (response.status == 200) {
-      let success = await response.json();
       alert("Booking sucessfully made. ");
     } else {
       alert("There was an error making your booking. ");

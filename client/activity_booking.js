@@ -80,9 +80,9 @@ function monthCalender(calTable, monthTitle, objName) {
   let outRangeColor = "#DDDDDD";
   let soMonth = new Date(); // Start of month
   let today = new Date();
-  today.setHours(0, 0, 0, 0);
+  today.setHours(12, 0, 0, 0);
   soMonth.setDate(1);
-  soMonth.setHours(0, 0, 0, 0);
+  soMonth.setHours(12, 0, 0, 0);
   let booking = {
     "date": -1
   };
@@ -163,7 +163,7 @@ function monthCalender(calTable, monthTitle, objName) {
     };
     soMonth = new Date();
     soMonth.setDate(1);
-    soMonth.setHours(0, 0, 0, 0);
+    soMonth.setHours(12, 0, 0, 0);
     popCells();
   };
 
@@ -196,6 +196,7 @@ async function submit() {
     alert("Please select a booking date.");
     return;
   }
+  console.log(bookDate);
   let response = await fetch('/customeractivitybooking', {
       method: "POST",
       headers: {
@@ -206,6 +207,8 @@ async function submit() {
         "&numberofpeople=" + String(groupSize) +
         "&price=" + String(groupSize * activity["price"])
     });
+  let testDate = new Date((Math.floor(bookDate.getTime()/1000)) * 1000);
+  console.log(testDate);
   let answer = await response;
   if (answer.status == 200) {
     alert("Booking Request succesfully made! ");
