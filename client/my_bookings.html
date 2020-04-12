@@ -33,21 +33,25 @@
       }
       #navigation1{
         position: fixed; /*or fixed/absolute */
-        right: 0px;
+        right: 10px;
         float: right;
         /*top:0;*/
         /*width:100%;*/
         z-index:100;
+        padding: 10px;
         background-color: #C2D6B6;
+        border-radius: 10px;
       }
       #navigation2{
         position: fixed; /*or fixed/absolute */
-        right: 0px;
+        right: 10px;
         float: right;
         /*top:0;*/
         /*width:100%;*/
         z-index:100;
+        padding: 10px;
         background-color: #C2D6B6;
+        border-radius: 10px;
       }
     </style>
 </head>
@@ -58,7 +62,7 @@
   <div class="jumbotron">
     <div class="container">
       <h1 class="display-3">Welcome back: <a id="username"> customer </a></h1>
-      <p class="lead">view and manage your bookings </p>
+      <p class="lead">View and manage your bookings </p>
       <!-- <p><a class="btn btn-primary btn-lg" href="#" role="button">Learn more »</a></p>-->
       <hr class="my-4">
       <p> Note: you can change your booking 24 hours before the appointment</p>
@@ -83,116 +87,110 @@
     <a href="#hostel2jump">Hostel Request</a>
   </div>
 
-    <!-- Nav tabs( the tab )-->
-    <ul class="nav nav-tabs" role="tablist">
-      <li class="nav-item">
-        <a class="nav-link active" data-toggle="tab" href="#type1" style="color:gray;font-size: 25px;" id="booking1">Confirmed booking(s)</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" data-toggle="tab" href="#type2" style="color:gray;font-size: 25px;" id="booking2">Booking request(s) </a>
-      </li>
-    </ul>
-  
-    <!-- Tab panes( the tab ) -->
-    <div class="tab-content">
-      <div id="type1" class="container tab-pane active"><br>
-        <div style=' margin-top: 20px; '>
-          <div id="activity1jump">
-            <h3 style="color: #A5B686 ;">Activity Booking:</h3>
-            <div class="mx-auto" style="width: 300px;" id = "activity1default">
-              Waiting for the server response...
-            </div>            
-            <div class="mx-auto" style="width: 200px;" id = "activity1NoRecord" hidden="true">
-              No booking records.
-            </div>
-            <div id = "activity1">
-              <!-- add cards here -->
-            </div>
-          </div>
+  <!-- Nav tabs( the tab )-->
+  <ul class="nav nav-tabs" role="tablist">
+    <li class="nav-item">
+      <a class="nav-link active" data-toggle="tab" href="#type1" style="color:gray;font-size: 25px;" id="booking1">Confirmed booking(s)</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" data-toggle="tab" href="#type2" style="color:gray;font-size: 25px;" id="booking2">Booking request(s) </a>
+    </li>
+  </ul>
 
-          <div id="community1jump">
-            <h3 style="color: #A5B686 ;">Community Booking:</h3>
-            <div class="mx-auto" style="width: 300px;" id = "community1default">
-              Waiting for the server response...
-            </div> 
-            <div class="mx-auto" style="width: 200px;" id = "community1NoRecord" hidden="true">
-              No booking records.
-            </div>
-            <div id = "community1">
-              <!-- add cards here -->
-            </div>
+  <!-- Tab panes( the tab ) -->
+  <div class="tab-content">
+    <div id="type1" class="container tab-pane active"><br>
+      <div style=' margin-top: 20px; '>
+        <div id="activity1jump">
+          <h3 style="color: #A5B686 ;">Activity Booking:</h3>
+          <div class="mx-auto" style="width: 300px;" id = "activity1default">
+            Waiting for the server response...
+          </div>            
+          <div class="mx-auto" style="width: 200px;" id = "activity1NoRecord" hidden="true">
+            No booking records.
           </div>
-
-          <div id="hostel1jump">
-            <h3 style="color: #A5B686 ;">Hostel Booking:</h3>
-            <div class="mx-auto" style="width: 300px;" id = "hostel1default">
-              Waiting for the server response...
-            </div> 
-            <div class="mx-auto" style="width: 200px;" id = "hostel1NoRecord" hidden="true">
-              No booking records.
-            </div>
-            <div id = "hostel1">
-              <!-- add cards here -->
-            </div>
+          <div id = "activity1">
+            <!-- add cards here -->
           </div>
-
-          <!-- cards  -->
         </div>
-      </div>
-  
-      <div id="type2" class="container tab-pane fade"><br>
-        <div style=' margin-top: 20px; '>
-
-          <div id="activity2jump">
-            <h3 style="color: #A5B686 ;">Activity Request:</h3>
-            <div class="mx-auto" style="width: 300px;" id = "activity2default">
-              Waiting for the server response...
-            </div> 
-            <div class="mx-auto" style="width: 200px;" id = "activity2NoRecord" hidden="true">
-              No booking records.
-            </div>
-            <div id = "activity2">
-              <!-- add cards here -->
-            </div>
+        <br>
+        <div id="community1jump">
+          <h3 style="color: #A5B686 ;">Community Booking:</h3>
+          <div class="mx-auto" style="width: 300px;" id = "community1default">
+            Waiting for the server response...
+          </div> 
+          <div class="mx-auto" style="width: 200px;" id = "community1NoRecord" hidden="true">
+            No booking records.
           </div>
-
-          <div id="community2jump">
-            <h3 style="color: #A5B686 ;">Community Request:</h3>
-            <div class="mx-auto" style="width: 300px;" id = "community2default">
-              Waiting for the server response...
-            </div> 
-            <div class="mx-auto" style="width: 200px;" id = "community2NoRecord" hidden="true">
-              No booking records.
-            </div>
-            <div id = "community2">
-              <!-- add cards here -->
-            </div>
+          <div id = "community1">
+            <!-- add cards here -->
           </div>
-
-          <div id="hostel2jump">
-            <h3 style="color: #A5B686 ;">Hostel Request:</h3>
-            <div class="mx-auto" style="width: 300px;" id = "hostel2default">
-              Waiting for the server response...
-            </div> 
-            <div class="mx-auto" style="width: 200px;" id = "hostel2NoRecord" hidden="true">
-              No booking records.
-            </div>
-            <div id = "hostel2">
-              <!-- add cards here -->
-            </div>
-          </div>
-
-          <!-- cards  -->
-
         </div>
+        <br>
+        <div id="hostel1jump">
+          <h3 style="color: #A5B686 ;">Hostel Booking:</h3>
+          <div class="mx-auto" style="width: 300px;" id = "hostel1default">
+            Waiting for the server response...
+          </div> 
+          <div class="mx-auto" style="width: 200px;" id = "hostel1NoRecord" hidden="true">
+            No booking records.
+          </div>
+          <div id = "hostel1">
+            <!-- add cards here -->
+          </div>
+        </div>
+
+        <!-- cards  -->
       </div>
     </div>
 
-  
+    <div id="type2" class="container tab-pane fade"><br>
+      <div style=' margin-top: 20px; '>
+        <br>
+        <div id="activity2jump">
+          <h3 style="color: #A5B686 ;">Activity Request:</h3>
+          <div class="mx-auto" style="width: 300px;" id = "activity2default">
+            Waiting for the server response...
+          </div> 
+          <div class="mx-auto" style="width: 200px;" id = "activity2NoRecord" hidden="true">
+            No booking records.
+          </div>
+          <div id = "activity2">
+            <!-- add cards here -->
+          </div>
+        </div>
+        <br>
+        <div id="community2jump">
+          <h3 style="color: #A5B686 ;">Community Request:</h3>
+          <div class="mx-auto" style="width: 300px;" id = "community2default">
+            Waiting for the server response...
+          </div> 
+          <div class="mx-auto" style="width: 200px;" id = "community2NoRecord" hidden="true">
+            No booking records.
+          </div>
+          <div id = "community2">
+            <!-- add cards here -->
+          </div>
+        </div>
+        <br>
+        <div id="hostel2jump">
+          <h3 style="color: #A5B686;">Hostel Request:</h3>
+          <div class="mx-auto" style="width: 300px;" id = "hostel2default">
+            Waiting for the server response...
+          </div> 
+          <div class="mx-auto" style="width: 200px;" id = "hostel2NoRecord" hidden="true">
+            No booking records.
+          </div>
+          <div id = "hostel2">
+            <!-- add cards here -->
+          </div>
+        </div>
 
+        <!-- cards  -->
 
-  
-
+      </div>
+    </div>
+  </div>
 </body>
 <script src="my_bookings.js"></script>
 </html>

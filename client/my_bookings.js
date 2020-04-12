@@ -123,16 +123,16 @@ async function getConfirmedBookings () {
       let difference = startTime-nowTime;
       let day = parseInt(difference/(1000*60*60*24));
       if (day > 0){
-        // comming in day days
-        document.getElementById("one-activity-header-" +String(flag)).innerHTML = "Comming in " + String(day) + " days."
+        // coming in day days
+        document.getElementById("one-activity-header-" +String(flag)).innerHTML = "Starting in " + String(day) + " days."
       }else{
         let hours =  parseInt(difference/(1000*60*60));
         if (hours > 0){
-          // comming in hours hours
-          document.getElementById("one-activity-header-" +String(flag)).innerHTML = "Comming in " + String(hours) + " hours."
+          // coming in hours hours
+          document.getElementById("one-activity-header-" +String(flag)).innerHTML = "Starting in " + String(hours) + " hours."
         }else{
           // less than one hour, don't be late
-          document.getElementById("one-activity-header-" +String(flag)).innerHTML = "Comming in less than one hour, hurry."
+          document.getElementById("one-activity-header-" +String(flag)).innerHTML = "Starting in less than one hour, hurry."
         }
       }
     }
@@ -185,16 +185,16 @@ async function getConfirmedBookings () {
       let difference = startTime-nowTime;
       let day = parseInt(difference/(1000*60*60*24));
       if (day > 0){
-        // comming in day days
-        document.getElementById("one-community-header-" +String(flag)).innerHTML = "Comming in " + String(day) + " days."
+        // coming in day days
+        document.getElementById("one-community-header-" +String(flag)).innerHTML = "Starting in " + String(day) + " days."
       }else{
         let hours =  parseInt(difference/(1000*60*60));
         if (hours > 0){
-          // comming in hours hours
-          document.getElementById("one-community-header-" +String(flag)).innerHTML = "Comming in " + String(hours) + " hours."
+          // coming in hours hours
+          document.getElementById("one-community-header-" +String(flag)).innerHTML = "Starting in " + String(hours) + " hours."
         }else{
           // less than one hour, don't be late
-          document.getElementById("one-activity-header-" +String(flag)).innerHTML = "Comming in less than one hour, hurry."
+          document.getElementById("one-activity-header-" +String(flag)).innerHTML = "Starting in less than one hour, hurry."
         }
       }
     }
@@ -248,16 +248,16 @@ async function getConfirmedBookings () {
       let difference = startTime-nowTime;
       let day = parseInt(difference/(1000*60*60*24));
       if (day > 0){
-        // comming in day days
-        document.getElementById("one-hostel-header-" +String(flag)).innerHTML = "Comming in " + String(day) + " days."
+        // coming in day days
+        document.getElementById("one-hostel-header-" +String(flag)).innerHTML = "coming in " + String(day) + " days."
       }else{
         let hours =  parseInt(difference/(1000*60*60));
         if (hours > 0){
-          // comming in hours hours
-          document.getElementById("one-hostel-header-" +String(flag)).innerHTML = "Comming in " + String(hours) + " hours."
+          // coming in hours hours
+          document.getElementById("one-hostel-header-" +String(flag)).innerHTML = "coming in " + String(hours) + " hours."
         }else{
           // less than one hour, don't be late
-          document.getElementById("one-hostel-header-" +String(flag)).innerHTML = "Comming in less than one hour, hurry."
+          document.getElementById("one-hostel-header-" +String(flag)).innerHTML = "coming in less than one hour, hurry."
         }
       }
     }
@@ -335,16 +335,16 @@ async function getBookingRequests () {
       let difference = startTime-nowTime;
       let day = parseInt(difference/(1000*60*60*24));
       if (day > 0){
-        // comming in day days
-        document.getElementById("two-activity-header-" +String(flag)).innerHTML = "Comming in " + String(day) + " days."
+        // coming in day days
+        document.getElementById("two-activity-header-" +String(flag)).innerHTML = "Starting in " + String(day) + " days."
       }else{
         let hours =  parseInt(difference/(1000*60*60));
         if (hours > 0){
-          // comming in hours hours
-          document.getElementById("two-activity-header-" +String(flag)).innerHTML = "Comming in " + String(hours) + " hours. Please consider make a phone call."
+          // coming in hours hours
+          document.getElementById("two-activity-header-" +String(flag)).innerHTML = "Starting in " + String(hours) + " hours. Please consider make a phone call."
         }else{
           // less than one hour, don't be late
-          document.getElementById("two-activity-header-" +String(flag)).innerHTML = "Comming in less than one hour! Definitely make a phone call now."
+          document.getElementById("two-activity-header-" +String(flag)).innerHTML = "Starting in less than one hour! Definitely make a phone call now."
         }
       }
     }
@@ -391,16 +391,16 @@ async function getBookingRequests () {
       let difference = startTime-nowTime;
       let day = parseInt(difference/(1000*60*60*24));
       if (day > 0){
-        // comming in day days
-        document.getElementById("two-community-header-" +String(flag)).innerHTML = "Comming in " + String(day) + " days."
+        // coming in day days
+        document.getElementById("two-community-header-" +String(flag)).innerHTML = "Starting in " + String(day) + " days."
       }else{
         let hours =  parseInt(difference/(1000*60*60));
         if (hours > 0){
-          // comming in hours hours
-          document.getElementById("two-community-header-" +String(flag)).innerHTML = "Comming in " + String(hours) + " hours. Please consider make a phone call."
+          // coming in hours hours
+          document.getElementById("two-community-header-" +String(flag)).innerHTML = "Starting in " + String(hours) + " hours. Please consider make a phone call."
         }else{
           // less than one hour, don't be late
-          document.getElementById("two-activity-header-" +String(flag)).innerHTML = "Comming in less than one hour! Definitely make a phone call now."
+          document.getElementById("two-activity-header-" +String(flag)).innerHTML = "Starting in less than one hour! Definitely make a phone call now."
         }
       }
     }
@@ -452,16 +452,16 @@ async function getBookingRequests () {
       let difference = startTime-nowTime;
       let day = parseInt(difference/(1000*60*60*24));
       if (day > 0){
-        // comming in day days
-        document.getElementById("two-hostel-header-" +String(flag)).innerHTML = "Comming in " + String(day) + " days."
+        // coming in day days
+        document.getElementById("two-hostel-header-" +String(flag)).innerHTML = "coming in " + String(day) + " days."
       }else{
         let hours =  parseInt(difference/(1000*60*60));
         if (hours > 0){
-          // comming in hours hours
-          document.getElementById("two-hostel-header-" +String(flag)).innerHTML = "Comming in " + String(hours) + " hours. Please consider make a phone call."
+          // coming in hours hours
+          document.getElementById("two-hostel-header-" +String(flag)).innerHTML = "coming in " + String(hours) + " hours. Please consider make a phone call."
         }else{
           // less than one hour, don't be late
-          document.getElementById("two-hostel-header-" +String(flag)).innerHTML = "Comming in less than one hour! Definitely make a phone call now."
+          document.getElementById("two-hostel-header-" +String(flag)).innerHTML = "coming in less than one hour! Definitely make a phone call now."
         }
       }
     }
@@ -500,7 +500,7 @@ function oneActivityCard(number){
   let head = document.createElement('div');
   head.className = "card-header";
   head.id="one-activity-header-" +String(number);
-  head.innerHTML = "Time stamps /eg: 2 days ago/ comming in 2 days";
+  head.innerHTML = "Time stamps /eg: 2 days ago/ coming in 2 days";
 
   let title = document.createElement('h4'); // <h4></h4>
   title.className="card-title";
@@ -518,7 +518,7 @@ function oneActivityCard(number){
   ilist2.appendChild(descriptionContent);
 
   let startTime = document.createElement('b');
-  startTime.innerHTML="Start Time(dd-mm-yyyy hh:mm:ss): ";
+  startTime.innerHTML="Start Time: ";
   let startTimeContent = document.createElement('a');
   startTimeContent.id = "one-activity-starttime-" +String(number);
   startTimeContent.innerHTML = "2020-01-27T02:00:00.000Z(e)";
@@ -596,7 +596,7 @@ function oneCommunityCard(number){
   let head = document.createElement('div');
   head.className = "card-header";
   head.id="one-community-header-" +String(number);
-  head.innerHTML = "Time stamps /eg: 2 days ago/ comming in 2 days";
+  head.innerHTML = "Time stamps /eg: 2 days ago/ coming in 2 days";
 
   let title = document.createElement('h4'); // <h4></h4>
   title.className="card-title";
@@ -614,7 +614,7 @@ function oneCommunityCard(number){
   ilist2.appendChild(descriptionContent);
 
   let startTime = document.createElement('b');
-  startTime.innerHTML="Start Time(dd-mm-yyyy hh:mm:ss): ";
+  startTime.innerHTML="Start Time: ";
   let startTimeContent = document.createElement('a');
   startTimeContent.id = "one-community-starttime-" +String(number);
   startTimeContent.innerHTML = "2020-01-27T02:00:00.000Z(e)";
@@ -624,7 +624,7 @@ function oneCommunityCard(number){
   ilist3.appendChild(startTimeContent);
 
   let endTime = document.createElement('b');
-  endTime.innerHTML="End Time(dd-mm-yyyy hh:mm:ss): ";
+  endTime.innerHTML="End Time: ";
   let endTimeContent = document.createElement('a');
   endTimeContent.id = "one-community-endtime-" +String(number);
   endTimeContent.innerHTML = "2020-01-27T02:00:00.000Z(e)";
@@ -692,7 +692,7 @@ function oneHostelCard(number){
   let head = document.createElement('div');
   head.className = "card-header";
   head.id="one-hostel-header-" +String(number);
-  head.innerHTML = "Time stamps /eg: 2 days ago/ comming in 2 days";
+  head.innerHTML = "Time stamps /eg: 2 days ago/ coming in 2 days";
 
   let title = document.createElement('h4'); // <h4></h4>
   title.className="card-title";
@@ -700,7 +700,7 @@ function oneHostelCard(number){
   title.innerHTML = "Event type"; //<h4 className="card-title">Event type</h4>
 
   let startTime = document.createElement('b');
-  startTime.innerHTML="Start Time(dd-mm-yyyy hh:mm:ss): ";
+  startTime.innerHTML="Start Time: ";
   let startTimeContent = document.createElement('a');
   startTimeContent.id = "one-hostel-starttime-" +String(number);
   startTimeContent.innerHTML = "2020-01-27T02:00:00.000Z(e)";
@@ -710,7 +710,7 @@ function oneHostelCard(number){
   ilist3.appendChild(startTimeContent);
 
   let endTime = document.createElement('b');
-  endTime.innerHTML="End Time(dd-mm-yyyy hh:mm:ss): ";
+  endTime.innerHTML="End Time: ";
   let endTimeContent = document.createElement('a');
   endTimeContent.id = "one-hostel-endtime-" +String(number);
   endTimeContent.innerHTML = "2020-01-27T02:00:00.000Z(e)";
@@ -788,7 +788,7 @@ function twoActivityCard(number){
   let head = document.createElement('div');
   head.className = "card-header";
   head.id="two-activity-header-" +String(number);
-  head.innerHTML = "Time stamps /eg: 2 days ago/ comming in 2 days";
+  head.innerHTML = "Time stamps /eg: 2 days ago/ coming in 2 days";
 
   let title = document.createElement('h4'); // <h4></h4>
   title.className="card-title";
@@ -806,7 +806,7 @@ function twoActivityCard(number){
   ilist2.appendChild(descriptionContent);
 
   let startTime = document.createElement('b');
-  startTime.innerHTML="Start Time(dd-mm-yyyy hh:mm:ss): ";
+  startTime.innerHTML="Start Time: ";
   let startTimeContent = document.createElement('a');
   startTimeContent.id = "two-activity-starttime-" +String(number);
   startTimeContent.innerHTML = "2020-01-27T02:00:00.000Z(e)";
@@ -873,7 +873,7 @@ function twoCommunityCard(number){
   let head = document.createElement('div');
   head.className = "card-header";
   head.id="two-community-header-" +String(number);
-  head.innerHTML = "Time stamps /eg: 2 days ago/ comming in 2 days";
+  head.innerHTML = "Time stamps /eg: 2 days ago/ coming in 2 days";
 
   let title = document.createElement('h4'); // <h4></h4>
   title.className="card-title";
@@ -891,7 +891,7 @@ function twoCommunityCard(number){
   ilist2.appendChild(descriptionContent);
 
   let startTime = document.createElement('b');
-  startTime.innerHTML="Start Time(dd-mm-yyyy hh:mm:ss): ";
+  startTime.innerHTML="Start Time: ";
   let startTimeContent = document.createElement('a');
   startTimeContent.id = "two-community-starttime-" +String(number);
   startTimeContent.innerHTML = "2020-01-27T02:00:00.000Z(e)";
@@ -901,7 +901,7 @@ function twoCommunityCard(number){
   ilist3.appendChild(startTimeContent);
 
   let endTime = document.createElement('b');
-  endTime.innerHTML="End Time(dd-mm-yyyy hh:mm:ss): ";
+  endTime.innerHTML="End Time: ";
   let endTimeContent = document.createElement('a');
   endTimeContent.id = "two-community-endtime-" +String(number);
   endTimeContent.innerHTML = "2020-01-27T02:00:00.000Z(e)";
@@ -958,7 +958,7 @@ function twoHostelCard(number){
   let head = document.createElement('div');
   head.className = "card-header";
   head.id="two-hostel-header-" +String(number);
-  head.innerHTML = "Time stamps /eg: 2 days ago/ comming in 2 days";
+  head.innerHTML = "Time stamps /eg: 2 days ago/ coming in 2 days";
 
   let title = document.createElement('h4'); // <h4></h4>
   title.className="card-title";
@@ -966,7 +966,7 @@ function twoHostelCard(number){
   title.innerHTML = "Event type"; //<h4 className="card-title">Event type</h4>
 
   let startTime = document.createElement('b');
-  startTime.innerHTML="Start Time(dd-mm-yyyy hh:mm:ss): ";
+  startTime.innerHTML="Start Time: ";
   let startTimeContent = document.createElement('a');
   startTimeContent.id = "two-hostel-starttime-" +String(number);
   startTimeContent.innerHTML = "2020-01-27T02:00:00.000Z(e)";
@@ -976,7 +976,7 @@ function twoHostelCard(number){
   ilist3.appendChild(startTimeContent);
 
   let endTime = document.createElement('b');
-  endTime.innerHTML="End Time(dd-mm-yyyy hh:mm:ss): ";
+  endTime.innerHTML="End Time: ";
   let endTimeContent = document.createElement('a');
   endTimeContent.id = "two-hostel-endtime-" +String(number);
   endTimeContent.innerHTML = "2020-01-27T02:00:00.000Z(e)";
