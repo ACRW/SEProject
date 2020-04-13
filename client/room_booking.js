@@ -223,7 +223,6 @@ function Calender () { // Calender constructor/class
       }
     });
     let availability = await response.json();
-    console.log(availability);
     rawBookings = availability["busy"];
     bookings = []; // Reset bookings
     for (i = 0; i < rawBookings.length; i++) {
@@ -244,6 +243,16 @@ function Calender () { // Calender constructor/class
   let unplaceBooking = async function () {
     userBooking["placed"] = false;
     updPayTable(); // update the pay table to reflect that the booking is no long valid in the context
+  }
+  
+  let checkCollision = function(startTime, endTime) {
+    for (booking of bookings) {
+      if (startTime <= booking["startTime"] && endTime > booking["startTime"]
+        || startTime >= booking["startTime"] && startTime < booking["endTime"]) {
+        return true;
+      }
+    }
+    return false;
   }
 
   this.changeRoom = async function () { // Called when the room is changed
@@ -313,12 +322,9 @@ function Calender () { // Calender constructor/class
       endTime.setMinutes(endTime.getMinutes() + parseInt(userBooking["bookingLength"]));
 
       // Check user hasnt booked during another booking
-      for (booking of bookings) {
-        if (selectedDate < booking["startTime"] && endTime > booking["startTime"]
-          || selectedDate > booking["startTime"] && selectedDate < booking["endTime"]) {
-          alert("Slot already occupied. ")
-          return;
-        }
+      if (checkCollision(selectedDate, endTime)) {
+        alert("Slot already occupied. ");
+        return;
       }
 
       if (userBooking["element"].parentNode) {
@@ -330,7 +336,7 @@ function Calender () { // Calender constructor/class
       userBooking["endTime"] = endTime;
       eTable.rows[0].cells[curColumn + 1].appendChild(userBooking["element"]);
       userBooking["placed"] = true;
-      userBooking["price"] = rooms[curRoom]["pricePerHour"] * userBooking["bookingLength"]/60
+      userBooking["price"] = rooms[curRoom]["pricePerHour"] * userBooking["bookingLength"]/60;
     }
 
     // update payment table:
@@ -346,8 +352,6 @@ function Calender () { // Calender constructor/class
       alert("Please put down a booking. ");
       return;
     }
-    console.log(String(curRoom));
-    console.log(Math.floor(userBooking["startTime"].getTime()/1000));
     let response = await fetch('/customercommunitybooking', {
       method: "POST",
       headers: {
@@ -368,9 +372,32 @@ function Calender () { // Calender constructor/class
 
   this.setBookingLength = async function(e) { // Sets what the booking length should be
     let lengthDrop = document.getElementById("lengthDrop");
-    userBooking["bookingLength"] = lengthDrop.value;
+    let newBookLength = lengthDrop.value;
+    
+    if (!userBooking["placed"]) { // If the user hasnt placed it we don't really have to do/check anything
+      userBooking["bookingLength"] = newBookLength;
+      userBooking["element"].style.height = String((userBooking["bookingLength"]/60) * 50) + "px";
+      peekElement.style.height = String((userBooking["bookingLength"]/60) * 50) + "px";
+      return;
+    }
+    
+    // Update end time
+    let endTime = new Date();
+    endTime.setTime(userBooking["startTime"].getTime()); // Calculate dat ethat the thing ends
+    endTime.setMinutes(endTime.getMinutes() + parseInt(newBookLength));
+    
+    // Check that selecting a longer time doesn't collide with another slot
+    if (newBookLength > userBooking["bookingLength"]
+      && checkCollision(userBooking["startTime"], endTime)) {
+      lengthDrop.selectedIndex = Math.floor((userBooking["bookingLength"]/30) - 1).toString();
+      alert("You cannot change to a longer booking time as there is a slot ahead of yours. ");
+      return;
+    }
+    
+    userBooking["bookingLength"] = newBookLength;
     userBooking["price"] = rooms[curRoom]["pricePerHour"] * userBooking["bookingLength"]/60;
     userBooking["element"].style.height = String((userBooking["bookingLength"]/60) * 50) + "px";
+    userBooking["endTime"] = endTime;
     peekElement.style.height = String((userBooking["bookingLength"]/60) * 50) + "px";
     updPayTable();
   }
