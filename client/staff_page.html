@@ -13,18 +13,46 @@
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
   <script>
 
+/*
+
+<button type="button" class="btn btn-primary newColor mainButton" onclick="clearEditBookingSearch()" data-toggle="modal" data-target="#editBookingModal">Edit a Booking</button>
+
+//resets form for editBookingModal
+function clearEditBookingSearch(){}
+
+//unhides the activity booking search form 
+function activityBookingSearchForm(){}
+
+<div class="modal" id="editBookingModal" tabindex="-1" role="dialog">
+
+<div class="modal" id='viewUsersActivityBookingsModal' tabindex="-1" role="dialog">
+
+function setActivityBookingID(bookingID)
+        
+<div id='activitybookingId'></div>
+
+
+*/
+
     //resets form
     function clearSearch(){
       document.getElementById('searchResults').innerHTML = '';
       document.getElementById("roomAvailabilityTable").hidden = true;
       document.getElementById('searchError').innerHTML = '';
     }
+      
+    //resets form for editBookingModal
+    function clearEditBookingSearch(){
+      document.getElementById('bookingSearchResults').innerHTML = '';
+      document.getElementById('bookingSearchError').innerHTML = '';
+      document.getElementById('usersActivityBookingTableforEditBody').innerHTML = '';
+    }
 
     //unhides the correct form
     function byUser (){
       document.getElementById("byUser").hidden = false;
       document.getElementById("byEvent").hidden = true;
-      document.getElementById("byAvailability").hidden = true;
+      document.getElementById("byAvaliability").hidden = true;
       document.getElementById('searchResults').innerHTML = '';
       document.getElementById("searchModalFooter").hidden = false;
       document.getElementById("roomAvailabilityTable").hidden = true;
@@ -36,7 +64,7 @@
     function byEvent (){
       document.getElementById("byEvent").hidden = false;
       document.getElementById("byUser").hidden = true;
-      document.getElementById("byAvailability").hidden = true;
+      document.getElementById("byAvaliability").hidden = true;
       document.getElementById('searchResults').innerHTML = '';
       document.getElementById("searchModalFooter").hidden = false;
       document.getElementById("roomAvailabilityTable").hidden = true;
@@ -45,15 +73,23 @@
     }
 
     //unhides the correct form
-    function byAvailability (){
+    function byAvaliability (){
       document.getElementById("byEvent").hidden = true;
       document.getElementById("byUser").hidden = true;
-      document.getElementById("byAvailability").hidden = false;
+      document.getElementById("byAvaliability").hidden = false;
       document.getElementById('searchResults').innerHTML = '';
       document.getElementById("searchModalFooter").hidden = false;
       document.getElementById("roomAvailabilityTable").hidden = true;
       document.getElementById("makeBooking").hidden = false;
       document.getElementById('searchError').innerHTML = '';
+    }
+      
+    //unhides the activity booking search form 
+    function activityBookingSearchForm(){
+      document.getElementById("activityBookingSearchForm").hidden = false;
+      document.getElementById('bookingSearchResults').innerHTML = '';
+      document.getElementById("editBookingModalFooter").hidden = false;
+      document.getElementById('bookingSearchError').innerHTML = '';
     }
 
     //define day and month names
@@ -81,7 +117,7 @@
             tempDate.setDate(tempDate.getDate() + 6);
             document.getElementById("tableDate").innerHTML = monthNames[targetMon.getMonth()] + " " + targetMon.getDate() + " - " + monthNames[tempDate.getMonth()] + " " + tempDate.getDate();
 
-            //find headers of availabilty tables
+            //find headers of avaliabilty tables
             headers = document.getElementById("calTable").rows[0];
             headers2 = document.getElementById('hostelTable').rows[0];
             month= targetMon.getMonth()
@@ -195,6 +231,11 @@
     function setUser(customerID){
       document.getElementById('customerId').value = customerID
         }
+      
+    function setActivityBookingID(bookingID){
+      document.getElementById('activitybookingId').value = bookingID
+        }
+      
   </script>
 </head>
 <body>
@@ -209,11 +250,13 @@
     <button type="button" class="btn btn-primary newColor mainButton" onclick="" data-toggle="modal" data-target="#paymentModal" id='paymentModalButton'>Pay for Booking</button>
     <button type="button" class="btn btn-primary newColor mainButton" onclick="" data-toggle="modal" data-target="#notificationModal" id='notificationButton'>Notifications</button>
     <button type="button" class="btn btn-primary newColor mainButton" onclick="" data-toggle="modal" data-target="#statisticsModal">Statistics</button>
+    <button type="button" class="btn btn-primary newColor mainButton" onclick="clearEditBookingSearch()" data-toggle="modal" data-target="#editBookingModal">Edit a Booking</button>
   </div>
 
   <div>
     <p id='errorMessage'></p>
     <div id='customerId'></div>
+    <div id='activitybookingId'></div>
     <button type="button" class="btn btn-primary newColor mainButton" id="prevWeek">Previous Week</button>
     <button type="button" class="btn btn-primary newColor mainButton" id="nextWeek">Next Week</button>
   </div>
@@ -290,7 +333,7 @@
           <h5>Select a button to search for a specific user, a specific event or to find out if a room is avaliable.</h5>
           <button type="button" class="btn btn-primary newColor" onclick="byUser()" id='searchUser'>Find User</button>
           <button type="button" class="btn btn-primary newColor" onclick="byEvent()" id ='searchEvent'>Find Event</button>
-          <button type="button" class="btn btn-primary newColor" onclick="byAvailability()" id='searchAvailability'>Check Availability</button>
+          <button type="button" class="btn btn-primary newColor" onclick="byAvaliability()" id='searchAvaliability'>Check Avaliabilty</button>
           <div id='searchResults'></div>
           <form id='byUser' hidden=true>
             <h5>Enter any information you have about the user. Leave inputs blank if you're unsure.</h5>
@@ -349,10 +392,10 @@
               </select>
             </div>
           </form>
-          <form id='byAvailability' hidden=true>
+          <form id='byAvaliability' hidden=true>
             <div class="form-group">
-              <h5>Choose a room and date to check room availabilty </h5>
-              <p id='availabiltySearchError'></p>
+              <h5>Choose a room and date to check room avaliabilty </h5>
+              <p id='avaliabiltySearchError'></p>
               <label>Room</label>
               <select class="browser-default custom-select newDropdown" id="roomSelectDrop">
                   <option selected>Select Room... </option> <!--check valid -->
@@ -1103,8 +1146,105 @@
 </div>
 
 
+<div class="modal" id="editBookingModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Edit a Booking</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" id="editBookingModalBody">
+        <h5>Please choose the type of the booking.</h5>
+        <button type="button" class="btn btn-primary newColor" onclick="activityBookingSearchForm()" id='activityBookingSearchFormBtn'>Activity Booking</button>
+        <div id='bookingSearchResults'></div>
+        <form id='activityBookingSearchForm' hidden=true>
+          <h5>Enter any information you have about the booking. Leave inputs blank if you're unsure.</h5>
+          <div class="form-group">
+            <label>First Name</label>
+            <input class="form-control" id="firstnameSearchforactivityBookingSearchForm" placeholder="Enter first name or leave blank">
+          </div>
+          <div class="form-group">
+            <label>Surname</label>
+            <input class="form-control" id="surnameSearchforactivityBookingSearchForm" placeholder="Enter surname or leave blank">
+          </div>
+          <div class="form-group">
+            <label>Email address</label>
+            <input class="form-control" id="emailSearchforactivityBookingSearchForm" placeholder="Enter email or leave blank"> <!--check valid -->
+          </div>
+          <div class="form-group">
+            <label>Phone Number</label>
+            <input class="form-control" id="phoneNoSearchforactivityBookingSearchForm" placeholder="Enter phone number or leave blank"> <!--check valid -->
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer" id="editBookingModalFooter">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id='searchBookingSubmitBtn'>Search</button>
+        <p id='bookingSearchError'></p>
+      </div>
+    </div>
+  </div>
+</div>
+    
+<div class="modal" id='viewUsersActivityBookingsModal' tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">User's Activity Bookings</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p id='usersBookingErrorforsearchActivityBooking'></p>
+        <p>Activity Bookings</p>
+        <table class="table table-striped newTable" id="usersActivityBookingTableforEdit" style="margin-top:5px; text-align: center;">
+          <thead>
+            <tr>
+              <th scope="col">ID</th>
+              <th scope="col">Date and Time</th>
+              <th scope="col">Number of People</th>
+              <th scope="col">Price of Booking</th>
+              <th scope="col">Amount Paid</th>
+              <th scope="col">Activity</th>
+            </tr>
+          </thead>
+            <tbody id="usersActivityBookingTableforEditBody">
+            </tbody>
+        </table>
+      </div>
+      <div class="modal-footer">
+      </div>
+    </div>
+  </div>
+</div>
 
-
+<div class="modal" id="updateActivityBookingModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Edit Activity Booking</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" id="updateActivityBookingModalBody">
+        <h5>Please enter the details that you want to edit.</h5>
+        <label>Enter how many people</label>
+          <input class="form-control" id="numberOfPeopleActivityforEdit" placeholder="Enter number of People">
+        <label>Enter the price of booking</label>
+          <input class="form-control" id="priceActivityforEdit" placeholder="Enter price of booking">
+      </div>
+      <div class="modal-footer" id="updateActivityBookingModalFooter">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" id='updateActivityBookingSubmitBtn'>Submit</button>
+          <p id='updateActivityBookingError'></p>
+      </div>
+    </div>
+  </div>
+</div>
 
 
 </body>
