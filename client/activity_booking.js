@@ -30,7 +30,7 @@ function ActivityCard (curActivity) { // curActivity card class, each instantiat
   desc.innerHTML = curActivity["description"];
 
   let button = document.createElement('a');
-  button.className = "btn btn-primary newColor";
+  button.className = "btn btn-primary newColorHov";
   button.type = "button";
   button.innerHTML = "Book Now";
   button.onclick= function(){modifyPopUp();};//function () {console.log("test");};
@@ -207,8 +207,6 @@ async function submit() {
         "&numberofpeople=" + String(groupSize) +
         "&price=" + String(groupSize * activity["price"])
     });
-  let testDate = new Date((Math.floor(bookDate.getTime()/1000)) * 1000);
-  console.log(testDate);
   let answer = await response;
   if (answer.status == 200) {
     alert("Booking Request succesfully made! ");
