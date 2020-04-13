@@ -406,7 +406,7 @@ async function preMonth(roomid){
 async function infor(e){
   let color=e.target.bgColor;
   if (color=='gray'){
-    alert('This day can not be book');
+    alert('Unfortunately you can\'t book this day.');
     return;
   }
 
