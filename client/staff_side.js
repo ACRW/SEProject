@@ -1392,8 +1392,15 @@ async function newBooking(id){
   //if room is avaliable
   if(free == true){
 
+      const offset = new Date(2020, month, day, startTime, 0, 0, 0).getTimezoneOffset();
+
     //get parameters
     startTime = new Date(2020, month, day, startTime, 0, 0, 0).getTime()/1000;
+
+    startTime -= offset * 60;
+    endTime -= offset * 60;
+
+
     roomId = document.getElementById('bookingRoomDropdown').value;
     price = document.getElementById('totalBookingPrice').innerText;
 
@@ -1478,8 +1485,13 @@ async function newHostelBooking(id){
   endDay = (parseInt(startDay) + parseInt(numberOfNights)) % daysInMonth(2020,startMonth)
 
   //calculate epoch value for start and end date
-  startTime = new Date(2020, month, startDay, 0, 0, 0, 0).getTime()/1000;
+  startTime = new Date(2020, month - 1, startDay, 0, 0, 0, 0).getTime()/1000;
   endTime = new Date(2020, endMonth, endDay, 0, 0, 0, 0).getTime()/1000;
+
+  let offset = new Date(2020, month, startDay, 0, 0, 0, 0).getTimezoneOffset();
+  startTime -= offset * 60;
+  endTime -= offset * 60;
+
   roomId = document.getElementById('hostelRoomsLargeEnough').value;
   free = true
 
@@ -1580,6 +1592,11 @@ async function newActivityBooking(id){
 
   //calculate epoch value for start and end date
   startTime = new Date(year, month, day, time, 0, 0, 0).getTime()/1000;
+
+  const offest = new Date(year, month, day, time, 0, 0, 0).getTimezoneOffset();
+
+  startTime -= offest * 60;
+
   activityId = document.getElementById('activityDropdown').value;
   price = document.getElementById('totalActivityBookingPrice').innerText
   numOfPeople = document.getElementById('numOfPeopleActivity').value
@@ -1924,12 +1941,16 @@ async function createNewEvent(){
   description = document.getElementById('descriptionOfEvent').value
   capacity = document.getElementById('capacityOfEvent').value
   year = document.getElementById("yearEventNew").value;
-  month = document.getElementById("monthEventNew").value;
+  month = document.getElementById("monthEventNew").value - 1;
   day = document.getElementById("dayEventNew").value;
-  startTime = document.getElementById("newEventStartTime").value + 8;
+  startTime = parseInt(document.getElementById("newEventStartTime").value) + 8;
 
   //convert date to epoch time
   date = new Date(year, month, day, startTime, 0, 0, 0).getTime()/1000;
+
+  let offset = new Date(year, month, day, startTime, 0, 0, 0).getTimezoneOffset();
+
+  date -= offset * 60;
 
   //post new event and add new tickets
   try{
@@ -2915,14 +2936,22 @@ async function updateCommunityBooking(){
   startDay = document.getElementById('startDayCommunityforEdit').value
   startHour = document.getElementById('startHourCommunityforEdit').value
   //calculate epoch value for start and end date
-  startTime = (new Date(startYear, startMonth-1, startDay, startHour, 0, 0, 0).getTime()+8*3600*1000)/1000;
+  startTime = (new Date(startYear, startMonth-1, startDay, startHour, 0, 0, 0).getTime())/1000;
 
+  let offset = (new Date(startYear, startMonth-1, startDay, startHour, 0, 0, 0)).getTimezoneOffset();
+
+  startTime -= offset * 60;
 
   endYear = document.getElementById('endYearCommunityforEdit').value
   endMonth = document.getElementById('endMonthCommunityforEdit').value
   endDay = document.getElementById('endDayCommunityforEdit').value
   endHour = document.getElementById('endHourCommunityforEdit').value
-  endTime = (new Date(endYear, endMonth-1, endDay, endHour, 0, 0, 0).getTime()+8*3600*1000)/1000;
+  endTime = (new Date(endYear, endMonth-1, endDay, endHour, 0, 0, 0).getTime())/1000;
+
+  offset = (new Date(endYear, endMonth-1, endDay, endHour, 0, 0, 0)).getTimezoneOffset();
+
+  endTime -= offset * 60;
+
   price = document.getElementById('priceCommunityforEdit').value
 
   try{
@@ -2961,15 +2990,21 @@ async function updateHostelBooking(){
   startDay = document.getElementById('startDayHostelforEdit').value
   startHour = document.getElementById('startHourHostelforEdit').value
   //calculate epoch value for start and end date
-  startTime = (new Date(startYear, startMonth-1, startDay, startHour, 0, 0, 0).getTime()+8*3600*1000)/1000;
+  startTime = (new Date(startYear, startMonth-1, startDay, startHour, 0, 0, 0).getTime())/1000;
 
+  let offset = (new Date(startYear, startMonth-1, startDay, startHour, 0, 0, 0)).getTimezoneOffset();
+
+  startTime -= offset * 60;
 
   endYear = document.getElementById('endYearHostelforEdit').value
   endMonth = document.getElementById('endMonthHostelforEdit').value
   endDay = document.getElementById('endDayHostelforEdit').value
   endHour = document.getElementById('endHourHostelforEdit').value
-  endTime = (new Date(endYear, endMonth-1, endDay, endHour, 0, 0, 0).getTime()+8*3600*1000)/1000;
+  endTime = (new Date(endYear, endMonth-1, endDay, endHour, 0, 0, 0).getTime())/1000;
 
+  offset = (new Date(endYear, endMonth-1, endDay, endHour, 0, 0, 0)).getTimezoneOffset();
+
+  endTime -= offset * 60;
 
   price = document.getElementById('priceHostelforEdit').value
 
