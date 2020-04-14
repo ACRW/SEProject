@@ -2231,9 +2231,9 @@ async function fillCalender(){
             for(var j = 1; j< 8; j++){
 
                if((bookings['activity'][i].dateTime.substring(8,10)+'/'+bookings['activity'][i].dateTime.substring(5,7)).toString()==document.getElementById('cday' + j).textContent.toString()){
-                    console.log("yes")
+
                     document.getElementById('day' + j + 'A').innerHTML += 'Start Time: ' + bookings['activity'][i].dateTime.substring(11,16) + '\n'
-                    document.getElementById('day' + j + 'A').innerHTML += '  Number of People: ' + bookings['activity'].numberOfPeople
+                    document.getElementById('day' + j + 'A').innerHTML += '  Number of People: ' + bookings['activity'][i].numberOfPeople + "   "
 
                 }
             }
@@ -2245,13 +2245,13 @@ async function fillCalender(){
 
               //put start date in calender
                if((bookings['hostel'][i].startDate.substring(8,10)+'/'+bookings['hostel'][i].startDate.substring(5,7)).toString()==document.getElementById('cday' + j).textContent.toString()){
-                    document.getElementById('day' + j + 'H').innerHTML += ' Start of Booking for ' + bookings['activity'].noOfPeople + ' people'
+                    document.getElementById('day' + j + 'H').innerHTML += ' Start of Booking for ' + bookings['hostel'][i].noOfPeople + ' person/people' + "   "
 
               }
 
               //put end date in calender
               if((bookings['hostel'][i].endDate.substring(8,10)+'/'+bookings['hostel'][i].endDate.substring(5,7)).toString()==document.getElementById('cday' + j).textContent.toString()){
-                   document.getElementById('day' + j + 'H').innerHTML += ' End of Booking for ' + bookings['hostel'].noOfPeople + ' people'
+                   document.getElementById('day' + j + 'H').innerHTML += ' End of Booking for ' + bookings['hostel'][i].noOfPeople + ' person/people' + "   "
 
                }
 
@@ -2261,9 +2261,9 @@ async function fillCalender(){
       //go through community bookings
       for(var i = 0; i<bookings['community'].length; i++){
             for(var j = 1; j< 8; j++){
-               if((bookings['community'][i].start.substring(8,10)+'/'+bookings['community'][i].start.substring(5,7)).toString()==document.getElementById('day' + j).textContent.toString()){
+               if((bookings['community'][i].start.substring(8,10)+'/'+bookings['community'][i].start.substring(5,7)).toString()==document.getElementById('cday' + j).textContent.toString()){
                     document.getElementById('day' + j + 'C').innerHTML += 'Start Time: ' + bookings['community'][i].start.substring(11,16) + '\n'
-                    document.getElementById('day' + j + 'C').innerHTML += '  End Time: ' + bookings['community'][i].end.substring(11,16)
+                    document.getElementById('day' + j + 'C').innerHTML += '  End Time: ' + bookings['community'][i].end.substring(11,16) + "   "
 
                 }
             }
