@@ -23,14 +23,37 @@ function clearEditBookingSearch(){}
 //unhides the activity booking search form 
 function activityBookingSearchForm(){}
 
+//unhides the community booking search form 
+function communityBookingSearchForm()
+
+//unhides the hostel booking search form 
+function hostelBookingSearchForm()
+
 <div class="modal" id="editBookingModal" tabindex="-1" role="dialog">
 
 <div class="modal" id='viewUsersActivityBookingsModal' tabindex="-1" role="dialog">
 
+<div class="modal" id='viewUsersCommunityBookingsModal' tabindex="-1" role="dialog">
+
+<div class="modal" id='viewUsersHostelBookingsModal' tabindex="-1" role="dialog">
+
+<div class="modal" id="updateActivityBookingModal" tabindex="-1" role="dialog">
+
+<div class="modal" id="updateCommunityBookingModal" tabindex="-1" role="dialog">
+
+<div class="modal" id="updateHostelBookingModal" tabindex="-1" role="dialog">
+
 function setActivityBookingID(bookingID)
+
+function setCommunityBookingID(bookingID)
+
+function setHostelBookingID(bookingID){
         
 <div id='activitybookingId'></div>
 
+<div id='communitybookingId'></div>
+
+<div id='hostelbookingId'></div>
 
 */
 
@@ -45,7 +68,9 @@ function setActivityBookingID(bookingID)
     function clearEditBookingSearch(){
       document.getElementById('bookingSearchResults').innerHTML = '';
       document.getElementById('bookingSearchError').innerHTML = '';
-      document.getElementById('usersActivityBookingTableforEditBody').innerHTML = '';
+      document.getElementById('usersActivityBookingTableforEditBody').innerHTML = '';    
+      document.getElementById('usersCommunityBookingTableforEditBody').innerHTML = '';
+      document.getElementById('usersHostelBookingTableforEditBody').innerHTML = '';   
     }
 
     //unhides the correct form
@@ -87,6 +112,28 @@ function setActivityBookingID(bookingID)
     //unhides the activity booking search form 
     function activityBookingSearchForm(){
       document.getElementById("activityBookingSearchForm").hidden = false;
+      document.getElementById("communityBookingSearchForm").hidden = true;
+      document.getElementById("hostelBookingSearchForm").hidden = true;
+      document.getElementById('bookingSearchResults').innerHTML = '';
+      document.getElementById("editBookingModalFooter").hidden = false;
+      document.getElementById('bookingSearchError').innerHTML = '';
+    }
+      
+    //unhides the community booking search form 
+    function communityBookingSearchForm(){
+      document.getElementById("activityBookingSearchForm").hidden = true;
+      document.getElementById("communityBookingSearchForm").hidden = false;
+      document.getElementById("hostelBookingSearchForm").hidden = true;
+      document.getElementById('bookingSearchResults').innerHTML = '';
+      document.getElementById("editBookingModalFooter").hidden = false;
+      document.getElementById('bookingSearchError').innerHTML = '';
+    }
+      
+    //unhides the hostel booking search form 
+    function hostelBookingSearchForm(){
+      document.getElementById("activityBookingSearchForm").hidden = true;
+      document.getElementById("communityBookingSearchForm").hidden = true;
+      document.getElementById("hostelBookingSearchForm").hidden = false;
       document.getElementById('bookingSearchResults').innerHTML = '';
       document.getElementById("editBookingModalFooter").hidden = false;
       document.getElementById('bookingSearchError').innerHTML = '';
@@ -236,6 +283,13 @@ function setActivityBookingID(bookingID)
       document.getElementById('activitybookingId').value = bookingID
         }
       
+    function setCommunityBookingID(bookingID){
+      document.getElementById('communitybookingId').value = bookingID
+        }
+      
+    function setHostelBookingID(bookingID){
+      document.getElementById('hostelbookingId').value = bookingID
+        }
   </script>
 </head>
 <body>
@@ -257,6 +311,8 @@ function setActivityBookingID(bookingID)
     <p id='errorMessage'></p>
     <div id='customerId'></div>
     <div id='activitybookingId'></div>
+    <div id='communitybookingId'></div>
+    <div id='hostelbookingId'></div>
     <button type="button" class="btn btn-primary newColor mainButton" id="prevWeek">Previous Week</button>
     <button type="button" class="btn btn-primary newColor mainButton" id="nextWeek">Next Week</button>
   </div>
@@ -1158,6 +1214,8 @@ function setActivityBookingID(bookingID)
       <div class="modal-body" id="editBookingModalBody">
         <h5>Please choose the type of the booking.</h5>
         <button type="button" class="btn btn-primary newColor" onclick="activityBookingSearchForm()" id='activityBookingSearchFormBtn'>Activity Booking</button>
+        <button type="button" class="btn btn-primary newColor" onclick="communityBookingSearchForm()" id='communityBookingSearchFormBtn'>Community Booking</button>
+        <button type="button" class="btn btn-primary newColor" onclick="hostelBookingSearchForm()" id='hostelBookingSearchFormBtn'>Hostel Booking</button>
         <div id='bookingSearchResults'></div>
         <form id='activityBookingSearchForm' hidden=true>
           <h5>Enter any information you have about the booking. Leave inputs blank if you're unsure.</h5>
@@ -1176,6 +1234,44 @@ function setActivityBookingID(bookingID)
           <div class="form-group">
             <label>Phone Number</label>
             <input class="form-control" id="phoneNoSearchforactivityBookingSearchForm" placeholder="Enter phone number or leave blank"> <!--check valid -->
+          </div>
+        </form>
+        <form id='communityBookingSearchForm' hidden=true>
+          <h5>Enter any information you have about the booking. Leave inputs blank if you're unsure.</h5>
+          <div class="form-group">
+            <label>First Name</label>
+            <input class="form-control" id="firstnameSearchforcommunityBookingSearchForm" placeholder="Enter first name or leave blank">
+          </div>
+          <div class="form-group">
+            <label>Surname</label>
+            <input class="form-control" id="surnameSearchforcommunityBookingSearchForm" placeholder="Enter surname or leave blank">
+          </div>
+          <div class="form-group">
+            <label>Email address</label>
+            <input class="form-control" id="emailSearchforcommunityBookingSearchForm" placeholder="Enter email or leave blank"> <!--check valid -->
+          </div>
+          <div class="form-group">
+            <label>Phone Number</label>
+            <input class="form-control" id="phoneNoSearchforcommunityBookingSearchForm" placeholder="Enter phone number or leave blank"> <!--check valid -->
+          </div>
+        </form>
+        <form id='hostelBookingSearchForm' hidden=true>
+          <h5>Enter any information you have about the booking. Leave inputs blank if you're unsure.</h5>
+          <div class="form-group">
+            <label>First Name</label>
+            <input class="form-control" id="firstnameSearchforhostelBookingSearchForm" placeholder="Enter first name or leave blank">
+          </div>
+          <div class="form-group">
+            <label>Surname</label>
+            <input class="form-control" id="surnameSearchforhostelBookingSearchForm" placeholder="Enter surname or leave blank">
+          </div>
+          <div class="form-group">
+            <label>Email address</label>
+            <input class="form-control" id="emailSearchforhostelBookingSearchForm" placeholder="Enter email or leave blank"> <!--check valid -->
+          </div>
+          <div class="form-group">
+            <label>Phone Number</label>
+            <input class="form-control" id="phoneNoSearchforhostelBookingSearchForm" placeholder="Enter phone number or leave blank"> <!--check valid -->
           </div>
         </form>
       </div>
@@ -1216,10 +1312,80 @@ function setActivityBookingID(bookingID)
         </table>
       </div>
       <div class="modal-footer">
+        <p id='cancelActivityBookingError'></p>
       </div>
     </div>
   </div>
 </div>
+
+<div class="modal" id='viewUsersCommunityBookingsModal' tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">User's Community Bookings</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p id='usersBookingErrorforsearchCommunityBooking'></p>
+        <p>Community Bookings</p>
+        <table class="table table-striped newTable" id="usersCommunityBookingTableforEdit" style="margin-top:5px; text-align: center;">
+          <thead>
+            <tr>
+              <th scope="col">ID</th>
+                <th scope="col">Start Time</th>
+                <th scope="col">End Time</th>
+                <th scope="col">Price of Booking</th>
+                <th scope="col">Amount Paid</th>
+                <th scope="col">Room</th>
+            </tr>
+          </thead>
+            <tbody id="usersCommunityBookingTableforEditBody">
+            </tbody>
+        </table>
+      </div>
+      <div class="modal-footer">
+        <p id='cancelCommunityBookingError'></p>
+      </div>
+    </div>
+  </div>
+</div>    
+
+<div class="modal" id='viewUsersHostelBookingsModal' tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">User's Hostel Bookings</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p id='usersBookingErrorforsearchHostelBooking'></p>
+        <p>Hostel Bookings</p>
+        <table class="table table-striped newTable" id="usersHostelBookingTableforEdit" style="margin-top:5px; text-align: center;">
+          <thead>
+            <tr>
+              <th scope="col">ID</th>
+              <th scope="col">Start Time</th>
+              <th scope="col">End Time</th>
+              <th scope="col">RoomID</th>
+              <th scope="col">Price per Night</th>
+              <th scope="col">Number of People</th>
+            </tr>
+          </thead>
+          <tbody id="usersHostelBookingTableforEditBody">
+          </tbody>
+        </table>
+      </div>
+      <div class="modal-footer">
+        <p id='cancelHostelBookingError'></p>
+      </div>
+    </div>
+  </div>
+</div> 
+
 
 <div class="modal" id="updateActivityBookingModal" tabindex="-1" role="dialog">
   <div class="modal-dialog modal-lg" role="document">
@@ -1246,6 +1412,74 @@ function setActivityBookingID(bookingID)
   </div>
 </div>
 
+<div class="modal" id="updateCommunityBookingModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Edit Community Booking</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" id="updateCommunityBookingModalBody">
+        <h5>Please enter the details that you want to edit.</h5>
+         <label>Enter the start time of booking</label>
+          <input class="form-control" id="startYearCommunityforEdit" placeholder="Enter number only, YYYY">
+          <input class="form-control" id="startMonthCommunityforEdit" placeholder="Enter number only, MM">
+          <input class="form-control" id="startDayCommunityforEdit" placeholder="Enter number only, DD">
+          <input class="form-control" id="startHourCommunityforEdit" placeholder="Enter number only, HH">
+        <label>Enter the end time of booking</label>
+          <input class="form-control" id="endYearCommunityforEdit" placeholder="Enter number only, YYYY">
+          <input class="form-control" id="endMonthCommunityforEdit" placeholder="Enter number only, MM">
+          <input class="form-control" id="endDayCommunityforEdit" placeholder="Enter number only, DD">
+          <input class="form-control" id="endHourCommunityforEdit" placeholder="Enter number only, HH">
+        <label>Enter the price of booking</label>
+          <input class="form-control" id="priceCommunityforEdit" placeholder="Enter number only">
+      </div>
+      <div class="modal-footer" id="updateCommunityBookingModalFooter">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" id='updateCommunityBookingSubmitBtn'>Submit</button>
+          <p id='updateCommunityBookingError'></p>
+      </div>
+    </div>
+  </div>
+</div>
+    
+<div class="modal" id="updateHostelBookingModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Edit Hostel Booking</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" id="updateHostelBookingModalBody">
+        <h5>Please enter the details that you want to edit.</h5>
+        <label>Enter the start time of booking</label>
+          <input class="form-control" id="startYearHostelforEdit" placeholder="Enter number only, YYYY">
+          <input class="form-control" id="startMonthHostelforEdit" placeholder="Enter number only, MM">
+          <input class="form-control" id="startDayHostelforEdit" placeholder="Enter number only, DD">
+          <input class="form-control" id="startHourHostelforEdit" placeholder="Enter number only, HH">
+        <label>Enter the end time of booking</label>
+          <input class="form-control" id="endYearHostelforEdit" placeholder="Enter number only, YYYY">
+          <input class="form-control" id="endMonthHostelforEdit" placeholder="Enter number only, MM">
+          <input class="form-control" id="endDayHostelforEdit" placeholder="Enter number only, DD">
+          <input class="form-control" id="endHourHostelforEdit" placeholder="Enter number only, HH">
+        <label>Enter the price of booking</label>
+          <input class="form-control" id="priceHostelforEdit" placeholder="Enter number only">
+        <label>Enter the number of peopel of booking</label>
+          <input class="form-control" id="numberOfPeopleHostelforEdit" placeholder="Enter number only">
+      </div>
+      <div class="modal-footer" id="updateHostelBookingModalFooter">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" id='updateHostelBookingSubmitBtn'>Submit</button>
+          <p id='updateHostelBookingError'></p>
+      </div>
+    </div>
+  </div>
+</div>
 
+    
 </body>
 </html>
