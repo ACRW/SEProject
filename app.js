@@ -855,7 +855,6 @@ app.post('/staffhostelbooking', async function(req, resp) {
                     // check for clashing bookings
                     const clashes = await performQuery('SELECT * FROM hostelBookings WHERE startDate < FROM_UNIXTIME(' + end + ') AND endDate > FROM_UNIXTIME(' + start + ')');
 
-
                     // if no database error
                     if (processQueryResult(clashes, resp)) {
                         // if no clashes

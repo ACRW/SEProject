@@ -20,13 +20,13 @@
 //resets form for editBookingModal
 function clearEditBookingSearch(){}
 
-//unhides the activity booking search form 
+//unhides the activity booking search form
 function activityBookingSearchForm(){}
 
-//unhides the community booking search form 
+//unhides the community booking search form
 function communityBookingSearchForm()
 
-//unhides the hostel booking search form 
+//unhides the hostel booking search form
 function hostelBookingSearchForm()
 
 <div class="modal" id="editBookingModal" tabindex="-1" role="dialog">
@@ -48,7 +48,7 @@ function setActivityBookingID(bookingID)
 function setCommunityBookingID(bookingID)
 
 function setHostelBookingID(bookingID){
-        
+
 <div id='activitybookingId'></div>
 
 <div id='communitybookingId'></div>
@@ -63,14 +63,14 @@ function setHostelBookingID(bookingID){
       document.getElementById("roomAvailabilityTable").hidden = true;
       document.getElementById('searchError').innerHTML = '';
     }
-      
+
     //resets form for editBookingModal
     function clearEditBookingSearch(){
       document.getElementById('bookingSearchResults').innerHTML = '';
       document.getElementById('bookingSearchError').innerHTML = '';
-      document.getElementById('usersActivityBookingTableforEditBody').innerHTML = '';    
+      document.getElementById('usersActivityBookingTableforEditBody').innerHTML = '';
       document.getElementById('usersCommunityBookingTableforEditBody').innerHTML = '';
-      document.getElementById('usersHostelBookingTableforEditBody').innerHTML = '';   
+      document.getElementById('usersHostelBookingTableforEditBody').innerHTML = '';
     }
 
     //unhides the correct form
@@ -108,8 +108,8 @@ function setHostelBookingID(bookingID){
       document.getElementById("makeBooking").hidden = false;
       document.getElementById('searchError').innerHTML = '';
     }
-      
-    //unhides the activity booking search form 
+
+    //unhides the activity booking search form
     function activityBookingSearchForm(){
       document.getElementById("activityBookingSearchForm").hidden = false;
       document.getElementById("communityBookingSearchForm").hidden = true;
@@ -118,8 +118,8 @@ function setHostelBookingID(bookingID){
       document.getElementById("editBookingModalFooter").hidden = false;
       document.getElementById('bookingSearchError').innerHTML = '';
     }
-      
-    //unhides the community booking search form 
+
+    //unhides the community booking search form
     function communityBookingSearchForm(){
       document.getElementById("activityBookingSearchForm").hidden = true;
       document.getElementById("communityBookingSearchForm").hidden = false;
@@ -128,8 +128,8 @@ function setHostelBookingID(bookingID){
       document.getElementById("editBookingModalFooter").hidden = false;
       document.getElementById('bookingSearchError').innerHTML = '';
     }
-      
-    //unhides the hostel booking search form 
+
+    //unhides the hostel booking search form
     function hostelBookingSearchForm(){
       document.getElementById("activityBookingSearchForm").hidden = true;
       document.getElementById("communityBookingSearchForm").hidden = true;
@@ -278,15 +278,15 @@ function setHostelBookingID(bookingID){
     function setUser(customerID){
       document.getElementById('customerId').value = customerID
         }
-      
+
     function setActivityBookingID(bookingID){
       document.getElementById('activitybookingId').value = bookingID
         }
-      
+
     function setCommunityBookingID(bookingID){
       document.getElementById('communitybookingId').value = bookingID
         }
-      
+
     function setHostelBookingID(bookingID){
       document.getElementById('hostelbookingId').value = bookingID
         }
@@ -389,7 +389,7 @@ function setHostelBookingID(bookingID){
           <h5>Select a button to search for a specific user, a specific event or to find out if a room is avaliable.</h5>
           <button type="button" class="btn btn-primary newColor" onclick="byUser()" id='searchUser'>Find User</button>
           <button type="button" class="btn btn-primary newColor" onclick="byEvent()" id ='searchEvent'>Find Event</button>
-          <button type="button" class="btn btn-primary newColor" onclick="byAvaliability()" id='searchAvaliability'>Check Avaliabilty</button>
+          <button type="button" class="btn btn-primary newColor" onclick="byAvaliability()" id='searchAvaliability'>Check Availabilty</button>
           <div id='searchResults'></div>
           <form id='byUser' hidden=true>
             <h5>Enter any information you have about the user. Leave inputs blank if you're unsure.</h5>
@@ -1043,18 +1043,18 @@ function setHostelBookingID(bookingID){
             <label id="monthActivityNewLabel" hidden="true">Month</label>
             <select class="browser-default custom-select newDropdown" id="monthActivityNew" hidden="true">
                 <option selected>Select Month... </option>
-                <option value="01">January</option>
-                <option value="02">February</option>
-                <option value="03">March</option>
-                <option value="04">April</option>
-                <option value="05">May</option>
-                <option value="06">June</option>
-                <option value="07">July</option>
-                <option value="08">August</option>
-                <option value="09">September</option>
-                <option value="10">October</option>
-                <option value="11">November</option>
-                <option value="12">December</option>
+                <option value="00">January</option>
+                <option value="01">February</option>
+                <option value="02">March</option>
+                <option value="03">April</option>
+                <option value="04">May</option>
+                <option value="05">June</option>
+                <option value="06">July</option>
+                <option value="07">August</option>
+                <option value="08">September</option>
+                <option value="09">October</option>
+                <option value="10">November</option>
+                <option value="11">December</option>
             </select>
             <label id="dayActivityNewLabel" hidden="true">Day</label>
             <select class="browser-default custom-select newDropdown" id="dayActivityNew" hidden="true">
@@ -1283,7 +1283,7 @@ function setHostelBookingID(bookingID){
     </div>
   </div>
 </div>
-    
+
 <div class="modal" id='viewUsersActivityBookingsModal' tabindex="-1" role="dialog">
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
@@ -1350,7 +1350,7 @@ function setHostelBookingID(bookingID){
       </div>
     </div>
   </div>
-</div>    
+</div>
 
 <div class="modal" id='viewUsersHostelBookingsModal' tabindex="-1" role="dialog">
   <div class="modal-dialog modal-lg" role="document">
@@ -1384,7 +1384,7 @@ function setHostelBookingID(bookingID){
       </div>
     </div>
   </div>
-</div> 
+</div>
 
 
 <div class="modal" id="updateActivityBookingModal" tabindex="-1" role="dialog">
@@ -1444,7 +1444,7 @@ function setHostelBookingID(bookingID){
     </div>
   </div>
 </div>
-    
+
 <div class="modal" id="updateHostelBookingModal" tabindex="-1" role="dialog">
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
@@ -1480,6 +1480,6 @@ function setHostelBookingID(bookingID){
   </div>
 </div>
 
-    
+
 </body>
 </html>

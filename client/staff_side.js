@@ -1533,7 +1533,7 @@ async function newHostelBooking(id){
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
           },
-          body: 'customerid=' + id + '&roomid=' + roomId + '&start=' + startTime + '&end=' + endTime + '&numberOfPeople=' + numberOfGuests + '&price=' + price
+          body: 'customerid=' + id + '&roomid=' + roomId + '&start=' + startTime + '&end=' + endTime + '&numberofpeople=' + numberOfGuests + '&price=' + price + '&paid=0'
         });
 
         //if response isn't fine
@@ -1558,8 +1558,8 @@ async function newActivityBooking(id){
   //get parameters
   year = document.getElementById('yearActivityNew').value
   month = document.getElementById('monthActivityNew').value
-  day = document.getElementById('monthActivityNew').value
-  time = document.getElementById('monthActivityNew').value + 8
+  day = document.getElementById('dayActivityNew').value
+  time = parseInt(document.getElementById('newActivityStartTime').value) + 8
 
   //get number of guests
   numberOfGuests = document.getElementById('numOfPeopleActivity').value
@@ -2001,7 +2001,7 @@ async function getNotifications(){
         document.getElementById('notificationBody').innerHTML += '<p> Activity Booking Requests </p>';
         //display info about request
         statement = 'Booking Request for ' + requests['activity'][0].name + ' from ' + requests['activity'][0].dateTime + ' by ' + requests['activity'][0].fName + ' ' + requests['activity'][0].lName;
-        customerInfo = ' Customer email: ' + requests['activity'][0].email + ' Customer phone: ' + requests['activity'][0].phone + ' Booking Price: £' + requests['activity'][0].priceOfBooking;
+        customerInfo = ' Customer email: ' + requests['activity'][0].email + ' Customer phone: ' + requests['activity'][0].phone + ' Booking Price: £' + requests['activity'][0].price;
         document.getElementById('notificationBody').innerHTML += '<p id="request' + requests['activity'][0].id + '"> '+statement + customerInfo +' </p>';
 
         document.getElementById('notificationBody').innerHTML += '<button type="button" class="btn btn-primary newColor" id="approveA'+ requests['activity'][0].id+'"> Approve </button>';
@@ -2021,8 +2021,8 @@ async function getNotifications(){
       if(requests['hostel'].length>=1){
         document.getElementById('notificationBody').innerHTML += '<p> Hostel Booking Requests </p>';
         //display info about request
-        statement = 'Booking Request for ' + requests['hostel'][0].roomNumber + ' from ' + requests['hostel'][0].start + ' by ' + requests['hostel'][0].fName + ' ' + requests['hostel'][0].lName;
-        customerInfo = ' Customer email: ' + requests['hostel'][0].email + ' Customer phone: ' + requests['hostel'][0].phone + ' Booking Price: £' + requests['hostel'][0].priceOfBooking;
+        statement = 'Booking Request for ' + requests['hostel'][0].roomNumber + ' from ' + requests['hostel'][0].startDate + ' by ' + requests['hostel'][0].fName + ' ' + requests['hostel'][0].lName;
+        customerInfo = ' Customer email: ' + requests['hostel'][0].email + ' Customer phone: ' + requests['hostel'][0].phone + ' Booking Price: £' + requests['hostel'][0].price;
         document.getElementById('notificationBody').innerHTML += '<p id="request' + requests['hostel'][0].id + '"> '+statement + customerInfo +' </p>';
 
         document.getElementById('notificationBody').innerHTML += '<button type="button" class="btn btn-primary newColor" id="approveH'+ requests['hostel'][0].id+'"> Approve </button>';
