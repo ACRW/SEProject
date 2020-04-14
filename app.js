@@ -742,7 +742,7 @@ app.post('/staffcommunitybooking', async function(req, resp) {
                 // if all parameters specified
                 if (roomID && start && end && price && paid) {
                     // check for clashing bookings
-                    const clashes = await performQuery('SELECT * FROM communityBookings WHERE start < FROM_UNIXTIME(' + end + ') AND end > FROM_UNIXTIME(' + start + ')');
+                    const clashes = await performQuery('SELECT * FROM communityBookings WHERE start < FROM_UNIXTIME(' + end + ') AND end > FROM_UNIXTIME(' + start + ') AND roomId = ' + roomID);
 
                     // if no database error
                     if (processQueryResult(clashes, resp)) {
@@ -796,7 +796,7 @@ app.post('/customercommunitybooking', async function(req, resp) {
         // if all parameters specified
         if (roomID && start && end && price) {
             // check for clashing bookings
-            const clashes = await performQuery('(SELECT start, end FROM communityBookings WHERE start < FROM_UNIXTIME(' + end + ') AND end > FROM_UNIXTIME(' + start + ')) UNION (SELECT start, end FROM communityRequests WHERE start < FROM_UNIXTIME(' + end + ') AND end > FROM_UNIXTIME(' + start + '))');
+            const clashes = await performQuery('(SELECT start, end FROM communityBookings WHERE start < FROM_UNIXTIME(' + end + ') AND end > FROM_UNIXTIME(' + start + ') AND roomId = ' + roomID + ') UNION (SELECT start, end FROM communityRequests WHERE start < FROM_UNIXTIME(' + end + ') AND end > FROM_UNIXTIME(' + start + ') AND roomId = ' + roomID + ')');
 
             // if no database error
             if (processQueryResult(clashes, resp)) {
@@ -853,7 +853,7 @@ app.post('/staffhostelbooking', async function(req, resp) {
                 // if all parameters specified
                 if (roomID && start && end && price && paid && numberOfPeople) {
                     // check for clashing bookings
-                    const clashes = await performQuery('SELECT * FROM hostelBookings WHERE startDate < FROM_UNIXTIME(' + end + ') AND endDate > FROM_UNIXTIME(' + start + ')');
+                    const clashes = await performQuery('SELECT * FROM hostelBookings WHERE startDate < FROM_UNIXTIME(' + end + ') AND endDate > FROM_UNIXTIME(' + start + ') AND roomId = ' + roomID);
 
                     // if no database error
                     if (processQueryResult(clashes, resp)) {
@@ -908,7 +908,7 @@ app.post('/customerhostelbooking', async function(req, resp) {
         // if all parameters specified
         if (roomID && start && end && price && numberOfPeople) {
             // check for clashing bookings
-            const clashes = await performQuery('(SELECT startDate, endDate FROM hostelBookings WHERE startDate < FROM_UNIXTIME(' + end + ') AND endDate > FROM_UNIXTIME(' + start + ')) UNION (SELECT startDate, endDate FROM hostelRequests WHERE startDate < FROM_UNIXTIME(' + end + ') AND endDate > FROM_UNIXTIME(' + start + '))');
+            const clashes = await performQuery('(SELECT startDate, endDate FROM hostelBookings WHERE startDate < FROM_UNIXTIME(' + end + ') AND endDate > FROM_UNIXTIME(' + start + ') AND roomId = ' + roomID + ') UNION (SELECT startDate, endDate FROM hostelRequests WHERE startDate < FROM_UNIXTIME(' + end + ') AND endDate > FROM_UNIXTIME(' + start + ') AND roomId = ' + roomID + ')');
 
             // if no database error
             if (processQueryResult(clashes, resp)) {
@@ -1675,8 +1675,6 @@ async function approveRequest(requestID, tableName, resp) {
         if (processQueryResult(request, resp)) {
             // if one row returned
             if (request.length == 1) {
-                // for community & hostel - check for clashes
-
                 // activity request
                 if (tableName == 'activity') {
                     // create activity booking

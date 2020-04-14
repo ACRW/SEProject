@@ -2,7 +2,7 @@ let roomCards = {} // Keeps track of all the activity card classes
 let rooms = {}
 
 async function createCards () { // Get the card information and create them
-  // 
+  //
   let response = await fetch('/rooms?types=hostel', {
       method: "GET",
       headers: {
@@ -743,6 +743,7 @@ async function roomAvailability(roomid){
 submitBooking = async(roomid,start,end,price,numOfPeople)=>{
   const temp ='roomid=' + roomid + '&start=' + start + '&end=' + end + '&prince=' + price + '&numberofpeople=' + numOfPeople
   console.log(temp)
+
   //create new hostel booking
   let response = await fetch('/customerhostelbooking',
   {
@@ -818,13 +819,18 @@ window.onload = function() {
     let day1 = Number(start[2]);
     let date1 = new Date(year1,month1,day1);//start date
     //2020-04-25 11:00:00
-    const startDate = Math.floor(date1.getTime() / 1000)
+    let startDate = Math.floor(date1.getTime() / 1000)
 
     let year2 = Number(end[0]);
     let month2 = Number(end[1])-1;
     let day2 = Number(end[2]);
     let date2 = new Date(year2,month2,day2);//end date
-    const endDate = Math.floor(date2.getTime() / 1000)
+    let endDate = Math.floor(date2.getTime() / 1000)
+
+    const offset = date1.getTimezoneOffset();
+
+    startDate -= offset * 60;
+    endDate -= offset * 60;
 
     // price
     totalPriceTemp = Number(totalPrice.innerHTML)
@@ -832,8 +838,7 @@ window.onload = function() {
     // numberofpeople
     numOfPeopleTemp = Number(numOfPeople.innerHTML)
 
-
     // send
-    submitBooking(roomid,startDate,endDate,totalPriceTemp,numOfPeopleTemp);
+    submitBooking(roomid - 1,startDate,endDate,totalPriceTemp,numOfPeopleTemp);
   });
 };

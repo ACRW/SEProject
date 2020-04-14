@@ -244,7 +244,7 @@ function Calender () { // Calender constructor/class
     userBooking["placed"] = false;
     updPayTable(); // update the pay table to reflect that the booking is no long valid in the context
   }
-  
+
   let checkCollision = function(startTime, endTime) {
     for (booking of bookings) {
       if (startTime <= booking["startTime"] && endTime > booking["startTime"]
@@ -352,14 +352,23 @@ function Calender () { // Calender constructor/class
       alert("Please put down a booking. ");
       return;
     }
+
+    let startTime = Math.floor(userBooking["startTime"].getTime()/1000)
+    let endTime = Math.floor(userBooking["endTime"].getTime()/1000)
+
+    const offset = (new Date(userBooking["endTime"].getTime())).getTimezoneOffset();
+
+    startTime -= offset * 60;
+    endTime -= offset * 60;
+
     let response = await fetch('/customercommunitybooking', {
       method: "POST",
       headers: {
       "Content-Type": "application/x-www-form-urlencoded",
       },
       body: "roomid=" + String(curRoom)
-      + "&start=" + Math.floor(userBooking["startTime"].getTime()/1000)
-      + "&end=" + Math.floor(userBooking["endTime"].getTime()/1000)
+      + "&start=" + startTime
+      + "&end=" + endTime
       + "&price=" + String(userBooking["price"])
       });
     console.log(response);
@@ -373,19 +382,19 @@ function Calender () { // Calender constructor/class
   this.setBookingLength = async function(e) { // Sets what the booking length should be
     let lengthDrop = document.getElementById("lengthDrop");
     let newBookLength = lengthDrop.value;
-    
+
     if (!userBooking["placed"]) { // If the user hasnt placed it we don't really have to do/check anything
       userBooking["bookingLength"] = newBookLength;
       userBooking["element"].style.height = String((userBooking["bookingLength"]/60) * 50) + "px";
       peekElement.style.height = String((userBooking["bookingLength"]/60) * 50) + "px";
       return;
     }
-    
+
     // Update end time
     let endTime = new Date();
     endTime.setTime(userBooking["startTime"].getTime()); // Calculate dat ethat the thing ends
     endTime.setMinutes(endTime.getMinutes() + parseInt(newBookLength));
-    
+
     // Check that selecting a longer time doesn't collide with another slot
     if (newBookLength > userBooking["bookingLength"]
       && checkCollision(userBooking["startTime"], endTime)) {
@@ -393,7 +402,7 @@ function Calender () { // Calender constructor/class
       alert("You cannot change to a longer booking time as there is a slot ahead of yours. ");
       return;
     }
-    
+
     userBooking["bookingLength"] = newBookLength;
     userBooking["price"] = rooms[curRoom]["pricePerHour"] * userBooking["bookingLength"]/60;
     userBooking["element"].style.height = String((userBooking["bookingLength"]/60) * 50) + "px";
