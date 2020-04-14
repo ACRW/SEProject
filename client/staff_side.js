@@ -68,7 +68,7 @@ var d = n.getDate();
 var day = n.getDay();
 
 //on loading of content
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", async function () {
     // make call to API
     let response = await fetch('/currentuser',
     {
