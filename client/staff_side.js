@@ -2227,11 +2227,12 @@ async function fillCalender(){
 
       //go through activity bookings
       for(var i = 0; i<bookings['activity'].length; i++){
-        console.log(bookings)
+
             for(var j = 1; j< 8; j++){
 
-               if((bookings['activity'][i].dateTime.substring(8,10)+'/'+bookings['activity'][i].dateTime.substring(5,7)).toString()==document.getElementById('day' + j).textContent.toString()){
-                    document.getElementById('day' + j + 'A').innerHTML += 'Start Time: ' + bookings['activity'][i].datetime.substring(11,16) + '\n'
+               if((bookings['activity'][i].dateTime.substring(8,10)+'/'+bookings['activity'][i].dateTime.substring(5,7)).toString()==document.getElementById('cday' + j).textContent.toString()){
+                    console.log("yes")
+                    document.getElementById('day' + j + 'A').innerHTML += 'Start Time: ' + bookings['activity'][i].dateTime.substring(11,16) + '\n'
                     document.getElementById('day' + j + 'A').innerHTML += '  Number of People: ' + bookings['activity'].numberOfPeople
 
                 }
@@ -2243,13 +2244,13 @@ async function fillCalender(){
             for(var j = 1; j< 8; j++){
 
               //put start date in calender
-               if((bookings['hostel'][i].startDate.substring(8,10)+'/'+bookings['hostel'][i].startDate.substring(5,7)).toString()==document.getElementById('day' + j).textContent.toString()){
+               if((bookings['hostel'][i].startDate.substring(8,10)+'/'+bookings['hostel'][i].startDate.substring(5,7)).toString()==document.getElementById('cday' + j).textContent.toString()){
                     document.getElementById('day' + j + 'H').innerHTML += ' Start of Booking for ' + bookings['activity'].noOfPeople + ' people'
 
               }
 
               //put end date in calender
-              if((bookings['hostel'][i].endDate.substring(8,10)+'/'+bookings['hostel'][i].endDate.substring(5,7)).toString()==document.getElementById('day' + j).textContent.toString()){
+              if((bookings['hostel'][i].endDate.substring(8,10)+'/'+bookings['hostel'][i].endDate.substring(5,7)).toString()==document.getElementById('cday' + j).textContent.toString()){
                    document.getElementById('day' + j + 'H').innerHTML += ' End of Booking for ' + bookings['hostel'].noOfPeople + ' people'
 
                }
