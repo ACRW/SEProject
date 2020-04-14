@@ -2,7 +2,7 @@ let roomCards = {} // Keeps track of all the activity card classes
 let rooms = {}
 
 async function createCards () { // Get the card information and create them
-  // http://localhost:8090/rooms?types=hostel
+  // 
   let response = await fetch('/rooms?types=hostel', {
       method: "GET",
       headers: {
